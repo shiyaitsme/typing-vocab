@@ -291,6 +291,18 @@ let debugOn = false;
 let isComposingNow = false;
 let pendingAdvance = false;
 
+// Force the caret to the end of the input's current value. Debug traces showed
+// new characters landing at index 0 instead of being appended (e.g. typing
+// "서" then "울" produced "울서", not "서울") — classic symptom of the caret
+// sitting at position 0 instead of following the typed text. Call this after
+// every focus() and after every direct value assignment, so the next native
+// keystroke or IME commit always inserts at the end where it belongs.
+function focusAtEnd(){
+  typer.focus();
+  const len = typer.value.length;
+  typer.setSelectionRange(len, len);
+}
+
 const typer = document.getElementById('typer');
 const syllablesEl = document.getElementById('syllables');
 const meaningEl = document.getElementById('meaning');
@@ -381,7 +393,8 @@ function render(){
 
   if(debugOn){
     const codepoints = Array.from(typed).map(c => c.codePointAt(0).toString(16)).join(' ');
-    debugLineEl.textContent = 'target="' + target + '" typed="' + typed + '" (len ' + typed.length + ') [' + codepoints + '] composing=' + isComposingNow;
+    const sel = 'sel=' + typer.selectionStart + '-' + typer.selectionEnd;
+    debugLineEl.textContent = 'target="' + target + '" typed="' + typed + '" (len ' + typed.length + ') [' + codepoints + '] composing=' + isComposingNow + ' ' + sel;
   }
 
   // track strip
@@ -448,6 +461,7 @@ function nextWord(){
     return;
   }
   render();
+  focusAtEnd();
 }
 
 function finishRound(){
@@ -463,7 +477,7 @@ function restart(){
   typer.value = '';
   doneScreen.classList.remove('show');
   render();
-  typer.focus();
+  focusAtEnd();
 }
 
 /* ---------- Input handling ---------- */
@@ -485,6 +499,13 @@ typer.addEventListener('input', () => {
   // DOM work mid-event can, on some browser/IME combinations, disturb the
   // Hangul composition session that's still in progress for this keystroke.
   requestAnimationFrame(() => {
+    // Belt-and-suspenders: re-assert the caret at the end after every
+    // keystroke (but never while an IME composition is still in progress,
+    // to avoid disturbing it) in case something keeps dragging it back to 0.
+    if(!isComposingNow){
+      const len = typer.value.length;
+      typer.setSelectionRange(len, len);
+    }
     render();
     const target = currentWord();
     const typed = typer.value;
@@ -506,9 +527,9 @@ typer.addEventListener('input', () => {
   });
 });
 
-document.getElementById('stage').addEventListener('click', () => typer.focus());
+document.getElementById('stage').addEventListener('click', () => focusAtEnd());
 document.addEventListener('click', (e) => {
-  if(!doneScreen.contains(e.target) && document.activeElement !== typer) typer.focus();
+  if(!doneScreen.contains(e.target) && document.activeElement !== typer) focusAtEnd();
 });
 
 document.getElementById('modeKo').addEventListener('click', () => setMode('ko'));
@@ -535,7 +556,7 @@ document.getElementById('restartBtn').addEventListener('click', restart);
 
 /* ---------- Init ---------- */
 render();
-typer.focus();
+focusAtEnd();
 </script>
 </body>
 </html>
