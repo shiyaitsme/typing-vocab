@@ -288,6 +288,7 @@ let correctKeys = 0, totalKeys = 0;
 let startTime = null;
 let soundOn = true;
 let debugOn = false;
+let isComposingNow = false;
 
 const typer = document.getElementById('typer');
 const syllablesEl = document.getElementById('syllables');
@@ -379,7 +380,7 @@ function render(){
 
   if(debugOn){
     const codepoints = Array.from(typed).map(c => c.codePointAt(0).toString(16)).join(' ');
-    debugLineEl.textContent = 'target="' + target + '" typed="' + typed + '" (len ' + typed.length + ') [' + codepoints + ']';
+    debugLineEl.textContent = 'target="' + target + '" typed="' + typed + '" (len ' + typed.length + ') [' + codepoints + '] composing=' + isComposingNow;
   }
 
   // track strip
@@ -451,32 +452,42 @@ function restart(){
 }
 
 /* ---------- Input handling ---------- */
+typer.addEventListener('compositionstart', () => { isComposingNow = true; });
+typer.addEventListener('compositionend', () => { isComposingNow = false; if(debugOn) render(); });
+
 typer.addEventListener('input', () => {
   if(!startTime) startTime = Date.now();
   totalKeys++;
-  render();
-  // score: was the just-typed char correct at its position?
-  const target = currentWord();
-  const typed = typer.value;
-  const i = typed.length - 1;
-  if(i >= 0 && i < target.length){
-    let ok = false;
-    if(mode === 'en'){
-      ok = typed[i].toLowerCase() === target[i].toLowerCase();
-    } else {
-      const td = decomposeSyllable(target[i]);
-      const yd = decomposeSyllable(typed[i]);
-      if(td && yd) ok = (yd.cho===td.cho && yd.jung===td.jung && yd.jong===td.jong);
+  // Defer the DOM-heavy render (and everything downstream) to the next frame
+  // instead of running it synchronously inside the input handler. Doing heavy
+  // DOM work mid-event can, on some browser/IME combinations, disturb the
+  // Hangul composition session that's still in progress for this keystroke.
+  requestAnimationFrame(() => {
+    render();
+    const target = currentWord();
+    const typed = typer.value;
+    const i = typed.length - 1;
+    if(i >= 0 && i < target.length){
+      let ok = false;
+      if(mode === 'en'){
+        ok = typed[i].toLowerCase() === target[i].toLowerCase();
+      } else {
+        const td = decomposeSyllable(target[i]);
+        const yd = decomposeSyllable(typed[i]);
+        if(td && yd) ok = (yd.cho===td.cho && yd.jung===td.jung && yd.jong===td.jong);
+      }
+      if(ok){ correctKeys++; beep(880,0.06); } else { beep(220,0.08); }
     }
-    if(ok){ correctKeys++; beep(880,0.06); } else { beep(220,0.08); }
-  }
-  if(isWordComplete()){
-    setTimeout(nextWord, 150);
-  }
+    if(isWordComplete()){
+      setTimeout(nextWord, 150);
+    }
+  });
 });
 
 document.getElementById('stage').addEventListener('click', () => typer.focus());
-document.addEventListener('click', (e) => { if(!doneScreen.contains(e.target)) typer.focus(); });
+document.addEventListener('click', (e) => {
+  if(!doneScreen.contains(e.target) && document.activeElement !== typer) typer.focus();
+});
 
 document.getElementById('modeKo').addEventListener('click', () => setMode('ko'));
 document.getElementById('modeEn').addEventListener('click', () => setMode('en'));
