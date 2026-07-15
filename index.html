@@ -289,6 +289,7 @@ let startTime = null;
 let soundOn = true;
 let debugOn = false;
 let isComposingNow = false;
+let pendingAdvance = false;
 
 const typer = document.getElementById('typer');
 const syllablesEl = document.getElementById('syllables');
@@ -426,6 +427,20 @@ function isWordComplete(){
 }
 
 function nextWord(){
+  // Guards against being invoked twice for the same completed word (once
+  // from the deferred setTimeout, once from compositionend) — after the
+  // first successful advance, the target word has changed and the input
+  // has been cleared, so this check naturally fails on the stale call.
+  if(!isWordComplete()) return;
+  // Never reset the input's value while the browser still has an active
+  // Hangul composition session open (isComposingNow) — doing so desyncs the
+  // IME's internal composition anchor from the (now-cleared) DOM value,
+  // and every subsequent keystroke gets inserted at the wrong position
+  // (observed as new characters piling up at the front of the string).
+  if(isComposingNow){
+    pendingAdvance = true;
+    return;
+  }
   idx++;
   typer.value = '';
   if(idx >= list.length){
@@ -453,7 +468,14 @@ function restart(){
 
 /* ---------- Input handling ---------- */
 typer.addEventListener('compositionstart', () => { isComposingNow = true; });
-typer.addEventListener('compositionend', () => { isComposingNow = false; if(debugOn) render(); });
+typer.addEventListener('compositionend', () => {
+  isComposingNow = false;
+  if(pendingAdvance){
+    pendingAdvance = false;
+    nextWord();
+  }
+  if(debugOn) render();
+});
 
 typer.addEventListener('input', () => {
   if(!startTime) startTime = Date.now();
