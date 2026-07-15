@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typing Vocab — 打字背单词</title>
+<style>
+  :root{
+    --blue:#1a56c4;
+    --blue-dark:#123e91;
+    --bg:#f4f6f9;
+    --gray:#c7cbd1;
+    --gray-dark:#8a8f98;
+    --green:#2fa84f;
+    --red:#e0453c;
+    --ink:#22262c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+    font-family:"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
+    display:flex; flex-direction:column;
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; background:#fff; border-bottom:1px solid #e4e7eb;
+    flex-wrap:wrap; gap:10px;
+  }
+  .topbar h1{font-size:16px; letter-spacing:2px; margin:0; color:var(--blue);}
+  .topbar .right{display:flex; align-items:center; gap:16px; font-size:13px; color:var(--gray-dark);}
+  .topbar button{
+    border:1px solid var(--blue); background:#fff; color:var(--blue);
+    border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer;
+  }
+  .topbar button.active{background:var(--blue); color:#fff;}
+  .progress-track{width:160px; height:6px; background:#e4e7eb; border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--blue); width:0%; transition:width .25s;}
+
+  .stage{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px 20px; gap:28px; cursor:text;
+  }
+  .ghost-hint{
+    min-height:22px; font-size:15px; color:var(--gray-dark); letter-spacing:6px;
+  }
+  .syllables{display:flex; gap:22px; align-items:flex-end;}
+  .syl-group{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .syl-char{
+    font-size:64px; font-weight:700; color:var(--gray);
+    min-width:1em; text-align:center; line-height:1;
+  }
+  .syl-char.done{color:var(--ink);}
+  .bars{display:flex; gap:5px;}
+  .bar{width:26px; height:5px; border-radius:3px; background:var(--gray);}
+  .bar.correct{background:var(--green);}
+  .bar.wrong{background:var(--red);}
+  .meaning{font-size:16px; color:#555; text-align:center;}
+  .meaning b{color:var(--ink);}
+
+  .track{
+    display:flex; align-items:center; justify-content:center; gap:0;
+    background:var(--blue); border-radius:40px; padding:14px 30px; width:min(880px,92%);
+  }
+  .track .cell{flex:1; display:flex; flex-direction:column; align-items:center; color:#cfe0ff; gap:2px;}
+  .track .cell.current{color:#fff;}
+  .track .cell .w{font-size:20px; font-weight:700;}
+  .track .cell.current .w{font-size:26px;}
+  .track .cell small{font-size:11px; opacity:.8;}
+  .track .sep{width:1px; align-self:stretch; background:rgba(255,255,255,.25); margin:0 6px;}
+
+  #typer{
+    position:fixed; opacity:0; pointer-events:none; top:0; left:0; width:1px; height:1px;
+  }
+
+  .stats{
+    display:flex; gap:26px; justify-content:center; padding:14px; background:#fff;
+    border-top:1px solid #e4e7eb; font-size:13px; color:var(--gray-dark);
+  }
+  .stats b{color:var(--ink); font-size:15px;}
+
+  .done-screen{
+    position:fixed; inset:0; background:rgba(20,25,35,.75); display:none;
+    align-items:center; justify-content:center; z-index:10;
+  }
+  .done-screen.show{display:flex;}
+  .done-card{
+    background:#fff; padding:32px 40px; border-radius:14px; text-align:center; min-width:260px;
+  }
+  .done-card h2{margin-top:0;}
+  .done-card button{
+    margin-top:16px; background:var(--blue); color:#fff; border:none; border-radius:20px;
+    padding:10px 22px; font-size:14px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>TYPING VOCAB</h1>
+    <div class="right">
+      <button id="modeKo" class="active">한국어</button>
+      <button id="modeEn">English</button>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="progressLabel">0 / 0</span>
+      <span>정확도 <b id="accLabel">0%</b></span>
+      <button id="soundBtn">🔊 소리</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="ghost-hint" id="ghostHint"></div>
+    <div class="syllables" id="syllables"></div>
+    <div class="meaning" id="meaning"></div>
+  </div>
+
+  <div class="track">
+    <div class="cell" id="prevCell"><div class="w"></div><small></small></div>
+    <div class="sep"></div>
+    <div class="cell current" id="curCell"><div class="w"></div><small></small></div>
+    <div class="sep"></div>
+    <div class="cell" id="nextCell"><div class="w"></div><small></small></div>
+  </div>
+
+  <input id="typer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+
+  <div class="stats">
+    <div>속도(타/분) <b id="speedLabel">0</b></div>
+    <div>경과 <b id="timeLabel">00:00</b></div>
+  </div>
+
+  <div class="done-screen" id="doneScreen">
+    <div class="done-card">
+      <h2>완료! 🎉</h2>
+      <p>정확도 <b id="finalAcc">0%</b> · 속도 <b id="finalSpeed">0</b> 타/분</p>
+      <button id="restartBtn">다시하기 / Restart</button>
+    </div>
+  </div>
+
+<script>
+/* ---------- Hangul jamo tables ---------- */
+const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
+const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+
+function decomposeSyllable(ch){
+  if(!ch) return null;
+  const code = ch.codePointAt(0) - 0xAC00;
+  if(code < 0 || code > 11171) return null; // not a composed hangul syllable
+  const jong = code % 28;
+  const jung = Math.floor(code / 28) % 21;
+  const cho = Math.floor(code / 28 / 21);
+  return { cho: CHO[cho], jung: JUNG[jung], jong: JONG[jong] };
+}
+// standalone (still-composing) jamo characters live in the compatibility block
+function jamoRole(ch){
+  if(CHO.includes(ch)) return 'cho';
+  if(JUNG.includes(ch)) return 'jung';
+  return null;
+}
+
+/* ---------- Word lists ---------- */
+const WORDS_KO = [
+  ["사과","苹果"],["사랑","爱"],["학교","学校"],["친구","朋友"],["감사","感谢"],
+  ["음식","食物"],["날씨","天气"],["시간","时间"],["여행","旅行"],["공부","学习"],
+  ["가족","家人"],["행복","幸福"],["문제","问题"],["생각","想法"],["사람","人"],
+  ["물건","东西"],["자유","自由"],["취미","爱好"],["계획","计划"],["경험","经验"],
+  ["운동","运动"],["음악","音乐"],["영화","电影"],["병원","医院"],["은행","银行"],
+  ["서울","首尔"],["한국","韩国"],["학생","学生"],["선생","老师"],["방학","放假"]
+];
+const WORDS_EN = [
+  ["apple","苹果"],["banana","香蕉"],["orange","橙子"],["guitar","吉他"],["mountain","山"],
+  ["river","河流"],["computer","电脑"],["keyboard","键盘"],["elephant","大象"],["giraffe","长颈鹿"],
+  ["holiday","假期"],["weather","天气"],["morning","早晨"],["evening","傍晚"],["kitchen","厨房"],
+  ["window","窗户"],["bicycle","自行车"],["airport","机场"],["hospital","医院"],["teacher","老师"],
+  ["student","学生"],["science","科学"],["history","历史"],["weekend","周末"],["birthday","生日"],
+  ["umbrella","雨伞"],["sandwich","三明治"],["chocolate","巧克力"],["adventure","冒险"],["sunshine","阳光"]
+];
+
+/* ---------- State ---------- */
+let mode = 'ko';
+let list = shuffle(WORDS_KO.slice());
+let idx = 0;
+let correctKeys = 0, totalKeys = 0;
+let startTime = null;
+let soundOn = true;
+
+const typer = document.getElementById('typer');
+const syllablesEl = document.getElementById('syllables');
+const ghostHintEl = document.getElementById('ghostHint');
+const meaningEl = document.getElementById('meaning');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const accLabel = document.getElementById('accLabel');
+const speedLabel = document.getElementById('speedLabel');
+const timeLabel = document.getElementById('timeLabel');
+const prevCell = document.getElementById('prevCell');
+const curCell = document.getElementById('curCell');
+const nextCell = document.getElementById('nextCell');
+const doneScreen = document.getElementById('doneScreen');
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+/* ---------- Audio (tiny beep, no assets) ---------- */
+let actx;
+function beep(freq, dur){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = freq; o.type = 'sine';
+    g.gain.value = 0.05;
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + dur);
+  }catch(e){}
+}
+
+/* ---------- Rendering ---------- */
+function currentWord(){ return list[idx][0]; }
+function currentMeaning(){ return list[idx][1]; }
+
+function render(){
+  const target = currentWord();
+  const typed = typer.value;
+  syllablesEl.innerHTML = '';
+
+  let ghostChar = '';
+
+  for(let i=0;i<target.length;i++){
+    const tChar = target[i];
+    const tDecomp = decomposeSyllable(tChar);
+    const group = document.createElement('div');
+    group.className = 'syl-group';
+
+    const charEl = document.createElement('div');
+    charEl.className = 'syl-char';
+    charEl.textContent = tChar;
+
+    const barsEl = document.createElement('div');
+    barsEl.className = 'bars';
+
+    const typedChar = typed[i];
+    const isComposingHere = (i === typed.length - 1);
+    const started = typedChar !== undefined;
+
+    if(!tDecomp){
+      // literal (non-hangul / non-letter) char, e.g. punctuation - single bar
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      if(started) bar.classList.add(typedChar === tChar ? 'correct' : 'wrong');
+      barsEl.appendChild(bar);
+      if(started && typedChar === tChar) charEl.classList.add('done');
+    } else {
+      const tDecomp2 = tDecomp;
+      const parts = tDecomp2.jong ? ['cho','jung','jong'] : ['cho','jung'];
+      let tDecTyped = started ? decomposeSyllable(typedChar) : null;
+      let soloRole = (!tDecTyped && started) ? jamoRole(typedChar) : null;
+
+      parts.forEach((part, pIdx) => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        if(started){
+          let state = 'pending';
+          const isLastPart = pIdx === parts.length - 1;
+          if(tDecTyped){
+            const typedVal = tDecTyped[part];
+            if(part === 'jong'){
+              if(!isComposingHere){
+                state = (typedVal === tDecomp2.jong) ? 'correct' : 'wrong';
+              } else {
+                state = typedVal ? (typedVal === tDecomp2.jong ? 'correct':'wrong') : 'pending';
+              }
+            } else {
+              state = (typedVal === tDecomp2[part]) ? 'correct' : 'wrong';
+            }
+          } else if(soloRole){
+            if(part === 'cho') state = (soloRole === 'cho') ? (typedChar === tDecomp2.cho ? 'correct':'wrong') : 'pending';
+            else if(part === 'jung') state = (soloRole === 'jung') ? (typedChar === tDecomp2.jung ? 'correct':'wrong') : 'pending';
+          } else if(!isComposingHere){
+            state = 'wrong'; // typed something unrecognizable for a settled position
+          }
+          if(state !== 'pending') bar.classList.add(state);
+        }
+        barsEl.appendChild(bar);
+      });
+
+      if(started && tDecTyped && tDecTyped.cho===tDecomp2.cho && tDecTyped.jung===tDecomp2.jung && tDecTyped.jong===tDecomp2.jong){
+        charEl.classList.add('done');
+      }
+    }
+
+    group.appendChild(charEl);
+    group.appendChild(barsEl);
+    syllablesEl.appendChild(group);
+
+    if(i === typed.length){ ghostChar = tChar; } // next char to type -> show as ghost hint
+  }
+
+  ghostHintEl.textContent = ghostChar ? ('다음: ' + ghostChar) : '';
+  meaningEl.innerHTML = '뜻: <b>' + currentMeaning() + '</b>';
+
+  // track strip
+  const prev = list[idx-1], next = list[idx+1];
+  prevCell.querySelector('.w').textContent = prev ? prev[0] : '';
+  prevCell.querySelector('small').textContent = prev ? prev[1] : '';
+  curCell.querySelector('.w').textContent = target;
+  curCell.querySelector('small').textContent = currentMeaning();
+  nextCell.querySelector('.w').textContent = next ? next[0] : '';
+  nextCell.querySelector('small').textContent = next ? next[1] : '';
+
+  progressLabel.textContent = (idx) + ' / ' + list.length;
+  progressFill.style.width = (100 * idx / list.length) + '%';
+  const acc = totalKeys ? Math.round(100 * correctKeys / totalKeys) : 0;
+  accLabel.textContent = acc + '%';
+}
+
+function updateStats(){
+  if(!startTime) return;
+  const elapsedMs = Date.now() - startTime;
+  const mins = elapsedMs / 60000;
+  speedLabel.textContent = mins > 0 ? Math.round(correctKeys / mins) : 0;
+  const s = Math.floor(elapsedMs/1000);
+  timeLabel.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
+setInterval(updateStats, 500);
+
+function isWordComplete(){
+  const target = currentWord();
+  const typed = typer.value;
+  if(mode === 'en'){
+    return typed.toLowerCase() === target.toLowerCase();
+  }
+  if(typed.length !== target.length) return false;
+  for(let i=0;i<target.length;i++){
+    const td = decomposeSyllable(target[i]);
+    const yd = decomposeSyllable(typed[i]);
+    if(td){
+      if(!yd || yd.cho!==td.cho || yd.jung!==td.jung || yd.jong!==td.jong) return false;
+    } else if(target[i] !== typed[i]) return false;
+  }
+  return true;
+}
+
+function nextWord(){
+  idx++;
+  typer.value = '';
+  if(idx >= list.length){
+    finishRound();
+    return;
+  }
+  render();
+}
+
+function finishRound(){
+  const acc = totalKeys ? Math.round(100*correctKeys/totalKeys) : 0;
+  document.getElementById('finalAcc').textContent = acc + '%';
+  document.getElementById('finalSpeed').textContent = speedLabel.textContent;
+  doneScreen.classList.add('show');
+}
+
+function restart(){
+  list = shuffle((mode==='ko'?WORDS_KO:WORDS_EN).slice());
+  idx = 0; correctKeys = 0; totalKeys = 0; startTime = null;
+  typer.value = '';
+  doneScreen.classList.remove('show');
+  render();
+  typer.focus();
+}
+
+/* ---------- Input handling ---------- */
+typer.addEventListener('input', () => {
+  if(!startTime) startTime = Date.now();
+  totalKeys++;
+  const before = correctKeys;
+  render();
+  // score: was the just-typed char correct at its position?
+  const target = currentWord();
+  const typed = typer.value;
+  const i = typed.length - 1;
+  if(i >= 0 && i < target.length){
+    let ok = false;
+    if(mode === 'en'){
+      ok = typed[i].toLowerCase() === target[i].toLowerCase();
+    } else {
+      const td = decomposeSyllable(target[i]);
+      const yd = decomposeSyllable(typed[i]);
+      if(td && yd) ok = (yd.cho===td.cho && yd.jung===td.jung && yd.jong===td.jong);
+    }
+    if(ok){ correctKeys++; beep(880,0.06); } else { beep(220,0.08); }
+  }
+  if(isWordComplete()){
+    setTimeout(nextWord, 150);
+  }
+});
+
+document.getElementById('stage').addEventListener('click', () => typer.focus());
+document.addEventListener('click', (e) => { if(!doneScreen.contains(e.target)) typer.focus(); });
+
+document.getElementById('modeKo').addEventListener('click', () => setMode('ko'));
+document.getElementById('modeEn').addEventListener('click', () => setMode('en'));
+function setMode(m){
+  mode = m;
+  document.getElementById('modeKo').classList.toggle('active', m==='ko');
+  document.getElementById('modeEn').classList.toggle('active', m==='en');
+  restart();
+}
+
+document.getElementById('soundBtn').addEventListener('click', (e) => {
+  soundOn = !soundOn;
+  e.target.textContent = soundOn ? '🔊 소리' : '🔇 소리';
+});
+
+document.getElementById('restartBtn').addEventListener('click', restart);
+
+/* ---------- Init ---------- */
+render();
+typer.focus();
+</script>
+</body>
+</html>
