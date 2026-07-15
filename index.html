@@ -9,9 +9,9 @@
     --blue:#1a56c4;
     --blue-dark:#123e91;
     --bg:#f4f6f9;
-    --gray:#c7cbd1;
+    --gray-light:#c7cbd1;
+    --gray-mid:#52565c;
     --gray-dark:#8a8f98;
-    --green:#2fa84f;
     --red:#e0453c;
     --ink:#22262c;
   }
@@ -40,19 +40,19 @@
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:40px 20px; gap:28px; cursor:text;
   }
-  .ghost-hint{
-    min-height:22px; font-size:15px; color:var(--gray-dark); letter-spacing:6px;
-  }
   .syllables{display:flex; gap:22px; align-items:flex-end;}
-  .syl-group{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .syl-group{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .syl-hint{font-size:14px; color:var(--gray-dark); min-height:18px; letter-spacing:1px;}
   .syl-char{
-    font-size:64px; font-weight:700; color:var(--gray);
+    font-size:64px; font-weight:700;
     min-width:1em; text-align:center; line-height:1;
   }
-  .syl-char.done{color:var(--ink);}
+  .syl-char.preview{color:var(--gray-light);}
+  .syl-char.correct{color:var(--gray-mid);}
+  .syl-char.wrong{color:var(--red);}
   .bars{display:flex; gap:5px;}
-  .bar{width:26px; height:5px; border-radius:3px; background:var(--gray);}
-  .bar.correct{background:var(--green);}
+  .bar{width:26px; height:5px; border-radius:3px; background:var(--gray-light);}
+  .bar.correct{background:var(--gray-mid);}
   .bar.wrong{background:var(--red);}
   .meaning{font-size:16px; color:#555; text-align:center;}
   .meaning b{color:var(--ink);}
@@ -107,7 +107,6 @@
   </div>
 
   <div class="stage" id="stage">
-    <div class="ghost-hint" id="ghostHint"></div>
     <div class="syllables" id="syllables"></div>
     <div class="meaning" id="meaning"></div>
   </div>
@@ -141,6 +140,19 @@ const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","
 const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
 const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
 
+// vowels/finals that take TWO physical keystrokes on a standard 2-beolsik keyboard
+// (they're a single jungseong/jongseong in Unicode, but two key presses to type)
+const COMPOUND_JUNG = {
+  "ㅘ":["ㅗ","ㅏ"], "ㅙ":["ㅗ","ㅐ"], "ㅚ":["ㅗ","ㅣ"],
+  "ㅝ":["ㅜ","ㅓ"], "ㅞ":["ㅜ","ㅔ"], "ㅟ":["ㅜ","ㅣ"],
+  "ㅢ":["ㅡ","ㅣ"]
+};
+const COMPOUND_JONG = {
+  "ㄳ":["ㄱ","ㅅ"], "ㄵ":["ㄴ","ㅈ"], "ㄶ":["ㄴ","ㅎ"],
+  "ㄺ":["ㄹ","ㄱ"], "ㄻ":["ㄹ","ㅁ"], "ㄼ":["ㄹ","ㅂ"],
+  "ㄽ":["ㄹ","ㅅ"], "ㄾ":["ㄹ","ㅌ"], "ㄿ":["ㄹ","ㅍ"], "ㅀ":["ㄹ","ㅎ"]
+};
+
 function decomposeSyllable(ch){
   if(!ch) return null;
   const code = ch.codePointAt(0) - 0xAC00;
@@ -155,6 +167,91 @@ function jamoRole(ch){
   if(CHO.includes(ch)) return 'cho';
   if(JUNG.includes(ch)) return 'jung';
   return null;
+}
+
+// how many keystroke "slots" (bars) a target character needs, and what each slot expects
+function getSlots(targetChar){
+  const d = decomposeSyllable(targetChar);
+  if(!d) return [{ type:'literal', expected: targetChar }];
+  const slots = [{ type:'cho', expected: d.cho }];
+  if(COMPOUND_JUNG[d.jung]){
+    const [a,b] = COMPOUND_JUNG[d.jung];
+    slots.push({ type:'jung1', expected:a }, { type:'jung2', expected:b });
+  } else {
+    slots.push({ type:'jung', expected: d.jung });
+  }
+  if(d.jong){
+    if(COMPOUND_JONG[d.jong]){
+      const [a,b] = COMPOUND_JONG[d.jong];
+      slots.push({ type:'jong1', expected:a }, { type:'jong2', expected:b });
+    } else {
+      slots.push({ type:'jong', expected: d.jong });
+    }
+  }
+  return slots;
+}
+
+// state ('pending'/'correct'/'wrong') for each slot, given what's typed so far at this position
+function evaluateSlots(targetChar, typedChar, isComposingHere){
+  const slots = getSlots(targetChar);
+  if(typedChar === undefined) return slots.map(() => 'pending');
+
+  const d = decomposeSyllable(targetChar);
+  if(!d){
+    return [ typedChar === targetChar ? 'correct' : 'wrong' ];
+  }
+
+  const yd = decomposeSyllable(typedChar);
+  if(!yd){
+    // typed value is still a bare (uncombined) jamo, e.g. mid-composition before a vowel lands
+    const role = jamoRole(typedChar);
+    return slots.map(s => {
+      if(s.type === 'cho') return role === 'cho' ? (typedChar === s.expected ? 'correct' : 'wrong') : 'pending';
+      if(s.type === 'jung' || s.type === 'jung1') return role === 'jung' ? (typedChar === s.expected ? 'correct' : 'wrong') : 'pending';
+      return 'pending';
+    });
+  }
+
+  const results = [ yd.cho === d.cho ? 'correct' : 'wrong' ];
+
+  const jungCompound = COMPOUND_JUNG[d.jung];
+  if(jungCompound){
+    const [a] = jungCompound;
+    if(isComposingHere && yd.jung !== d.jung){
+      results.push(yd.jung ? (yd.jung === a ? 'correct' : 'wrong') : 'pending');
+      results.push('pending');
+    } else {
+      const ok = yd.jung === d.jung;
+      results.push(ok ? 'correct' : 'wrong', ok ? 'correct' : 'wrong');
+    }
+  } else {
+    if(isComposingHere && !yd.jung){
+      results.push('pending');
+    } else {
+      results.push(yd.jung === d.jung ? 'correct' : 'wrong');
+    }
+  }
+
+  if(d.jong){
+    const jongCompound = COMPOUND_JONG[d.jong];
+    if(jongCompound){
+      const [a] = jongCompound;
+      if(isComposingHere && yd.jong !== d.jong){
+        results.push(yd.jong ? (yd.jong === a ? 'correct' : 'wrong') : 'pending');
+        results.push('pending');
+      } else {
+        const ok = yd.jong === d.jong;
+        results.push(ok ? 'correct' : 'wrong', ok ? 'correct' : 'wrong');
+      }
+    } else {
+      if(isComposingHere && !yd.jong){
+        results.push('pending');
+      } else {
+        results.push(yd.jong === d.jong ? 'correct' : 'wrong');
+      }
+    }
+  }
+  return results;
 }
 
 /* ---------- Word lists ---------- */
@@ -185,7 +282,6 @@ let soundOn = true;
 
 const typer = document.getElementById('typer');
 const syllablesEl = document.getElementById('syllables');
-const ghostHintEl = document.getElementById('ghostHint');
 const meaningEl = document.getElementById('meaning');
 const progressFill = document.getElementById('progressFill');
 const progressLabel = document.getElementById('progressLabel');
@@ -228,79 +324,47 @@ function render(){
   const typed = typer.value;
   syllablesEl.innerHTML = '';
 
-  let ghostChar = '';
-
   for(let i=0;i<target.length;i++){
     const tChar = target[i];
-    const tDecomp = decomposeSyllable(tChar);
-    const group = document.createElement('div');
-    group.className = 'syl-group';
-
-    const charEl = document.createElement('div');
-    charEl.className = 'syl-char';
-    charEl.textContent = tChar;
-
-    const barsEl = document.createElement('div');
-    barsEl.className = 'bars';
-
     const typedChar = typed[i];
     const isComposingHere = (i === typed.length - 1);
     const started = typedChar !== undefined;
+    const states = evaluateSlots(tChar, typedChar, isComposingHere);
+    const hasWrong = states.includes('wrong');
 
-    if(!tDecomp){
-      // literal (non-hangul / non-letter) char, e.g. punctuation - single bar
-      const bar = document.createElement('div');
-      bar.className = 'bar';
-      if(started) bar.classList.add(typedChar === tChar ? 'correct' : 'wrong');
-      barsEl.appendChild(bar);
-      if(started && typedChar === tChar) charEl.classList.add('done');
+    const group = document.createElement('div');
+    group.className = 'syl-group';
+
+    // small correct-answer hint, only while this exact syllable is actively being typed
+    const hintEl = document.createElement('div');
+    hintEl.className = 'syl-hint';
+    hintEl.textContent = (started && isComposingHere) ? tChar : '';
+
+    // big display: hide the answer once typing starts here — show what was actually
+    // typed instead (colored by correctness), not the target itself
+    const charEl = document.createElement('div');
+    if(started){
+      charEl.textContent = typedChar;
+      charEl.className = 'syl-char ' + (hasWrong ? 'wrong' : 'correct');
     } else {
-      const tDecomp2 = tDecomp;
-      const parts = tDecomp2.jong ? ['cho','jung','jong'] : ['cho','jung'];
-      let tDecTyped = started ? decomposeSyllable(typedChar) : null;
-      let soloRole = (!tDecTyped && started) ? jamoRole(typedChar) : null;
-
-      parts.forEach((part, pIdx) => {
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        if(started){
-          let state = 'pending';
-          const isLastPart = pIdx === parts.length - 1;
-          if(tDecTyped){
-            const typedVal = tDecTyped[part];
-            if(part === 'jong'){
-              if(!isComposingHere){
-                state = (typedVal === tDecomp2.jong) ? 'correct' : 'wrong';
-              } else {
-                state = typedVal ? (typedVal === tDecomp2.jong ? 'correct':'wrong') : 'pending';
-              }
-            } else {
-              state = (typedVal === tDecomp2[part]) ? 'correct' : 'wrong';
-            }
-          } else if(soloRole){
-            if(part === 'cho') state = (soloRole === 'cho') ? (typedChar === tDecomp2.cho ? 'correct':'wrong') : 'pending';
-            else if(part === 'jung') state = (soloRole === 'jung') ? (typedChar === tDecomp2.jung ? 'correct':'wrong') : 'pending';
-          } else if(!isComposingHere){
-            state = 'wrong'; // typed something unrecognizable for a settled position
-          }
-          if(state !== 'pending') bar.classList.add(state);
-        }
-        barsEl.appendChild(bar);
-      });
-
-      if(started && tDecTyped && tDecTyped.cho===tDecomp2.cho && tDecTyped.jung===tDecomp2.jung && tDecTyped.jong===tDecomp2.jong){
-        charEl.classList.add('done');
-      }
+      charEl.textContent = tChar;
+      charEl.className = 'syl-char preview';
     }
 
+    const barsEl = document.createElement('div');
+    barsEl.className = 'bars';
+    states.forEach(state => {
+      const bar = document.createElement('div');
+      bar.className = 'bar' + (state !== 'pending' ? (' ' + state) : '');
+      barsEl.appendChild(bar);
+    });
+
+    group.appendChild(hintEl);
     group.appendChild(charEl);
     group.appendChild(barsEl);
     syllablesEl.appendChild(group);
-
-    if(i === typed.length){ ghostChar = tChar; } // next char to type -> show as ghost hint
   }
 
-  ghostHintEl.textContent = ghostChar ? ('다음: ' + ghostChar) : '';
   meaningEl.innerHTML = '뜻: <b>' + currentMeaning() + '</b>';
 
   // track strip
@@ -375,7 +439,6 @@ function restart(){
 typer.addEventListener('input', () => {
   if(!startTime) startTime = Date.now();
   totalKeys++;
-  const before = correctKeys;
   render();
   // score: was the just-typed char correct at its position?
   const target = currentWord();
