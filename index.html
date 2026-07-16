@@ -910,7 +910,7 @@
 
     if(mode==='ko'){
       koRow.style.display='flex'; enRow.style.display='none';
-      romanizationEl.textContent = dictation ? '???' : (KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'');
+      romanizationEl.textContent = KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'';
       koRow.innerHTML='';
       let allComplete=koEngine.activeIndex===koEngine.targets.length-1;
       let allCorrect=true;
