@@ -9,73 +9,74 @@
 <style>
   *{box-sizing:border-box;}
   body{margin:0;background:#0a0a0a;}
-  ::selection{background:#e3b8d6;color:#0a0a0a;}
-  input::placeholder, textarea::placeholder{color:rgba(242,237,226,.35);}
-  a{color:#e3b8d6;}
-  a:hover{color:#f2ede2;}
+  ::selection{background:var(--accent);color:var(--accent-ink);}
+  input::placeholder, textarea::placeholder{color:rgba(var(--ink-rgb),.35);}
+  a{color:var(--accent);}
+  a:hover{color:rgb(var(--ink-rgb));}
   ::-webkit-scrollbar{width:10px;}
   ::-webkit-scrollbar-track{background:#0a0a0a;}
   ::-webkit-scrollbar-thumb{background:#2a2a2a;}
-  .tab-btn:hover .tab-glyph{color:#e3b8d6 !important;}
+  .tab-btn:hover .tab-glyph{color:var(--accent) !important;}
   .arrow-btn{transition:background .18s ease,color .18s ease,letter-spacing .18s ease;}
-  .arrow-btn:hover{background:#0a0a0a !important;color:#f2ede2 !important;letter-spacing:.1em;}
+  .arrow-btn:hover{background:#0a0a0a !important;color:rgb(var(--ink-rgb)) !important;letter-spacing:.1em;}
 </style>
 </head>
 <body>
-<div style="min-height:100vh;background:#0a0a0a;color:#f2ede2;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;padding-bottom:40px;">
+<div id="appRoot" style="--bg:#0a0a0a;--bg-rgb:10,10,10;--ink-rgb:242,237,226;--accent:#e3b8d6;--accent-rgb:227,184,214;--accent-ink:#0a0a0a;--input-bg:#141414;--warn:#e07a5f;min-height:100vh;background:var(--bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;overflow-x:hidden;padding-bottom:40px;transition:background .25s ease,color .25s ease;">
 
   <!-- HEADER -->
-  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;border-bottom:1px solid rgba(242,237,226,.14);background:rgba(10,10,10,.88);backdrop-filter:blur(8px);flex-wrap:wrap;">
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;border-bottom:1px solid rgba(var(--ink-rgb),.14);background:rgba(var(--bg-rgb),.88);backdrop-filter:blur(8px);flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:16px;">
-      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em;">TYPE<span style="color:#e3b8d6;">/</span>TRAINER</div>
-      <div id="headerTagline" data-i18n="tagline" style="font-size:10.5px;letter-spacing:.08em;color:rgba(242,237,226,.5);font-weight:500;white-space:nowrap;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em;">TYPE<span style="color:var(--accent);">/</span>TRAINER</div>
+      <div id="headerTagline" data-i18n="tagline" style="font-size:10.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.5);font-weight:500;white-space:nowrap;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
     </div>
     <div id="tabs" style="display:flex;gap:14px;font-size:11px;letter-spacing:.05em;font-weight:600;">
-      <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#f2ede2;">
-        <span class="tab-glyph" data-mode="ko" style="color:#e3b8d6;transition:color .15s ease;">■</span>한국어
+      <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgb(var(--ink-rgb));">
+        <span class="tab-glyph" data-mode="ko" style="color:var(--accent);transition:color .15s ease;">■</span>한국어
       </button>
-      <button class="tab-btn" data-mode="en" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(242,237,226,.45);">
+      <button class="tab-btn" data-mode="en" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(var(--ink-rgb),.45);">
         <span class="tab-glyph" data-mode="en" style="transition:color .15s ease;">□</span>english
       </button>
     </div>
     <nav style="display:flex;gap:18px;font-size:11px;letter-spacing:.05em;font-weight:600;">
-      <button id="navPracticeBtn" data-i18n="navPractice" style="all:unset;cursor:pointer;color:#f2ede2;">연습</button>
-      <button id="openDrawerBtn" data-i18n="navWords" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">단어 목록</button>
-      <button id="openHistoryBtn" data-i18n="navHistory" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">학습 기록</button>
-      <button id="openStatsBtn" data-i18n="navStats" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">통계</button>
+      <button id="navPracticeBtn" data-i18n="navPractice" style="all:unset;cursor:pointer;color:rgb(var(--ink-rgb));">연습</button>
+      <button id="openDrawerBtn" data-i18n="navWords" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">단어 목록</button>
+      <button id="openHistoryBtn" data-i18n="navHistory" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">학습 기록</button>
+      <button id="openStatsBtn" data-i18n="navStats" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">통계</button>
     </nav>
     <div style="display:flex;align-items:center;gap:8px;">
-      <div id="uiLangToggle" title="Interface language / 界面语言" style="display:flex;align-items:center;background:rgba(242,237,226,.08);border-radius:100px;padding:3px;gap:2px;">
+      <button id="themeToggleBtn" title="라이트 모드로 전환" style="all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:100px;background:rgba(var(--ink-rgb),.08);color:rgba(var(--ink-rgb),.75);font-size:14px;">☾</button>
+      <div id="uiLangToggle" title="Interface language / 界面语言" style="display:flex;align-items:center;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
         <button class="ui-lang-btn" data-lang="ko" style="all:unset;cursor:pointer;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:inherit;transition:background .15s ease,color .15s ease;">KO</button>
         <button class="ui-lang-btn" data-lang="en" style="all:unset;cursor:pointer;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:inherit;transition:background .15s ease,color .15s ease;">EN</button>
       </div>
-      <button id="switchUserBtn" style="display:flex;align-items:center;gap:8px;background:#f2ede2;color:#0a0a0a;border:none;border-radius:100px;padding:8px 16px;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;font-family:inherit;">
-        <span style="width:14px;height:14px;border-radius:50%;background:#e3b8d6;display:inline-block;"></span><span id="currentUserLabel"></span>
+      <button id="switchUserBtn" style="display:flex;align-items:center;gap:8px;background:rgb(var(--ink-rgb));color:var(--bg);border:none;border-radius:100px;padding:8px 16px;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;font-family:inherit;">
+        <span style="width:14px;height:14px;border-radius:50%;background:var(--accent);display:inline-block;"></span><span id="currentUserLabel"></span>
       </button>
-      <button id="renameUserBtn" data-i18n-title="renameTitle" title="이름 변경" style="all:unset;cursor:pointer;color:rgba(242,237,226,.4);font-size:14px;padding:4px;">✎</button>
+      <button id="renameUserBtn" data-i18n-title="renameTitle" title="이름 변경" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.4);font-size:14px;padding:4px;">✎</button>
     </div>
   </header>
 
   <!-- HERO -->
-  <section style="padding:56px 32px 26px;border-bottom:1px solid rgba(242,237,226,.14);max-width:1100px;margin:0 auto;">
+  <section style="padding:56px 32px 26px;border-bottom:1px solid rgba(var(--ink-rgb),.14);max-width:1100px;margin:0 auto;">
     <div style="display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end;">
       <h1 id="heroTitle" data-i18n="heroTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
-      <p id="heroDesc" data-i18n="heroDesc" style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(242,237,226,.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
+      <p id="heroDesc" data-i18n="heroDesc" style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(var(--ink-rgb),.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
     </div>
     <div aria-hidden="true" style="position:relative;height:clamp(120px,16vw,190px);margin-top:32px;overflow:hidden;">
-      <div style="position:absolute;top:9px;left:9px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(227,184,214,.22);">HANGUL</div>
-      <div style="position:absolute;top:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(242,237,226,.16);">HANGUL</div>
-      <div style="position:absolute;bottom:-8px;left:8px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(242,237,226,.12);">TRAINER</div>
-      <div style="position:absolute;bottom:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:#e3b8d6;">TRAINER</div>
+      <div style="position:absolute;top:9px;left:9px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(var(--accent-rgb),.22);">HANGUL</div>
+      <div style="position:absolute;top:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(var(--ink-rgb),.16);">HANGUL</div>
+      <div style="position:absolute;bottom:-8px;left:8px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(var(--ink-rgb),.12);">TRAINER</div>
+      <div style="position:absolute;bottom:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:var(--accent);">TRAINER</div>
     </div>
   </section>
 
-  <div id="cloudStatus" style="max-width:1100px;margin:0 auto;width:100%;padding:14px 32px 0;font-size:10.5px;letter-spacing:.3px;color:#e07a5f;text-align:center;display:none;box-sizing:border-box;"></div>
+  <div id="cloudStatus" style="max-width:1100px;margin:0 auto;width:100%;padding:14px 32px 0;font-size:10.5px;letter-spacing:.3px;color:var(--warn);text-align:center;display:none;box-sizing:border-box;"></div>
 
   <!-- PRACTICE -->
   <section style="padding:10px 32px 70px;max-width:1100px;margin:0 auto;width:100%;box-sizing:border-box;">
     <div aria-hidden="true" style="position:relative;height:clamp(64px,8vw,110px);overflow:hidden;">
-      <div style="position:absolute;top:4px;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(40px,7vw,92px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(242,237,226,.14);">PRACTICE</div>
+      <div style="position:absolute;top:4px;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(40px,7vw,92px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(var(--ink-rgb),.14);">PRACTICE</div>
     </div>
 
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-top:-18px;position:relative;">
@@ -114,30 +115,30 @@
 
       <!-- SIDEBAR -->
       <div style="flex:1 1 240px;max-width:320px;display:flex;flex-direction:column;gap:12px;">
-        <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
-          <div data-i18n="sessionStatsTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
-          <div id="progress" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;line-height:1.8;letter-spacing:.02em;color:#f2ede2;"></div>
+        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
+          <div data-i18n="sessionStatsTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
+          <div id="progress" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;line-height:1.8;letter-spacing:.02em;color:rgb(var(--ink-rgb));"></div>
         </div>
-        <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
-          <div data-i18n="favSectionTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
+        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
+          <div data-i18n="favSectionTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
           <div id="favCountLabel" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;"></div>
         </div>
-        <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
+        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-            <span data-i18n="masteryProgressTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;">숙련도 진행</span>
-            <span id="masteryPct" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e3b8d6;font-weight:700;"></span>
+            <span data-i18n="masteryProgressTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;">숙련도 진행</span>
+            <span id="masteryPct" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;"></span>
           </div>
-          <div style="height:5px;background:rgba(242,237,226,.12);border-radius:3px;overflow:hidden;">
-            <div id="masteryFill" style="height:100%;width:0%;background:#e3b8d6;transition:width .35s cubic-bezier(.4,0,.2,1);"></div>
+          <div style="height:5px;background:rgba(var(--ink-rgb),.12);border-radius:3px;overflow:hidden;">
+            <div id="masteryFill" style="height:100%;width:0%;background:var(--accent);transition:width .35s cubic-bezier(.4,0,.2,1);"></div>
           </div>
-          <div id="masteryLabel" style="font-size:10.5px;color:rgba(242,237,226,.4);margin-top:8px;letter-spacing:.02em;"></div>
+          <div id="masteryLabel" style="font-size:10.5px;color:rgba(var(--ink-rgb),.4);margin-top:8px;letter-spacing:.02em;"></div>
         </div>
-        <div style="border:1px solid rgba(242,237,226,.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
-            <input type="checkbox" id="dictationToggle" style="accent-color:#e3b8d6;"><span data-i18n="dictationLabel">딕테이션 모드</span>
+        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
+            <input type="checkbox" id="dictationToggle" style="accent-color:var(--accent);"><span data-i18n="dictationLabel">딕테이션 모드</span>
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
-            <input type="checkbox" id="reviewModeToggle" style="accent-color:#e3b8d6;"><span data-i18n="reviewLabel">🔁 복습 모드</span>
+          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
+            <input type="checkbox" id="reviewModeToggle" style="accent-color:var(--accent);"><span data-i18n="reviewLabel">🔁 복습 모드</span>
           </label>
         </div>
       </div>
@@ -145,71 +146,71 @@
   </section>
 
   <!-- DRAWER -->
-  <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:#0a0a0a;border-left:1px solid rgba(242,237,226,.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
-    <div style="padding:22px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;justify-content:space-between;align-items:center;">
+  <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
+    <div style="padding:22px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;justify-content:space-between;align-items:center;">
       <div id="drawerHeaderTitle" data-i18n="drawerHeaderTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어 & 기록</div>
-      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:#f2ede2;padding:2px 8px;">&times;</button>
+      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:rgb(var(--ink-rgb));padding:2px 8px;">&times;</button>
     </div>
-    <div style="display:flex;border-bottom:1px solid rgba(242,237,226,.14);">
+    <div style="display:flex;border-bottom:1px solid rgba(var(--ink-rgb),.14);">
       <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
       <button id="drawerTabHistory" data-i18n="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">학습 기록</button>
       <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
     </div>
-    <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;flex-direction:column;gap:12px;">
+    <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
         </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="notesOnlyLabel">📝 노트만</span>
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="notesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="notesOnlyLabel">📝 노트만</span>
         </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
         </label>
       </div>
-      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;outline:none;border-radius:2px;">
+      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;">
       <div style="display:flex;gap:8px;">
-        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
-        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
-        <button id="addWordBtn" style="all:unset;cursor:pointer;background:#e3b8d6;color:#0a0a0a;padding:0 16px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;">+</button>
+        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <button id="addWordBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 16px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;">+</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
-        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
-        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:#e07a5f;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
+        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
+        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
+        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:var(--warn);padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
       </div>
     </div>
     <div id="drawerContent" style="flex:1;overflow-y:auto;padding:8px 16px;"></div>
   </div>
 
   <!-- AI PROMPT MODAL -->
-  <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
-    <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:520px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+  <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:520px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
       <div id="aiPromptModalTitle" data-i18n="aiPromptTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">🤖 AI 프롬프트</div>
-      <div id="aiPromptModalDesc" data-i18n="aiPromptDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
-      <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:11.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
+      <div id="aiPromptModalDesc" data-i18n="aiPromptDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
+      <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:11.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeAiPromptModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
-        <button id="copyAiPromptBtn" data-i18n="copyBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">복사하기</button>
+        <button id="closeAiPromptModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
+        <button id="copyAiPromptBtn" data-i18n="copyBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">복사하기</button>
       </div>
     </div>
   </div>
 
   <!-- BULK MODAL -->
-  <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
-    <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:480px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+  <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:480px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
       <div id="bulkModalTitle" data-i18n="bulkModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">일괄 가져오기/내보내기</div>
-      <div id="bulkModalDesc" data-i18n="bulkModalDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
-      <textarea id="bulkTextarea" data-i18n-placeholder="bulkTextareaPlaceholder" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
+      <div id="bulkModalDesc" data-i18n="bulkModalDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
+      <textarea id="bulkTextarea" data-i18n-placeholder="bulkTextareaPlaceholder" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
-        <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
+        <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
+        <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
       </div>
     </div>
   </div>
 
   <!-- NOTES MODAL -->
-  <div id="notesModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+  <div id="notesModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="background:#f2ede2;color:#0a0a0a;padding:26px;width:100%;max-width:460px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
       <div id="notesModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
       <div id="notesModalDesc" data-i18n="notesDesc" style="font-size:11px;color:rgba(10,10,10,.55);line-height:1.5;">예문, 관련 지식 등을 자유롭게 적어두세요.</div>
@@ -222,35 +223,35 @@
   </div>
 
   <!-- WHO ARE YOU MODAL (first visit only) -->
-  <div id="whoAmIOverlay" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+  <div id="whoAmIOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="width:100%;max-width:400px;text-align:center;">
       <div id="whoAmITitle" data-i18n="whoAmITitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:24px;margin-bottom:10px;">👋 이름을 알려주세요</div>
-      <div id="whoAmIDesc" data-i18n="whoAmIDesc" style="font-size:12.5px;color:rgba(242,237,226,.5);line-height:1.6;margin:0 0 22px;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
-      <input type="text" id="whoAmIInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:13px;text-align:center;font-size:14px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
-      <button id="whoAmISubmitBtn" data-i18n="startBtn" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;text-align:center;background:#e3b8d6;color:#0a0a0a;padding:13px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;font-weight:700;">시작하기</button>
+      <div id="whoAmIDesc" data-i18n="whoAmIDesc" style="font-size:12.5px;color:rgba(var(--ink-rgb),.5);line-height:1.6;margin:0 0 22px;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
+      <input type="text" id="whoAmIInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:13px;text-align:center;font-size:14px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
+      <button id="whoAmISubmitBtn" data-i18n="startBtn" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;text-align:center;background:var(--accent);color:var(--accent-ink);padding:13px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;font-weight:700;">시작하기</button>
     </div>
   </div>
 
   <!-- LOADING OVERLAY -->
-  <div id="loadingOverlay" data-i18n="loadingText" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:1500;color:rgba(242,237,226,.5);font-size:11px;letter-spacing:.05em;text-transform:uppercase;">
+  <div id="loadingOverlay" data-i18n="loadingText" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1500;color:rgba(var(--ink-rgb),.5);font-size:11px;letter-spacing:.05em;text-transform:uppercase;">
     불러오는 중...
   </div>
 
   <!-- SWITCH USER MODAL -->
-  <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
-    <div style="width:100%;max-width:400px;background:#0a0a0a;border:1px solid rgba(242,237,226,.2);padding:26px;border-radius:4px;box-sizing:border-box;">
+  <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="width:100%;max-width:400px;background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);padding:26px;border-radius:4px;box-sizing:border-box;">
       <div id="switchUserModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;margin-bottom:8px;"></div>
-      <div id="switchUserModalDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;margin-bottom:14px;"></div>
-      <input type="text" id="switchUserInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:11px;font-size:13px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
+      <div id="switchUserModalDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;margin-bottom:14px;"></div>
+      <input type="text" id="switchUserInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px;font-size:13px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeSwitchUserModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
-        <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">전환하기</button>
+        <button id="closeSwitchUserModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
+        <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">전환하기</button>
       </div>
     </div>
   </div>
 
   <!-- FOOTER -->
-  <footer style="max-width:1100px;margin:0 auto;width:100%;border-top:1px solid rgba(242,237,226,.14);padding:20px 32px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.03em;color:rgba(242,237,226,.4);box-sizing:border-box;">
+  <footer style="max-width:1100px;margin:0 auto;width:100%;border-top:1px solid rgba(var(--ink-rgb),.14);padding:20px 32px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.4);box-sizing:border-box;">
     <span>TYPE/TRAINER — 2026</span>
     <span id="footerHint" data-i18n="footerHint" style="text-align:right;line-height:1.6;">[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요</span>
   </footer>
@@ -259,7 +260,7 @@
 <script>
 (function(){
   "use strict";
-  const COL = { black:'#0a0a0a', pink:'#e3b8d6', pinkDeep:'#c26fae', gray:'#c9c2b3', red:'#c0392b', green:'#0a7a3d', mutedInk:'rgba(10,10,10,.5)' };
+  const COL = { black:'#0a0a0a', pinkDeep:'#F7CDCE', gray:'#c9c2b3', red:'#c0392b', green:'#0a7a3d', mutedInk:'rgba(10,10,10,.5)' };
 
   const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
   const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
@@ -990,7 +991,7 @@
   function renderDrawer(){
     drawerContent.innerHTML='';
     const total=currentWordCount();
-    if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
+    if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
     const list = mode==='ko' ? KO_WORDS : EN_WORDS;
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
@@ -1012,32 +1013,32 @@
     });
     if(shown===0){
       const msg = query ? t('noSearchResults') : (notesOnly ? t('noNotesWords') : (wrongOnly ? t('noWrongWords') : t('noFavWords')));
-      drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${msg}</div>`;
+      drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${msg}</div>`;
     }
   }
 
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(227,184,214,.12)':'transparent'};color:${active?COL.pink:'#f2ede2'};`;
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
     container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-520px'; setNavActive('practice'); });
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
     const mainSpan=document.createElement('span');
     mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongCount>0?'❌'+wrongCount+' ':''}${displayIndex}. ${mainText}`;
     info.appendChild(mainSpan);
-    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(242,237,226,.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
     const actions=document.createElement('div');
     actions.style.cssText='display:flex;align-items:center;gap:2px;';
     const favBtn=document.createElement('button');
     favBtn.dataset.role='fav';
     favBtn.textContent = isFavorite ? '★' : '☆';
-    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?COL.pink:'rgba(242,237,226,.4)'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
+    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?'var(--accent)':'rgba(var(--ink-rgb),.4)'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
     favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
     const delBtn=document.createElement('button');
     delBtn.dataset.role='del';
     delBtn.textContent='✕';
-    delBtn.style.cssText='border:none;background:none;color:rgba(242,237,226,.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
+    delBtn.style.cssText='border:none;background:none;color:rgba(var(--ink-rgb),.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
     delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
     actions.appendChild(favBtn); actions.appendChild(delBtn);
     container.appendChild(info); container.appendChild(actions);
@@ -1050,8 +1051,8 @@
 
   function setDrawerView(view){
     drawerView=view;
-    const activeStyle={color:'#f2ede2',borderBottom:`2px solid ${COL.pink}`};
-    const inactiveStyle={color:'rgba(242,237,226,.45)',borderBottom:'2px solid transparent'};
+    const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`};
+    const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent'};
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
     Object.assign(drawerTabHistory.style, view==='history'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
@@ -1078,7 +1079,7 @@
     drawerContent.innerHTML='';
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     if(history.length===0){
-      drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${t('noHistory')}</div>`;
+      drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noHistory')}</div>`;
       return;
     }
     for(let i=history.length-1;i>=0;i--){
@@ -1088,26 +1089,26 @@
 
   function createHistoryItemDOM(entry, index){
     const container=document.createElement('div');
-    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(242,237,226,.14);border-radius:2px;';
+    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(var(--ink-rgb),.14);border-radius:2px;';
     const row=document.createElement('div');
     row.style.cssText='display:flex;justify-content:space-between;align-items:center;';
     const dateSpan=document.createElement('span');
-    dateSpan.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:#f2ede2;";
+    dateSpan.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:rgb(var(--ink-rgb));";
     dateSpan.textContent=entry.date;
     const countSpan=document.createElement('span');
-    countSpan.style.cssText='font-size:11px;color:rgba(242,237,226,.45);';
+    countSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.45);';
     countSpan.textContent=t('historyCount',{count:entry.words.length});
     row.appendChild(dateSpan); row.appendChild(countSpan);
     container.appendChild(row);
 
     const preview=document.createElement('div');
-    preview.style.cssText='font-size:11px;color:rgba(242,237,226,.4);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    preview.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
     preview.textContent=entry.words.map(w=>w.word).join(', ');
     container.appendChild(preview);
 
     const studyBtn=document.createElement('button');
     studyBtn.textContent=t('studyThisDate');
-    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:#e3b8d6;color:#0a0a0a;padding:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;border-radius:2px;';
+    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:var(--accent);color:var(--accent-ink);padding:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;border-radius:2px;';
     studyBtn.addEventListener('click', ()=>studyHistoryEntry(index));
     container.appendChild(studyBtn);
 
@@ -1135,14 +1136,14 @@
 
   function statCard(){
     const card=document.createElement('div');
-    card.style.cssText='border:1px solid rgba(242,237,226,.16);border-radius:4px;padding:16px;';
+    card.style.cssText='border:1px solid rgba(var(--ink-rgb),.16);border-radius:4px;padding:16px;';
     return card;
   }
 
   function statSectionTitle(text,marginBottom){
     const title=document.createElement('div');
     const mb = marginBottom==null ? 12 : marginBottom;
-    title.style.cssText=`font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;margin-bottom:${mb}px;`;
+    title.style.cssText=`font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:${mb}px;`;
     title.textContent=text;
     return title;
   }
@@ -1162,9 +1163,9 @@
     grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
     [
       {label:t('overdueLabel'), value:overdue, icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
-      {label:t('dueTodayLabel'), value:dueToday, icon:'🟡', bg:'rgba(227,184,214,.09)', border:'1px solid rgba(227,184,214,.4)', dot:'rgba(227,184,214,.18)', num:COL.pink},
-      {label:t('upcomingLabel'), value:upcoming, icon:'⚪', bg:'rgba(242,237,226,.04)', border:'1px solid rgba(242,237,226,.14)', dot:'rgba(242,237,226,.06)', num:'rgba(242,237,226,.8)'},
-      {label:t('freshLabel'), value:fresh, icon:'🆕', bg:'rgba(242,237,226,.04)', border:'1px dashed rgba(242,237,226,.22)', dot:'rgba(242,237,226,.05)', num:'rgba(242,237,226,.6)'}
+      {label:t('dueTodayLabel'), value:dueToday, icon:'🟡', bg:'rgba(var(--accent-rgb),.09)', border:'1px solid rgba(var(--accent-rgb),.4)', dot:'rgba(var(--accent-rgb),.18)', num:'var(--accent)'},
+      {label:t('upcomingLabel'), value:upcoming, icon:'⚪', bg:'rgba(var(--ink-rgb),.04)', border:'1px solid rgba(var(--ink-rgb),.14)', dot:'rgba(var(--ink-rgb),.06)', num:'rgba(var(--ink-rgb),.8)'},
+      {label:t('freshLabel'), value:fresh, icon:'🆕', bg:'rgba(var(--ink-rgb),.04)', border:'1px dashed rgba(var(--ink-rgb),.22)', dot:'rgba(var(--ink-rgb),.05)', num:'rgba(var(--ink-rgb),.6)'}
     ].forEach(item=>{
       const tile=document.createElement('div');
       tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${item.bg};border:${item.border};overflow:hidden;`;
@@ -1174,7 +1175,7 @@
       num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:23px;color:${item.num};position:relative;`;
       num.textContent=String(item.value);
       const lab=document.createElement('div');
-      lab.style.cssText='font-size:10px;letter-spacing:.02em;color:rgba(242,237,226,.55);margin-top:3px;position:relative;';
+      lab.style.cssText='font-size:10px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);margin-top:3px;position:relative;';
       lab.textContent=`${item.icon} ${item.label}`;
       tile.appendChild(blob); tile.appendChild(num); tile.appendChild(lab);
       grid.appendChild(tile);
@@ -1187,16 +1188,16 @@
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:8px;';
     const lab=document.createElement('div');
-    lab.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(242,237,226,.4);width:${labelWidth}px;flex:none;`;
+    lab.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(var(--ink-rgb),.4);width:${labelWidth}px;flex:none;`;
     lab.textContent=label;
     const track=document.createElement('div');
-    track.style.cssText='flex:1;height:13px;background:rgba(242,237,226,.08);border-radius:2px;overflow:hidden;';
+    track.style.cssText='flex:1;height:13px;background:rgba(var(--ink-rgb),.08);border-radius:2px;overflow:hidden;';
     const fill=document.createElement('div');
     const pct = max>0 ? Math.round(count/max*100) : 0;
     fill.style.cssText=`height:100%;width:${pct}%;background:${barColor};transition:width .3s ease;`;
     track.appendChild(fill);
     const num=document.createElement('div');
-    num.style.cssText=`font-size:11px;color:${numColor||'rgba(242,237,226,.5)'};width:20px;text-align:right;flex:none;${numWeight?`font-weight:${numWeight};`:''}`;
+    num.style.cssText=`font-size:11px;color:${numColor||'rgba(var(--ink-rgb),.5)'};width:20px;text-align:right;flex:none;${numWeight?`font-weight:${numWeight};`:''}`;
     num.textContent=String(count);
     row.appendChild(lab); row.appendChild(track); row.appendChild(num);
     return row;
@@ -1207,12 +1208,12 @@
     section.appendChild(statSectionTitle(t('masteryDistTitle')));
     if(list.length===0){
       const empty=document.createElement('div');
-      empty.style.cssText='font-size:11px;color:rgba(242,237,226,.4);';
+      empty.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);';
       empty.textContent=t('noWords');
       section.appendChild(empty);
       return section;
     }
-    const RAMP=['#5c4256','#6f4d67','#8a5a7d','#a4699a','#c26fae','#e3b8d6'];
+    const RAMP=['#5c4256','#6f4d67','#8a5a7d','#a4699a','#c26fae','var(--accent)'];
     const counts=[0,0,0,0,0,0];
     list.forEach(w=>{ counts[Math.min(w.box||0,5)]++; });
     const max=Math.max(...counts,1);
@@ -1220,7 +1221,7 @@
     rows.style.cssText='display:flex;flex-direction:column;gap:7px;';
     counts.forEach((c,box)=>{
       const isTop = box===5;
-      rows.appendChild(buildBarRow(`LV.${box}`, c, max, RAMP[box], 30, isTop?COL.pink:null, isTop?700:null));
+      rows.appendChild(buildBarRow(`LV.${box}`, c, max, RAMP[box], 30, isTop?'var(--accent)':null, isTop?700:null));
     });
     section.appendChild(rows);
     return section;
@@ -1250,10 +1251,10 @@
       badge.style.cssText=`width:16px;height:16px;border-radius:50%;background:rgba(192,57,43,${badgeAlphas[i]??.07});color:#e0685a;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;`;
       badge.textContent=String(i+1);
       const lab=document.createElement('div');
-      lab.style.cssText='width:58px;font-size:11px;color:#f2ede2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;';
+      lab.style.cssText='width:58px;font-size:11px;color:rgb(var(--ink-rgb));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;';
       lab.textContent=w.word;
       const track=document.createElement('div');
-      track.style.cssText='flex:1;height:10px;background:rgba(242,237,226,.08);border-radius:2px;overflow:hidden;';
+      track.style.cssText='flex:1;height:10px;background:rgba(var(--ink-rgb),.08);border-radius:2px;overflow:hidden;';
       const fill=document.createElement('div');
       const pct=Math.round((w.wrongCount||0)/max*100);
       fill.style.cssText=`height:100%;width:${pct}%;background:linear-gradient(90deg,#c0392b,#e0685a);`;
@@ -1272,7 +1273,7 @@
     const section=statCard();
     section.appendChild(statSectionTitle(t('activityTitle'), 4));
     const caption=document.createElement('div');
-    caption.style.cssText='font-size:9.5px;color:rgba(242,237,226,.35);margin-bottom:12px;line-height:1.5;';
+    caption.style.cssText='font-size:9.5px;color:rgba(var(--ink-rgb),.35);margin-bottom:12px;line-height:1.5;';
     caption.textContent=t('activityCaption');
     section.appendChild(caption);
 
@@ -1290,12 +1291,12 @@
     }
     const max=Math.max(...cells.map(c=>c.count),1);
     const tierColor = c => {
-      if(c<=0) return 'rgba(242,237,226,.06)';
+      if(c<=0) return 'rgba(var(--ink-rgb),.06)';
       const ratio=c/max;
-      if(ratio<=0.25) return 'rgba(227,184,214,.25)';
-      if(ratio<=0.5) return 'rgba(227,184,214,.45)';
-      if(ratio<=0.75) return 'rgba(227,184,214,.7)';
-      return COL.pink;
+      if(ratio<=0.25) return 'rgba(var(--accent-rgb),.25)';
+      if(ratio<=0.5) return 'rgba(var(--accent-rgb),.45)';
+      if(ratio<=0.75) return 'rgba(var(--accent-rgb),.7)';
+      return 'var(--accent)';
     };
 
     const grid=document.createElement('div');
@@ -1310,14 +1311,14 @@
 
     const legend=document.createElement('div');
     legend.style.cssText='display:flex;align-items:center;gap:4px;margin-top:10px;justify-content:flex-end;';
-    const lessLab=document.createElement('span'); lessLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; lessLab.textContent=t('legendLess');
+    const lessLab=document.createElement('span'); lessLab.style.cssText='font-size:9px;color:rgba(var(--ink-rgb),.35);'; lessLab.textContent=t('legendLess');
     legend.appendChild(lessLab);
-    ['rgba(242,237,226,.06)','rgba(227,184,214,.25)','rgba(227,184,214,.45)','rgba(227,184,214,.7)',COL.pink].forEach(color=>{
+    ['rgba(var(--ink-rgb),.06)','rgba(var(--accent-rgb),.25)','rgba(var(--accent-rgb),.45)','rgba(var(--accent-rgb),.7)','var(--accent)'].forEach(color=>{
       const sw=document.createElement('div');
       sw.style.cssText=`width:9px;height:9px;border-radius:2px;background:${color};`;
       legend.appendChild(sw);
     });
-    const moreLab=document.createElement('span'); moreLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; moreLab.textContent=t('legendMore');
+    const moreLab=document.createElement('span'); moreLab.style.cssText='font-size:9px;color:rgba(var(--ink-rgb),.35);'; moreLab.textContent=t('legendMore');
     legend.appendChild(moreLab);
     section.appendChild(legend);
     return section;
@@ -1406,8 +1407,8 @@
   });
 
   function setActiveTab(m){
-    document.querySelectorAll('.tab-btn').forEach(b=>{ b.style.color = b.dataset.mode===m ? '#f2ede2' : 'rgba(242,237,226,.45)'; });
-    document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? COL.pink : 'rgba(242,237,226,.45)'; });
+    document.querySelectorAll('.tab-btn').forEach(b=>{ b.style.color = b.dataset.mode===m ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
+    document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? 'var(--accent)' : 'rgba(var(--ink-rgb),.45)'; });
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -1429,7 +1430,7 @@
 
   function setNavActive(which){
     const map = {practice:'navPracticeBtn', words:'openDrawerBtn', history:'openHistoryBtn', stats:'openStatsBtn'};
-    Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? '#f2ede2' : 'rgba(242,237,226,.45)'; });
+    Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
   }
   $('navPracticeBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
   $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words'); setNavActive('words'); });
@@ -1665,6 +1666,34 @@
   submitSwitchUserBtn.addEventListener('click', submitSwitchUserModal);
   switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submitSwitchUserModal(); } });
 
+  const THEMES = {
+    dark:  { bg:'#0a0a0a', bgRgb:'10,10,10',    inkRgb:'242,237,226', inputBg:'#141414', accent:'#e3b8d6', accentRgb:'227,184,214', accentInk:'#0a0a0a', warn:'#e07a5f' },
+    light: { bg:'#f1efe9', bgRgb:'241,239,233', inkRgb:'26,23,20',    inputBg:'#ffffff', accent:'#F7CDCE', accentRgb:'247,205,206', accentInk:'#1a1714', warn:'#b8451f' }
+  };
+  const THEME_KEY = 'TRAINER_THEME';
+  let theme = localStorage.getItem(THEME_KEY) || 'dark';
+  function applyTheme(t){
+    theme = t;
+    const p = THEMES[t];
+    const root = $('appRoot');
+    if(root){
+      root.style.setProperty('--bg', p.bg);
+      root.style.setProperty('--bg-rgb', p.bgRgb);
+      root.style.setProperty('--ink-rgb', p.inkRgb);
+      root.style.setProperty('--input-bg', p.inputBg);
+      root.style.setProperty('--accent', p.accent);
+      root.style.setProperty('--accent-rgb', p.accentRgb);
+      root.style.setProperty('--accent-ink', p.accentInk);
+      root.style.setProperty('--warn', p.warn);
+    }
+    localStorage.setItem(THEME_KEY, t);
+    const btn = $('themeToggleBtn');
+    if(btn){ btn.textContent = t==='dark' ? '☾' : '☀'; btn.title = t==='dark' ? '라이트 모드로 전환' : '다크 모드로 전환'; }
+  }
+  const themeToggleBtn = $('themeToggleBtn');
+  if(themeToggleBtn) themeToggleBtn.addEventListener('click', ()=>applyTheme(theme==='dark'?'light':'dark'));
+  applyTheme(theme);
+
   function applyI18n(){
     document.documentElement.lang = uiLang;
     document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.dataset.i18n); });
@@ -1672,8 +1701,8 @@
     document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.dataset.i18nTitle); });
     document.querySelectorAll('.ui-lang-btn').forEach(b=>{
       const active = b.dataset.lang===uiLang;
-      b.style.background = active ? '#f2ede2' : 'transparent';
-      b.style.color = active ? '#0a0a0a' : 'rgba(242,237,226,.5)';
+      b.style.background = active ? 'rgb(var(--ink-rgb))' : 'transparent';
+      b.style.color = active ? 'var(--bg)' : 'rgba(var(--ink-rgb),.5)';
     });
     updateMobileHints();
     refreshSwitchUserModalTexts();
