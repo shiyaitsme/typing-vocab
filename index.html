@@ -117,9 +117,23 @@
         <input type="text" id="newMeaning" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:140px;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
       </div>
       <button id="addWordBtn" style="all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:10px;background:#111;color:#e7b8da;padding:11px;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 추가</button>
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;">
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
         <button id="openBulkBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#5b5650;">일괄 가져오기/내보내기</button>
+        <button id="openAiPromptBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#5b5650;">🤖 AI 프롬프트 복사</button>
         <button id="clearWordsBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#c0392b;">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI PROMPT MODAL -->
+  <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:520px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;">🤖 AI 프롬프트</div>
+      <div style="font-size:11px;color:#5b5650;line-height:1.5;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "일괄 가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
+      <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:10px;border:1px solid #111;font-family:'JetBrains Mono',monospace;font-size:11.5px;resize:none;background:#fff;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="closeAiPromptModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
+        <button id="copyAiPromptBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">복사하기</button>
       </div>
     </div>
   </div>
@@ -332,6 +346,22 @@
     {word:'computer',meaning:'电脑'},{word:'keyboard',meaning:'键盘'},{word:'mountain',meaning:'山脉'},
     {word:'sandwich',meaning:'三明治'},{word:'elephant',meaning:'大象'},{word:'umbrella',meaning:'雨伞'},{word:'calendar',meaning:'日历'}
   ];
+
+  const AI_IMPORT_PROMPT = `请作为我的备考助教，帮我提取并整理附件（图片/文档）中的单词。
+我需要把这些单词导入到我的打字背词软件中，请帮我将提取出来的单词过滤并整理成以下格式：
+1. 格式要求：
+
+* 韩语单词：整理为 韩语单词,中文翻译/罗马音（例如：학교,学校/hakgyo）。
+* 英语单词（新规则）：整理为 英语单词,中文翻译（例如：experience,经验）。
+* 统一规范：所有单词中间仅用英文逗号（,）隔开，绝对不要有空格，一行一个。
+2.过滤规则：
+
+* 过滤掉段落、标点符号、无意义的背景字和系统无用文字。
+* 忽略过于简单的词（如 is, the, 에, 을）。
+* 韩语动词保留原形（如 하다）。
+3. 输出要求：
+
+* 仅输出可以直接复制的纯文本代码块（Code Block），不要带有任何额外的问候、序号（如 1., 2.）或解释。`;
 
   let KO_WORDS = [];
   let EN_WORDS = [];
@@ -832,6 +862,27 @@
       pushWordsToCloud('en', EN_WORDS);
       wordIndex=0; loadWord();
     }
+  });
+
+  const aiPromptModalOverlay=$('aiPromptModalOverlay'), aiPromptTextarea=$('aiPromptTextarea');
+  $('openAiPromptBtn').addEventListener('click', ()=>{
+    aiPromptTextarea.value = AI_IMPORT_PROMPT;
+    aiPromptModalOverlay.style.opacity='1'; aiPromptModalOverlay.style.pointerEvents='auto';
+  });
+  $('closeAiPromptModalBtn').addEventListener('click', ()=>{
+    aiPromptModalOverlay.style.opacity='0'; aiPromptModalOverlay.style.pointerEvents='none';
+  });
+  $('copyAiPromptBtn').addEventListener('click', async ()=>{
+    const btn = $('copyAiPromptBtn');
+    try{
+      await navigator.clipboard.writeText(AI_IMPORT_PROMPT);
+    } catch(err){
+      aiPromptTextarea.focus(); aiPromptTextarea.select();
+      document.execCommand('copy');
+    }
+    const original = btn.textContent;
+    btn.textContent = '✓ 복사됨';
+    setTimeout(()=>{ btn.textContent = original; }, 1500);
   });
 
   const modalOverlay=$('modalOverlay'), bulkTextarea=$('bulkTextarea');
