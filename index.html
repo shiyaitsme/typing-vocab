@@ -44,7 +44,7 @@
   <div id="progress" style="max-width:1100px;width:100%;padding:4px 24px 18px;font-size:11px;letter-spacing:1px;color:#8f8f8f;text-align:center;"></div>
   <div id="cloudStatus" style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10.5px;letter-spacing:.5px;color:#e0433a;text-align:center;display:none;"></div>
   <div style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10px;letter-spacing:.5px;color:#8f8f8f;text-align:center;">
-    👤 <span id="currentUserLabel"></span> · <button id="switchUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">계정 전환</button>
+    👤 <span id="currentUserLabel"></span> · <button id="switchUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">계정 전환</button> · <button id="renameUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">이름 변경</button>
   </div>
 
   <!-- MAIN CARD -->
@@ -185,8 +185,8 @@
   <!-- SWITCH USER MODAL -->
   <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
     <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
-      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👤 계정 전환</div>
-      <div style="font-size:11px;color:#5b5650;line-height:1.5;">다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.</div>
+      <div id="switchUserModalTitle" style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👤 계정 전환</div>
+      <div id="switchUserModalDesc" style="font-size:11px;color:#5b5650;line-height:1.5;">다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.</div>
       <input type="text" id="switchUserInput" placeholder="예: shiya" autocomplete="off" style="width:100%;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="closeSwitchUserModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
@@ -957,7 +957,23 @@
     }
   }
 
+  const switchUserModalTitle=$('switchUserModalTitle'), switchUserModalDesc=$('switchUserModalDesc'), submitSwitchUserBtn=$('submitSwitchUserBtn');
+  let switchUserModalMode = 'switch';
+
   function openSwitchUserModal(){
+    switchUserModalMode = 'switch';
+    switchUserModalTitle.textContent = '👤 계정 전환';
+    switchUserModalDesc.textContent = '다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.';
+    submitSwitchUserBtn.textContent = '전환하기';
+    switchUserInput.value = userId;
+    switchUserModalOverlay.style.opacity='1'; switchUserModalOverlay.style.pointerEvents='auto';
+    switchUserInput.focus(); switchUserInput.select();
+  }
+  function openRenameUserModal(){
+    switchUserModalMode = 'rename';
+    switchUserModalTitle.textContent = '✏️ 이름 변경';
+    switchUserModalDesc.textContent = `현재 계정(${userId})의 단어·즐겨찾기·노트·기록은 그대로 유지한 채 이름만 바꿉니다.`;
+    submitSwitchUserBtn.textContent = '변경하기';
     switchUserInput.value = userId;
     switchUserModalOverlay.style.opacity='1'; switchUserModalOverlay.style.pointerEvents='auto';
     switchUserInput.focus(); switchUserInput.select();
@@ -965,14 +981,8 @@
   function closeSwitchUserModal(){
     switchUserModalOverlay.style.opacity='0'; switchUserModalOverlay.style.pointerEvents='none';
   }
-  async function switchToUser(newName){
-    const name = newName.trim();
-    if(!name){ return; }
-    if(name===userId){ closeSwitchUserModal(); return; }
-    userId = name;
-    localStorage.setItem(USER_ID_KEY, userId);
-    currentUserLabel.textContent = userId;
-    closeSwitchUserModal();
+
+  async function reloadAfterAccountChange(){
     loadingOverlay.style.display='flex';
     cloudOk = true;
     cloudStatusEl.style.display = 'none';
@@ -982,10 +992,51 @@
     setActiveTab('ko');
     loadWord();
   }
+
+  async function switchToUser(newName){
+    const name = newName.trim();
+    if(!name || name===userId){ closeSwitchUserModal(); return; }
+    userId = name;
+    localStorage.setItem(USER_ID_KEY, userId);
+    currentUserLabel.textContent = userId;
+    closeSwitchUserModal();
+    await reloadAfterAccountChange();
+  }
+
+  async function renameCurrentUser(newName){
+    const name = newName.trim();
+    if(!name || name===userId){ closeSwitchUserModal(); return; }
+    try{
+      const res = await fetch('/api/rename', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ oldUser: userId, newUser: name })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.ok){
+        alert(data.error==='target_exists' ? `'${name}' 계정에는 이미 데이터가 있어요. 다른 이름을 사용해 주세요.` : '이름 변경에 실패했습니다.');
+        return;
+      }
+    } catch(err){
+      console.error('rename failed', err);
+      alert('이름 변경 중 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.');
+      return;
+    }
+    userId = name;
+    localStorage.setItem(USER_ID_KEY, userId);
+    currentUserLabel.textContent = userId;
+    closeSwitchUserModal();
+    await reloadAfterAccountChange();
+  }
+
   $('switchUserBtn').addEventListener('click', openSwitchUserModal);
+  $('renameUserBtn').addEventListener('click', openRenameUserModal);
   $('closeSwitchUserModalBtn').addEventListener('click', closeSwitchUserModal);
-  $('submitSwitchUserBtn').addEventListener('click', ()=> switchToUser(switchUserInput.value));
-  switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); switchToUser(switchUserInput.value); } });
+  function submitSwitchUserModal(){
+    if(switchUserModalMode==='rename') renameCurrentUser(switchUserInput.value);
+    else switchToUser(switchUserInput.value);
+  }
+  submitSwitchUserBtn.addEventListener('click', submitSwitchUserModal);
+  switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submitSwitchUserModal(); } });
 
   async function init(){
     await ensureUserId();
