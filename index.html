@@ -1388,7 +1388,7 @@
   }
 
   mobileInput.addEventListener('input',(e)=>{
-    const val=e.target.value;
+    const val=e.target.value.replace(/\s+/g,'');
     if(mode==='ko') koEngine.syncWithString(val); else enEngine.syncWithString(val);
     render();
   });
