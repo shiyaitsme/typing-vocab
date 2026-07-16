@@ -28,7 +28,7 @@
   <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;border-bottom:1px solid rgba(242,237,226,.14);background:rgba(10,10,10,.88);backdrop-filter:blur(8px);flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:16px;">
       <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em;">TYPE<span style="color:#e3b8d6;">/</span>TRAINER</div>
-      <div style="font-size:10.5px;letter-spacing:.08em;color:rgba(242,237,226,.5);font-weight:500;white-space:nowrap;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
+      <div id="headerTagline" data-i18n="tagline" style="font-size:10.5px;letter-spacing:.08em;color:rgba(242,237,226,.5);font-weight:500;white-space:nowrap;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
     </div>
     <div id="tabs" style="display:flex;gap:14px;font-size:11px;letter-spacing:.05em;font-weight:600;">
       <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#f2ede2;">
@@ -39,24 +39,28 @@
       </button>
     </div>
     <nav style="display:flex;gap:18px;font-size:11px;letter-spacing:.05em;font-weight:600;">
-      <button id="navPracticeBtn" style="all:unset;cursor:pointer;color:#f2ede2;">연습</button>
-      <button id="openDrawerBtn" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">단어 목록</button>
-      <button id="openHistoryBtn" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">학습 기록</button>
-      <button id="openStatsBtn" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">통계</button>
+      <button id="navPracticeBtn" data-i18n="navPractice" style="all:unset;cursor:pointer;color:#f2ede2;">연습</button>
+      <button id="openDrawerBtn" data-i18n="navWords" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">단어 목록</button>
+      <button id="openHistoryBtn" data-i18n="navHistory" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">학습 기록</button>
+      <button id="openStatsBtn" data-i18n="navStats" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">통계</button>
     </nav>
     <div style="display:flex;align-items:center;gap:8px;">
+      <div id="uiLangToggle" title="Interface language / 界面语言" style="display:flex;align-items:center;background:rgba(242,237,226,.08);border-radius:100px;padding:3px;gap:2px;">
+        <button class="ui-lang-btn" data-lang="ko" style="all:unset;cursor:pointer;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:inherit;transition:background .15s ease,color .15s ease;">KO</button>
+        <button class="ui-lang-btn" data-lang="en" style="all:unset;cursor:pointer;padding:5px 11px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.03em;font-family:inherit;transition:background .15s ease,color .15s ease;">EN</button>
+      </div>
       <button id="switchUserBtn" style="display:flex;align-items:center;gap:8px;background:#f2ede2;color:#0a0a0a;border:none;border-radius:100px;padding:8px 16px;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;font-family:inherit;">
         <span style="width:14px;height:14px;border-radius:50%;background:#e3b8d6;display:inline-block;"></span><span id="currentUserLabel"></span>
       </button>
-      <button id="renameUserBtn" title="이름 변경" style="all:unset;cursor:pointer;color:rgba(242,237,226,.4);font-size:14px;padding:4px;">✎</button>
+      <button id="renameUserBtn" data-i18n-title="renameTitle" title="이름 변경" style="all:unset;cursor:pointer;color:rgba(242,237,226,.4);font-size:14px;padding:4px;">✎</button>
     </div>
   </header>
 
   <!-- HERO -->
   <section style="padding:56px 32px 26px;border-bottom:1px solid rgba(242,237,226,.14);max-width:1100px;margin:0 auto;">
     <div style="display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end;">
-      <h1 style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
-      <p style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(242,237,226,.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
+      <h1 id="heroTitle" data-i18n="heroTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
+      <p id="heroDesc" data-i18n="heroDesc" style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(242,237,226,.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
     </div>
     <div aria-hidden="true" style="position:relative;height:clamp(120px,16vw,190px);margin-top:32px;overflow:hidden;">
       <div style="position:absolute;top:9px;left:9px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(227,184,214,.22);">HANGUL</div>
@@ -86,9 +90,9 @@
             <div id="masteryDots" style="display:flex;gap:4px;margin-top:6px;"></div>
           </div>
           <div style="display:flex;gap:8px;">
-            <button id="favoriteBtn" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
-            <button id="notesBtn" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
-            <button id="restartBtn" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
+            <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
+            <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
+            <button id="restartBtn" data-i18n-title="restartTitle" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
           </div>
         </div>
 
@@ -98,7 +102,7 @@
           <div class="letter-row" id="enRow" style="display:none;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
           <div id="statusBanner" style="text-align:center;font-size:12.5px;font-weight:700;height:18px;margin-top:14px;letter-spacing:.5px;text-transform:uppercase;"></div>
           <div id="keyHint" style="display:flex;flex-direction:column;gap:4px;margin-top:16px;"></div>
-          <input type="text" id="mobileInput" placeholder="여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off" style="margin-top:18px;width:100%;max-width:320px;text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;padding:11px 14px;border:1.5px solid #0a0a0a;border-radius:2px;background:#fff;color:#0a0a0a;outline:none;">
+          <input type="text" id="mobileInput" data-i18n-placeholder="mobilePlaceholderStart" placeholder="여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off" style="margin-top:18px;width:100%;max-width:320px;text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;padding:11px 14px;border:1.5px solid #0a0a0a;border-radius:2px;background:#fff;color:#0a0a0a;outline:none;">
           <div id="mobileTip" style="font-size:10.5px;color:rgba(10,10,10,.45);text-align:center;letter-spacing:.3px;margin-top:6px;"></div>
         </div>
 
@@ -111,16 +115,16 @@
       <!-- SIDEBAR -->
       <div style="flex:1 1 240px;max-width:320px;display:flex;flex-direction:column;gap:12px;">
         <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
-          <div style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
+          <div data-i18n="sessionStatsTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
           <div id="progress" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;line-height:1.8;letter-spacing:.02em;color:#f2ede2;"></div>
         </div>
         <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
-          <div style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
+          <div data-i18n="favSectionTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
           <div id="favCountLabel" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;"></div>
         </div>
         <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-            <span style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;">숙련도 진행</span>
+            <span data-i18n="masteryProgressTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;">숙련도 진행</span>
             <span id="masteryPct" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#e3b8d6;font-weight:700;"></span>
           </div>
           <div style="height:5px;background:rgba(242,237,226,.12);border-radius:3px;overflow:hidden;">
@@ -130,10 +134,10 @@
         </div>
         <div style="border:1px solid rgba(242,237,226,.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
           <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
-            <input type="checkbox" id="dictationToggle" style="accent-color:#e3b8d6;">딕테이션 모드
+            <input type="checkbox" id="dictationToggle" style="accent-color:#e3b8d6;"><span data-i18n="dictationLabel">딕테이션 모드</span>
           </label>
           <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
-            <input type="checkbox" id="reviewModeToggle" style="accent-color:#e3b8d6;">🔁 복습 모드
+            <input type="checkbox" id="reviewModeToggle" style="accent-color:#e3b8d6;"><span data-i18n="reviewLabel">🔁 복습 모드</span>
           </label>
         </div>
       </div>
@@ -143,36 +147,36 @@
   <!-- DRAWER -->
   <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:#0a0a0a;border-left:1px solid rgba(242,237,226,.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
     <div style="padding:22px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어 & 기록</div>
+      <div id="drawerHeaderTitle" data-i18n="drawerHeaderTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어 & 기록</div>
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:#f2ede2;padding:2px 8px;">&times;</button>
     </div>
     <div style="display:flex;border-bottom:1px solid rgba(242,237,226,.14);">
-      <button id="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
-      <button id="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">학습 기록</button>
-      <button id="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
+      <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
+      <button id="drawerTabHistory" data-i18n="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">학습 기록</button>
+      <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
     </div>
     <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e3b8d6;">★ 즐겨찾기만
+          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
         </label>
         <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e3b8d6;">📝 노트만
+          <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="notesOnlyLabel">📝 노트만</span>
         </label>
         <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
-          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e3b8d6;">❌ 오답만
+          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e3b8d6;"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
         </label>
       </div>
-      <input type="text" id="wordSearchInput" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;outline:none;border-radius:2px;">
+      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;outline:none;border-radius:2px;">
       <div style="display:flex;gap:8px;">
-        <input type="text" id="newWord" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
-        <input type="text" id="newMeaning" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
         <button id="addWordBtn" style="all:unset;cursor:pointer;background:#e3b8d6;color:#0a0a0a;padding:0 16px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;">+</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
-        <button id="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
-        <button id="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:#e07a5f;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
+        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
+        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
+        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:#e07a5f;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
       </div>
     </div>
     <div id="drawerContent" style="flex:1;overflow-y:auto;padding:8px 16px;"></div>
@@ -181,12 +185,12 @@
   <!-- AI PROMPT MODAL -->
   <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:520px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
-      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">🤖 AI 프롬프트</div>
-      <div style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
+      <div id="aiPromptModalTitle" data-i18n="aiPromptTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">🤖 AI 프롬프트</div>
+      <div id="aiPromptModalDesc" data-i18n="aiPromptDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
       <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:11.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeAiPromptModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
-        <button id="copyAiPromptBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">복사하기</button>
+        <button id="closeAiPromptModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="copyAiPromptBtn" data-i18n="copyBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">복사하기</button>
       </div>
     </div>
   </div>
@@ -194,12 +198,12 @@
   <!-- BULK MODAL -->
   <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:480px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
-      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">일괄 가져오기/내보내기</div>
-      <div style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
-      <textarea id="bulkTextarea" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
+      <div id="bulkModalTitle" data-i18n="bulkModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">일괄 가져오기/내보내기</div>
+      <div id="bulkModalDesc" data-i18n="bulkModalDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
+      <textarea id="bulkTextarea" data-i18n-placeholder="bulkTextareaPlaceholder" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
-        <button id="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
+        <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
       </div>
     </div>
   </div>
@@ -208,11 +212,11 @@
   <div id="notesModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="background:#f2ede2;color:#0a0a0a;padding:26px;width:100%;max-width:460px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
       <div id="notesModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
-      <div style="font-size:11px;color:rgba(10,10,10,.55);line-height:1.5;">예문, 관련 지식 등을 자유롭게 적어두세요.</div>
-      <textarea id="notesTextarea" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;padding:11px;border:1.5px solid #0a0a0a;font-family:'Space Grotesk',sans-serif;font-size:12.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
+      <div id="notesModalDesc" data-i18n="notesDesc" style="font-size:11px;color:rgba(10,10,10,.55);line-height:1.5;">예문, 관련 지식 등을 자유롭게 적어두세요.</div>
+      <textarea id="notesTextarea" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;padding:11px;border:1.5px solid #0a0a0a;font-family:'Space Grotesk',sans-serif;font-size:12.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeNotesModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1.5px solid #0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">취소</button>
-        <button id="saveNotesBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#0a0a0a;color:#f2ede2;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
+        <button id="closeNotesModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1.5px solid #0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">취소</button>
+        <button id="saveNotesBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#0a0a0a;color:#f2ede2;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
       </div>
     </div>
   </div>
@@ -220,15 +224,15 @@
   <!-- WHO ARE YOU MODAL (first visit only) -->
   <div id="whoAmIOverlay" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="width:100%;max-width:400px;text-align:center;">
-      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:24px;margin-bottom:10px;">👋 이름을 알려주세요</div>
-      <div style="font-size:12.5px;color:rgba(242,237,226,.5);line-height:1.6;margin:0 0 22px;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
-      <input type="text" id="whoAmIInput" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:13px;text-align:center;font-size:14px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
-      <button id="whoAmISubmitBtn" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;text-align:center;background:#e3b8d6;color:#0a0a0a;padding:13px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;font-weight:700;">시작하기</button>
+      <div id="whoAmITitle" data-i18n="whoAmITitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:24px;margin-bottom:10px;">👋 이름을 알려주세요</div>
+      <div id="whoAmIDesc" data-i18n="whoAmIDesc" style="font-size:12.5px;color:rgba(242,237,226,.5);line-height:1.6;margin:0 0 22px;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
+      <input type="text" id="whoAmIInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:13px;text-align:center;font-size:14px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
+      <button id="whoAmISubmitBtn" data-i18n="startBtn" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;text-align:center;background:#e3b8d6;color:#0a0a0a;padding:13px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;font-weight:700;">시작하기</button>
     </div>
   </div>
 
   <!-- LOADING OVERLAY -->
-  <div id="loadingOverlay" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:1500;color:rgba(242,237,226,.5);font-size:11px;letter-spacing:.05em;text-transform:uppercase;">
+  <div id="loadingOverlay" data-i18n="loadingText" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:1500;color:rgba(242,237,226,.5);font-size:11px;letter-spacing:.05em;text-transform:uppercase;">
     불러오는 중...
   </div>
 
@@ -237,9 +241,9 @@
     <div style="width:100%;max-width:400px;background:#0a0a0a;border:1px solid rgba(242,237,226,.2);padding:26px;border-radius:4px;box-sizing:border-box;">
       <div id="switchUserModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;margin-bottom:8px;"></div>
       <div id="switchUserModalDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;margin-bottom:14px;"></div>
-      <input type="text" id="switchUserInput" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:11px;font-size:13px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
+      <input type="text" id="switchUserInput" data-i18n-placeholder="namePlaceholder" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:11px;font-size:13px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeSwitchUserModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="closeSwitchUserModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
         <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">전환하기</button>
       </div>
     </div>
@@ -248,7 +252,7 @@
   <!-- FOOTER -->
   <footer style="max-width:1100px;margin:0 auto;width:100%;border-top:1px solid rgba(242,237,226,.14);padding:20px 32px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.03em;color:rgba(242,237,226,.4);box-sizing:border-box;">
     <span>TYPE/TRAINER — 2026</span>
-    <span style="text-align:right;line-height:1.6;">[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요</span>
+    <span id="footerHint" data-i18n="footerHint" style="text-align:right;line-height:1.6;">[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요</span>
   </footer>
 </div>
 
@@ -430,6 +434,140 @@
 
 * 仅输出可以直接复制的纯文本代码块（Code Block），不要带有任何额外的问候、序号（如 1., 2.）或解释。`;
 
+  const UI_LANG_KEY = 'TRAINER_UI_LANG';
+  let uiLang = localStorage.getItem(UI_LANG_KEY) || 'ko';
+
+  const I18N = {
+    ko: {
+      tagline: '+ 한글 &amp; 영어 타자 연습기',
+      navPractice: '연습', navWords: '단어 목록', navHistory: '학습 기록', navStats: '통계',
+      renameTitle: '이름 변경',
+      heroTitle: '타자로 배우는<br>한글 &amp; 영어',
+      heroDesc: '매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.',
+      favTitle: '즐겨찾기', notesTitle: '노트', restartTitle: '다시 시작',
+      mobilePlaceholderStart: '여기를 눌러 입력을 시작하세요',
+      mobilePlaceholderKo: '한국어 키보드로 입력하세요',
+      mobileTipKo: '※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.',
+      mobilePlaceholderEn: 'English input here',
+      mobileTipEn: '※ 영어 모드일 때는 영문 키보드로 입력해 주세요.',
+      sessionStatsTitle: '이번 세션', favSectionTitle: '즐겨찾기', masteryProgressTitle: '숙련도 진행',
+      dictationLabel: '딕테이션 모드', reviewLabel: '🔁 복습 모드',
+      progressLine: '정답 {{correct}} · 건너뜀 {{skipped}} · 정확도 {{accuracy}}% · CPM {{cpm}}{{streak}}',
+      streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
+      masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
+      correctNext: '정답! Enter로 다음',
+      drawerHeaderTitle: '단어 & 기록', drawerTabWords: '단어 목록', drawerTabHistory: '학습 기록', drawerTabStats: '통계',
+      favOnlyLabel: '★ 즐겨찾기만', notesOnlyLabel: '📝 노트만', wrongOnlyLabel: '❌ 오답만',
+      wordSearchPlaceholder: '🔍 단어, 뜻, 노트 검색...', newWordPlaceholder: '단어 (한국어/english)', newMeaningPlaceholder: '뜻/로마자',
+      openBulkBtn: '가져오기/내보내기', openAiPromptBtn: '🤖 AI 프롬프트', clearWordsBtn: '초기화',
+      noWords: '단어가 없습니다.', noSearchResults: '검색 결과가 없습니다.', noNotesWords: '노트를 남긴 단어가 없습니다.',
+      noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
+      deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
+      noHistory: '학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.',
+      historyCount: '{{count}}개', studyThisDate: '▶ 이 날짜로 연습하기',
+      reviewStatusTitle: '복습 현황', overdueLabel: '밀린 복습', dueTodayLabel: '오늘 복습', upcomingLabel: '예정', freshLabel: '미학습',
+      masteryDistTitle: '숙련도 분포', weakWordsTitle: '취약 단어 TOP 5', wrongOrderTag: '❌ 오답순',
+      activityTitle: '단어 추가 활동', activityCaption: '일괄 가져오기로 새 단어를 추가한 날짜 기준',
+      legendLess: '적음', legendMore: '많음', activityTooltip: '{{date}}: {{count}}개',
+      addWordAlertEmpty: '추가할 단어를 입력해 주세요!',
+      clearConfirm: '모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?',
+      aiPromptTitle: '🤖 AI 프롬프트',
+      aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
+      cancel: '취소', copyBtn: '복사하기', copiedBtn: '✓ 복사됨',
+      bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.',
+      bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기',
+      importAlertEmpty: '가져올 내용을 입력해 주세요!',
+      importSuccess: '가져오기 완료! (한국어: {{koCount}}개, 영어: {{enCount}}개)\n오늘 날짜({{date}})로 학습 기록에 저장되었습니다.',
+      notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장',
+      whoAmITitle: '👋 이름을 알려주세요',
+      whoAmIDesc: '이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.',
+      namePlaceholder: '예: shiya', startBtn: '시작하기',
+      loadingText: '불러오는 중...',
+      switchTitle: '👤 계정 전환',
+      switchDesc: '다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.',
+      switchSubmit: '전환하기',
+      renameTitleModal: '✏️ 이름 변경',
+      renameDesc: '현재 계정({{userId}})의 단어·즐겨찾기·노트·기록은 그대로 유지한 채 이름만 바꿉니다.',
+      renameSubmit: '변경하기',
+      targetExists: "'{{name}}' 계정에는 이미 데이터가 있어요. 다른 이름을 사용해 주세요.",
+      renameFailed: '이름 변경에 실패했습니다.',
+      renameError: '이름 변경 중 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.',
+      reviewDoneAll: '오늘 복습할 단어를 모두 마쳤습니다! 🎉',
+      reviewNoneInMode: '이 모드에는 오늘 복습할 단어가 없습니다! 🎉',
+      reviewNoneToday: '오늘 복습할 단어가 없습니다! 🎉 모든 단어가 아직 복습 예정일이 되지 않았어요.',
+      cloudUnavailable: '클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.',
+      cloudSaveFailed: '클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.',
+      footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
+    },
+    en: {
+      tagline: '+ Korean &amp; English Typing Trainer',
+      navPractice: 'Practice', navWords: 'Words', navHistory: 'History', navStats: 'Stats',
+      renameTitle: 'Rename',
+      heroTitle: 'Learn Korean<br>&amp; English by Typing',
+      heroDesc: "A little every day — memorize Korean and English words with your fingertips. Only words you truly learn stick.",
+      favTitle: 'Favorite', notesTitle: 'Notes', restartTitle: 'Restart',
+      mobilePlaceholderStart: 'Tap here to start typing',
+      mobilePlaceholderKo: 'Type using a Korean keyboard',
+      mobileTipKo: '※ In Korean mode, please use your phone\'s Korean keyboard.',
+      mobilePlaceholderEn: 'English input here',
+      mobileTipEn: '※ In English mode, please use an English keyboard.',
+      sessionStatsTitle: 'This Session', favSectionTitle: 'Favorites', masteryProgressTitle: 'Mastery Progress',
+      dictationLabel: 'Dictation Mode', reviewLabel: '🔁 Review Mode',
+      progressLine: 'Correct {{correct}} · Skipped {{skipped}} · Accuracy {{accuracy}}% · CPM {{cpm}}{{streak}}',
+      streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
+      masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
+      correctNext: 'Correct! Press Enter for next',
+      drawerHeaderTitle: 'Words & History', drawerTabWords: 'Words', drawerTabHistory: 'History', drawerTabStats: 'Stats',
+      favOnlyLabel: '★ Favorites only', notesOnlyLabel: '📝 Notes only', wrongOnlyLabel: '❌ Wrong only',
+      wordSearchPlaceholder: '🔍 Search word, meaning, notes...', newWordPlaceholder: 'Word (한국어/english)', newMeaningPlaceholder: 'Meaning / romanization',
+      openBulkBtn: 'Import/Export', openAiPromptBtn: '🤖 AI Prompt', clearWordsBtn: 'Reset',
+      noWords: 'No words yet.', noSearchResults: 'No search results.', noNotesWords: 'No words with notes.',
+      noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
+      deleteConfirm: "Delete '{{word}}'?",
+      noHistory: 'No history yet.<br>Bulk-import words to save today\'s date as a record.',
+      historyCount: '{{count}}', studyThisDate: '▶ Practice this date',
+      reviewStatusTitle: 'Review Status', overdueLabel: 'Overdue', dueTodayLabel: 'Due Today', upcomingLabel: 'Upcoming', freshLabel: 'Not Studied',
+      masteryDistTitle: 'Mastery Distribution', weakWordsTitle: 'Top 5 Weak Words', wrongOrderTag: '❌ By mistakes',
+      activityTitle: 'Word Addition Activity', activityCaption: 'Based on dates new words were bulk-imported',
+      legendLess: 'Less', legendMore: 'More', activityTooltip: '{{date}}: {{count}}',
+      addWordAlertEmpty: 'Please enter a word to add!',
+      clearConfirm: 'Reset all your words back to the defaults?',
+      aiPromptTitle: '🤖 AI Prompt',
+      aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
+      cancel: 'Cancel', copyBtn: 'Copy', copiedBtn: '✓ Copied',
+      bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format.',
+      bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import',
+      importAlertEmpty: 'Please enter content to import!',
+      importSuccess: 'Import complete! (Korean: {{koCount}}, English: {{enCount}})\nSaved to history under today\'s date ({{date}}).',
+      notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save',
+      whoAmITitle: "👋 What's your name?",
+      whoAmIDesc: "Your word list will be saved to the cloud under this name. It'll be remembered automatically next time on this device.",
+      namePlaceholder: 'e.g. shiya', startBtn: 'Get Started',
+      loadingText: 'Loading...',
+      switchTitle: '👤 Switch Account',
+      switchDesc: 'Enter the exact same name (matching case and spaces) used on your other device to see the same data.',
+      switchSubmit: 'Switch',
+      renameTitleModal: '✏️ Rename',
+      renameDesc: 'Keeps all words, favorites, notes and history for the current account ({{userId}}) — only the name changes.',
+      renameSubmit: 'Rename',
+      targetExists: "'{{name}}' already has data. Please choose another name.",
+      renameFailed: 'Failed to rename.',
+      renameError: 'An error occurred while renaming. Please check your internet connection.',
+      reviewDoneAll: "You've finished all today's reviews! 🎉",
+      reviewNoneInMode: 'No words to review in this mode today! 🎉',
+      reviewNoneToday: 'No words due for review today! 🎉 None of your words are due yet.',
+      cloudUnavailable: "Can't connect to the cloud — changes made this session won't be saved.",
+      cloudSaveFailed: 'Cloud save failed — refreshing may lose your latest changes.',
+      footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
+    }
+  };
+
+  function t(key, vars){
+    let str = (I18N[uiLang] && I18N[uiLang][key]) || I18N.ko[key] || key;
+    if(vars) for(const k in vars) str = str.split(`{{${k}}}`).join(vars[k]);
+    return str;
+  }
+
   let KO_WORDS = [];
   let EN_WORDS = [];
   let HISTORY_KO = [];
@@ -466,7 +604,7 @@
     const due=findDueIndex(wordIndex,dir,false);
     if(due===-1){
       if(dir>0){
-        alert('오늘 복습할 단어를 모두 마쳤습니다! 🎉');
+        alert(t('reviewDoneAll'));
         reviewMode=false;
         const toggle=$('reviewModeToggle'); if(toggle) toggle.checked=false;
       }
@@ -512,9 +650,11 @@
   function apiWordsUrl(m){ return `/api/words?user=${encodeURIComponent(userId)}&mode=${m}`; }
   function apiHistoryUrl(m){ return `/api/history?user=${encodeURIComponent(userId)}&mode=${m}`; }
 
-  function showCloudWarning(msg){
+  let cloudWarningKey = null;
+  function showCloudWarning(key){
     cloudOk = false;
-    cloudStatusEl.textContent = msg;
+    cloudWarningKey = key;
+    cloudStatusEl.textContent = t(key);
     cloudStatusEl.style.display = 'block';
   }
 
@@ -534,14 +674,14 @@
     if(!cloudOk) return;
     fetch(apiWordsUrl(m), { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(words) })
       .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
-      .catch(err=>{ console.error('cloud save failed', err); showCloudWarning('클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.'); });
+      .catch(err=>{ console.error('cloud save failed', err); showCloudWarning('cloudSaveFailed'); });
   }
 
   function pushHistoryToCloud(m, date, words){
     if(!cloudOk) return;
     fetch(apiHistoryUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({date, words}) })
       .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
-      .catch(err=>{ console.error('cloud history save failed', err); showCloudWarning('클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.'); });
+      .catch(err=>{ console.error('cloud history save failed', err); showCloudWarning('cloudSaveFailed'); });
   }
 
   function ensureUserId(){
@@ -577,14 +717,21 @@
     if(wordIndex<0) wordIndex=listCount-1;
     if(mode==='ko'){
       koEngine=makeKoreanEngine(KO_WORDS[wordIndex].word);
-      mobileInput.placeholder='한국어 키보드로 입력하세요';
-      mobileTip.textContent='※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.';
     } else {
       enEngine=makeEnglishEngine(EN_WORDS[wordIndex]);
-      mobileInput.placeholder='English input here';
-      mobileTip.textContent='※ 영어 모드일 때는 영문 키보드로 입력해 주세요.';
     }
+    updateMobileHints();
     render(); renderActiveDrawerView(); updateFavoriteBtn(); updateNotesBtn();
+  }
+
+  function updateMobileHints(){
+    if(mode==='ko'){
+      mobileInput.placeholder=t('mobilePlaceholderKo');
+      mobileTip.textContent=t('mobileTipKo');
+    } else {
+      mobileInput.placeholder=t('mobilePlaceholderEn');
+      mobileTip.textContent=t('mobileTipEn');
+    }
   }
 
   function currentWordList(){ return mode==='ko' ? KO_WORDS : EN_WORDS; }
@@ -653,13 +800,13 @@
     const fill=$('masteryFill'), pct=$('masteryPct'), label=$('masteryLabel');
     if(!fill) return;
     const list=currentWordList();
-    if(list.length===0){ fill.style.width='0%'; pct.textContent=''; label.textContent='단어를 추가해 주세요'; return; }
+    if(list.length===0){ fill.style.width='0%'; pct.textContent=''; label.textContent=t('masteryEmpty'); return; }
     const sum=list.reduce((s,w)=>s+(w.box||0),0);
     const p=Math.round(sum/(list.length*5)*100);
     const mastered=list.filter(w=>(w.box||0)>=5).length;
     fill.style.width=`${p}%`;
     pct.textContent=`${p}%`;
-    label.textContent=`완전 숙련 ${mastered} / ${list.length}개`;
+    label.textContent=t('masteryProgressLabel',{mastered,total:list.length});
   }
 
   function renderMasteryDots(word){
@@ -726,8 +873,8 @@
     const accuracy = sessionStats.wordsCompleted>0 ? Math.round(sessionStats.wordsCleanCompleted/sessionStats.wordsCompleted*100) : 100;
     const elapsedMin = Math.max((Date.now()-sessionStats.startAt)/60000, 1/60);
     const cpm = sessionStats.keysTyped>0 ? Math.round(sessionStats.keysTyped/elapsedMin) : 0;
-    const streakTag = sessionStreak>=3 ? ` · 연속 ${sessionStreak}🔥` : (sessionStreak>0 ? ` · 연속 ${sessionStreak}` : '');
-    progressEl.textContent = `정답 ${stats.correct} · 건너뜀 ${stats.skipped} · 정확도 ${accuracy}% · CPM ${cpm}${streakTag}`;
+    const streakTag = sessionStreak>=3 ? t('streakTagFire',{n:sessionStreak}) : (sessionStreak>0 ? t('streakTag',{n:sessionStreak}) : '');
+    progressEl.textContent = t('progressLine',{correct:stats.correct,skipped:stats.skipped,accuracy,cpm,streak:streakTag});
     pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
     const pageBadge=$('pageBadge'); if(pageBadge) pageBadge.textContent = total>0 ? `NO.${String(wordIndex+1).padStart(3,'0')}` : '';
     renderMasteryDots(currentWordObj());
@@ -778,7 +925,7 @@
       const lastTyped=koEngine.typed[koEngine.activeIndex];
       const lastFilled = lastTarget ? (lastTarget.jong ? (lastTyped.cho&&lastTyped.jung&&lastTyped.jong) : (lastTyped.cho&&lastTyped.jung)) : false;
       const wordDone = allComplete && !!lastFilled;
-      statusBanner.textContent = wordDone&&allCorrect ? '정답! Enter로 다음' : '';
+      statusBanner.textContent = wordDone&&allCorrect ? t('correctNext') : '';
       statusBanner.style.color = wordDone&&allCorrect ? COL.green : 'inherit';
     } else {
       koRow.style.display='none'; enRow.style.display='flex';
@@ -814,7 +961,7 @@
           enRow.appendChild(block);
         }
       }
-      statusBanner.textContent = r.complete ? '정답! Enter로 다음' : '';
+      statusBanner.textContent = r.complete ? t('correctNext') : '';
       statusBanner.style.color = r.complete ? COL.green : 'inherit';
     }
   }
@@ -822,7 +969,7 @@
   function renderDrawer(){
     drawerContent.innerHTML='';
     const total=currentWordCount();
-    if(total===0){ drawerContent.innerHTML='<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">단어가 없습니다.</div>'; return; }
+    if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
     const list = mode==='ko' ? KO_WORDS : EN_WORDS;
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
@@ -843,7 +990,7 @@
       drawerContent.appendChild(createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0));
     });
     if(shown===0){
-      const msg = query ? '검색 결과가 없습니다.' : (notesOnly ? '노트를 남긴 단어가 없습니다.' : (wrongOnly ? '오답 단어가 없습니다.' : '즐겨찾기한 단어가 없습니다.'));
+      const msg = query ? t('noSearchResults') : (notesOnly ? t('noNotesWords') : (wrongOnly ? t('noWrongWords') : t('noFavWords')));
       drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${msg}</div>`;
     }
   }
@@ -870,7 +1017,7 @@
     delBtn.dataset.role='del';
     delBtn.textContent='✕';
     delBtn.style.cssText='border:none;background:none;color:rgba(242,237,226,.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
-    delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(`'${mainText}' 단어를 삭제할까요?`)) deleteWordAt(index); });
+    delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
     actions.appendChild(favBtn); actions.appendChild(delBtn);
     container.appendChild(info); container.appendChild(actions);
     return container;
@@ -910,7 +1057,7 @@
     drawerContent.innerHTML='';
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     if(history.length===0){
-      drawerContent.innerHTML='<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.</div>';
+      drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${t('noHistory')}</div>`;
       return;
     }
     for(let i=history.length-1;i>=0;i--){
@@ -928,7 +1075,7 @@
     dateSpan.textContent=entry.date;
     const countSpan=document.createElement('span');
     countSpan.style.cssText='font-size:11px;color:rgba(242,237,226,.45);';
-    countSpan.textContent=`${entry.words.length}개`;
+    countSpan.textContent=t('historyCount',{count:entry.words.length});
     row.appendChild(dateSpan); row.appendChild(countSpan);
     container.appendChild(row);
 
@@ -938,7 +1085,7 @@
     container.appendChild(preview);
 
     const studyBtn=document.createElement('button');
-    studyBtn.textContent='▶ 이 날짜로 연습하기';
+    studyBtn.textContent=t('studyThisDate');
     studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:#e3b8d6;color:#0a0a0a;padding:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;border-radius:2px;';
     studyBtn.addEventListener('click', ()=>studyHistoryEntry(index));
     container.appendChild(studyBtn);
@@ -976,7 +1123,7 @@
 
   function buildReviewStatusSection(list){
     const section=statCard();
-    section.appendChild(statSectionTitle('복습 현황'));
+    section.appendChild(statSectionTitle(t('reviewStatusTitle')));
     const today=todayStr();
     let overdue=0, dueToday=0, upcoming=0, fresh=0;
     list.forEach(w=>{
@@ -988,21 +1135,21 @@
     const grid=document.createElement('div');
     grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
     [
-      {label:'밀린 복습', value:overdue, icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
-      {label:'오늘 복습', value:dueToday, icon:'🟡', bg:'rgba(227,184,214,.09)', border:'1px solid rgba(227,184,214,.4)', dot:'rgba(227,184,214,.18)', num:COL.pink},
-      {label:'예정', value:upcoming, icon:'⚪', bg:'rgba(242,237,226,.04)', border:'1px solid rgba(242,237,226,.14)', dot:'rgba(242,237,226,.06)', num:'rgba(242,237,226,.8)'},
-      {label:'미학습', value:fresh, icon:'🆕', bg:'rgba(242,237,226,.04)', border:'1px dashed rgba(242,237,226,.22)', dot:'rgba(242,237,226,.05)', num:'rgba(242,237,226,.6)'}
-    ].forEach(t=>{
+      {label:t('overdueLabel'), value:overdue, icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
+      {label:t('dueTodayLabel'), value:dueToday, icon:'🟡', bg:'rgba(227,184,214,.09)', border:'1px solid rgba(227,184,214,.4)', dot:'rgba(227,184,214,.18)', num:COL.pink},
+      {label:t('upcomingLabel'), value:upcoming, icon:'⚪', bg:'rgba(242,237,226,.04)', border:'1px solid rgba(242,237,226,.14)', dot:'rgba(242,237,226,.06)', num:'rgba(242,237,226,.8)'},
+      {label:t('freshLabel'), value:fresh, icon:'🆕', bg:'rgba(242,237,226,.04)', border:'1px dashed rgba(242,237,226,.22)', dot:'rgba(242,237,226,.05)', num:'rgba(242,237,226,.6)'}
+    ].forEach(item=>{
       const tile=document.createElement('div');
-      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${t.bg};border:${t.border};overflow:hidden;`;
+      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${item.bg};border:${item.border};overflow:hidden;`;
       const blob=document.createElement('div');
-      blob.style.cssText=`position:absolute;top:-12px;right:-12px;width:46px;height:46px;border-radius:50%;background:${t.dot};`;
+      blob.style.cssText=`position:absolute;top:-12px;right:-12px;width:46px;height:46px;border-radius:50%;background:${item.dot};`;
       const num=document.createElement('div');
-      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:23px;color:${t.num};position:relative;`;
-      num.textContent=String(t.value);
+      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:23px;color:${item.num};position:relative;`;
+      num.textContent=String(item.value);
       const lab=document.createElement('div');
       lab.style.cssText='font-size:10px;letter-spacing:.02em;color:rgba(242,237,226,.55);margin-top:3px;position:relative;';
-      lab.textContent=`${t.icon} ${t.label}`;
+      lab.textContent=`${item.icon} ${item.label}`;
       tile.appendChild(blob); tile.appendChild(num); tile.appendChild(lab);
       grid.appendChild(tile);
     });
@@ -1031,11 +1178,11 @@
 
   function buildMasterySection(list){
     const section=statCard();
-    section.appendChild(statSectionTitle('숙련도 분포'));
+    section.appendChild(statSectionTitle(t('masteryDistTitle')));
     if(list.length===0){
       const empty=document.createElement('div');
       empty.style.cssText='font-size:11px;color:rgba(242,237,226,.4);';
-      empty.textContent='단어가 없습니다.';
+      empty.textContent=t('noWords');
       section.appendChild(empty);
       return section;
     }
@@ -1059,10 +1206,10 @@
     const section=statCard();
     const header=document.createElement('div');
     header.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
-    header.appendChild(statSectionTitle('취약 단어 TOP 5', 0));
+    header.appendChild(statSectionTitle(t('weakWordsTitle'), 0));
     const tag=document.createElement('div');
     tag.style.cssText='font-size:9.5px;color:#e0685a;font-weight:700;letter-spacing:.03em;';
-    tag.textContent='❌ 오답순';
+    tag.textContent=t('wrongOrderTag');
     header.appendChild(tag);
     section.appendChild(header);
 
@@ -1097,10 +1244,10 @@
 
   function buildActivitySection(history){
     const section=statCard();
-    section.appendChild(statSectionTitle('단어 추가 활동', 4));
+    section.appendChild(statSectionTitle(t('activityTitle'), 4));
     const caption=document.createElement('div');
     caption.style.cssText='font-size:9.5px;color:rgba(242,237,226,.35);margin-bottom:12px;line-height:1.5;';
-    caption.textContent='일괄 가져오기로 새 단어를 추가한 날짜 기준';
+    caption.textContent=t('activityCaption');
     section.appendChild(caption);
 
     const byDate={};
@@ -1129,7 +1276,7 @@
     grid.style.cssText='display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;gap:3px;overflow-x:auto;padding-bottom:2px;';
     cells.forEach(c=>{
       const cell=document.createElement('div');
-      cell.title=`${c.date}: ${c.count}개`;
+      cell.title=t('activityTooltip',{date:c.date,count:c.count});
       cell.style.cssText=`width:11px;height:11px;border-radius:2px;background:${tierColor(c.count)};`;
       grid.appendChild(cell);
     });
@@ -1137,14 +1284,14 @@
 
     const legend=document.createElement('div');
     legend.style.cssText='display:flex;align-items:center;gap:4px;margin-top:10px;justify-content:flex-end;';
-    const lessLab=document.createElement('span'); lessLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; lessLab.textContent='적음';
+    const lessLab=document.createElement('span'); lessLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; lessLab.textContent=t('legendLess');
     legend.appendChild(lessLab);
     ['rgba(242,237,226,.06)','rgba(227,184,214,.25)','rgba(227,184,214,.45)','rgba(227,184,214,.7)',COL.pink].forEach(color=>{
       const sw=document.createElement('div');
       sw.style.cssText=`width:9px;height:9px;border-radius:2px;background:${color};`;
       legend.appendChild(sw);
     });
-    const moreLab=document.createElement('span'); moreLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; moreLab.textContent='많음';
+    const moreLab=document.createElement('span'); moreLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; moreLab.textContent=t('legendMore');
     legend.appendChild(moreLab);
     section.appendChild(legend);
     return section;
@@ -1242,7 +1389,7 @@
       if(reviewMode){
         const due=findDueIndex(0,1,true);
         if(due===-1){
-          alert('이 모드에는 오늘 복습할 단어가 없습니다! 🎉');
+          alert(t('reviewNoneInMode'));
           reviewMode=false; reviewModeToggle.checked=false;
         } else wordIndex=due;
       }
@@ -1275,7 +1422,7 @@
       if(currentWordCount()===0){ e.target.checked=false; return; }
       const due=findDueIndex(wordIndex,1,true);
       if(due===-1){
-        alert('오늘 복습할 단어가 없습니다! 🎉 모든 단어가 아직 복습 예정일이 되지 않았어요.');
+        alert(t('reviewNoneToday'));
         e.target.checked=false;
         return;
       }
@@ -1304,7 +1451,7 @@
   $('addWordBtn').addEventListener('click', ()=>{
     const wordInput=$('newWord'), meaningInput=$('newMeaning');
     const word=wordInput.value.trim(), meaning=meaningInput.value.trim();
-    if(!word){ alert('추가할 단어를 입력해 주세요!'); return; }
+    if(!word){ alert(t('addWordAlertEmpty')); return; }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
     if(isKorean){
       KO_WORDS.push({word,roman:meaning||'Custom',favorite:false,notes:''});
@@ -1321,7 +1468,7 @@
   });
 
   $('clearWordsBtn').addEventListener('click', ()=>{
-    if(confirm('모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?')){
+    if(confirm(t('clearConfirm'))){
       KO_WORDS=[...DEFAULT_KO_WORDS]; EN_WORDS=[...DEFAULT_EN_WORDS];
       pushWordsToCloud('ko', KO_WORDS);
       pushWordsToCloud('en', EN_WORDS);
@@ -1346,7 +1493,7 @@
       document.execCommand('copy');
     }
     const original = btn.textContent;
-    btn.textContent = '✓ 복사됨';
+    btn.textContent = t('copiedBtn');
     setTimeout(()=>{ btn.textContent = original; }, 1500);
   });
 
@@ -1358,7 +1505,7 @@
   $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
   $('importBtn').addEventListener('click', ()=>{
     const rawText=bulkTextarea.value.trim();
-    if(!rawText){ alert('가져올 내용을 입력해 주세요!'); return; }
+    if(!rawText){ alert(t('importAlertEmpty')); return; }
     const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
     const tempKo=[], tempEn=[];
     lines.forEach(line=>{
@@ -1377,7 +1524,7 @@
       addHistoryBatch('en', tempEn);
       EN_WORDS=tempEn; pushWordsToCloud('en', EN_WORDS);
     }
-    alert(`가져오기 완료! (한국어: ${tempKo.length}개, 영어: ${tempEn.length}개)\n오늘 날짜(${todayStr()})로 학습 기록에 저장되었습니다.`);
+    alert(t('importSuccess',{koCount:tempKo.length,enCount:tempEn.length,date:todayStr()}));
     modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
     wordIndex=0; loadWord();
   });
@@ -1400,27 +1547,34 @@
       EN_WORDS = [...DEFAULT_EN_WORDS];
       HISTORY_KO = [];
       HISTORY_EN = [];
-      showCloudWarning('클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.');
+      showCloudWarning('cloudUnavailable');
     }
   }
 
   const switchUserModalTitle=$('switchUserModalTitle'), switchUserModalDesc=$('switchUserModalDesc'), submitSwitchUserBtn=$('submitSwitchUserBtn');
   let switchUserModalMode = 'switch';
 
+  function refreshSwitchUserModalTexts(){
+    if(switchUserModalMode==='rename'){
+      switchUserModalTitle.textContent = t('renameTitleModal');
+      switchUserModalDesc.textContent = t('renameDesc',{userId});
+      submitSwitchUserBtn.textContent = t('renameSubmit');
+    } else {
+      switchUserModalTitle.textContent = t('switchTitle');
+      switchUserModalDesc.textContent = t('switchDesc');
+      submitSwitchUserBtn.textContent = t('switchSubmit');
+    }
+  }
   function openSwitchUserModal(){
     switchUserModalMode = 'switch';
-    switchUserModalTitle.textContent = '👤 계정 전환';
-    switchUserModalDesc.textContent = '다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.';
-    submitSwitchUserBtn.textContent = '전환하기';
+    refreshSwitchUserModalTexts();
     switchUserInput.value = userId;
     switchUserModalOverlay.style.opacity='1'; switchUserModalOverlay.style.pointerEvents='auto';
     switchUserInput.focus(); switchUserInput.select();
   }
   function openRenameUserModal(){
     switchUserModalMode = 'rename';
-    switchUserModalTitle.textContent = '✏️ 이름 변경';
-    switchUserModalDesc.textContent = `현재 계정(${userId})의 단어·즐겨찾기·노트·기록은 그대로 유지한 채 이름만 바꿉니다.`;
-    submitSwitchUserBtn.textContent = '변경하기';
+    refreshSwitchUserModalTexts();
     switchUserInput.value = userId;
     switchUserModalOverlay.style.opacity='1'; switchUserModalOverlay.style.pointerEvents='auto';
     switchUserInput.focus(); switchUserInput.select();
@@ -1460,12 +1614,12 @@
       });
       const data = await res.json().catch(()=>({}));
       if(!res.ok || !data.ok){
-        alert(data.error==='target_exists' ? `'${name}' 계정에는 이미 데이터가 있어요. 다른 이름을 사용해 주세요.` : '이름 변경에 실패했습니다.');
+        alert(data.error==='target_exists' ? t('targetExists',{name}) : t('renameFailed'));
         return;
       }
     } catch(err){
       console.error('rename failed', err);
-      alert('이름 변경 중 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.');
+      alert(t('renameError'));
       return;
     }
     userId = name;
@@ -1485,7 +1639,36 @@
   submitSwitchUserBtn.addEventListener('click', submitSwitchUserModal);
   switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submitSwitchUserModal(); } });
 
+  function applyI18n(){
+    document.documentElement.lang = uiLang;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPlaceholder); });
+    document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title = t(el.dataset.i18nTitle); });
+    document.querySelectorAll('.ui-lang-btn').forEach(b=>{
+      const active = b.dataset.lang===uiLang;
+      b.style.background = active ? '#f2ede2' : 'transparent';
+      b.style.color = active ? '#0a0a0a' : 'rgba(242,237,226,.5)';
+    });
+    updateMobileHints();
+    refreshSwitchUserModalTexts();
+    if(!cloudOk && cloudWarningKey) cloudStatusEl.textContent = t(cloudWarningKey);
+    render();
+    renderActiveDrawerView();
+    updateFavoriteBtn();
+    updateNotesBtn();
+  }
+
+  document.querySelectorAll('.ui-lang-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.dataset.lang===uiLang) return;
+      uiLang = btn.dataset.lang;
+      localStorage.setItem(UI_LANG_KEY, uiLang);
+      applyI18n();
+    });
+  });
+
   async function init(){
+    applyI18n();
     await ensureUserId();
     currentUserLabel.textContent = userId;
     await loadCloudData();
