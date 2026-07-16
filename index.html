@@ -5,212 +5,233 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TYPE/TRAINER · 타자 연습 도구</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;background:#0c0c0c;}
-  ::selection{background:#e7b8da;color:#0c0c0c;}
-  input::placeholder, textarea::placeholder{color:#8f8f8f;}
-  a{color:#e7b8da;}
-  a:hover{color:#f3d3ea;}
+  body{margin:0;background:#0a0a0a;}
+  ::selection{background:#e3b8d6;color:#0a0a0a;}
+  input::placeholder, textarea::placeholder{color:rgba(242,237,226,.35);}
+  a{color:#e3b8d6;}
+  a:hover{color:#f2ede2;}
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:#0a0a0a;}
+  ::-webkit-scrollbar-thumb{background:#2a2a2a;}
 </style>
 </head>
 <body>
-<div style="min-height:100vh;background:#0c0c0c;color:#f1ede6;font-family:'JetBrains Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:0 0 80px;overflow-x:hidden;">
+<div style="min-height:100vh;background:#0a0a0a;color:#f2ede2;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;padding-bottom:40px;">
 
-  <!-- NAV -->
-  <div style="width:100%;max-width:1100px;display:flex;justify-content:space-between;align-items:center;padding:22px 20px 18px;flex-wrap:wrap;gap:14px;">
-    <div style="font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;color:#f1ede6;">TYPE<span style="color:#e7b8da;">/</span>TRAINER</div>
-    <div style="font-size:10.5px;letter-spacing:1.5px;color:#8f8f8f;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
-    <div id="tabs" style="display:flex;gap:16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">
-      <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#f1ede6;">
+  <!-- HEADER -->
+  <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;border-bottom:1px solid rgba(242,237,226,.14);background:rgba(10,10,10,.88);backdrop-filter:blur(8px);flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:19px;letter-spacing:-.02em;">TYPE<span style="color:#e3b8d6;">/</span>TRAINER</div>
+      <div style="font-size:10.5px;letter-spacing:.08em;color:rgba(242,237,226,.5);font-weight:500;white-space:nowrap;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
+    </div>
+    <div id="tabs" style="display:flex;gap:14px;font-size:11px;letter-spacing:.05em;font-weight:600;">
+      <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#f2ede2;">
         <span class="tab-glyph" data-mode="ko">■</span>한국어
       </button>
-      <button class="tab-btn" data-mode="en" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#8f8f8f;">
+      <button class="tab-btn" data-mode="en" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(242,237,226,.45);">
         <span class="tab-glyph" data-mode="en">□</span>english
       </button>
     </div>
-  </div>
-
-  <div style="width:100%;max-width:1100px;height:1px;background:rgba(255,255,255,.18);"></div>
+    <nav style="display:flex;gap:18px;font-size:11px;letter-spacing:.05em;font-weight:600;">
+      <button id="navPracticeBtn" style="all:unset;cursor:pointer;color:#f2ede2;">연습</button>
+      <button id="openDrawerBtn" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">단어 목록</button>
+      <button id="openHistoryBtn" style="all:unset;cursor:pointer;color:rgba(242,237,226,.45);">학습 기록</button>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button id="switchUserBtn" style="display:flex;align-items:center;gap:8px;background:#f2ede2;color:#0a0a0a;border:none;border-radius:100px;padding:8px 16px;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;font-family:inherit;">
+        <span style="width:14px;height:14px;border-radius:50%;background:#e3b8d6;display:inline-block;"></span><span id="currentUserLabel"></span>
+      </button>
+      <button id="renameUserBtn" title="이름 변경" style="all:unset;cursor:pointer;color:rgba(242,237,226,.4);font-size:14px;padding:4px;">✎</button>
+    </div>
+  </header>
 
   <!-- HERO -->
-  <div style="width:100%;max-width:1100px;padding:36px 20px 10px;text-align:center;">
-    <div style="font-family:'Anton',sans-serif;font-size:clamp(32px,7vw,74px);line-height:.94;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.5);letter-spacing:1px;">PRACTICE</div>
-    <div style="font-family:'Black Han Sans',sans-serif;font-size:clamp(34px,8vw,86px);line-height:1.05;color:#e7b8da;margin-top:-4px;letter-spacing:1px;">타자 연습 도구</div>
-  </div>
+  <section style="padding:56px 32px 26px;border-bottom:1px solid rgba(242,237,226,.14);max-width:1100px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end;">
+      <h1 style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
+      <p style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(242,237,226,.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
+    </div>
+    <div aria-hidden="true" style="position:relative;height:clamp(120px,16vw,190px);margin-top:32px;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(242,237,226,.16);">HANGUL</div>
+      <div style="position:absolute;bottom:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:#e3b8d6;">TRAINER</div>
+    </div>
+  </section>
 
-  <!-- PROGRESS -->
-  <div id="progress" style="max-width:1100px;width:100%;padding:4px 24px 18px;font-size:11px;letter-spacing:1px;color:#8f8f8f;text-align:center;"></div>
-  <div id="cloudStatus" style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10.5px;letter-spacing:.5px;color:#e0433a;text-align:center;display:none;"></div>
-  <div style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10px;letter-spacing:.5px;color:#8f8f8f;text-align:center;">
-    👤 <span id="currentUserLabel"></span> · <button id="switchUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">계정 전환</button> · <button id="renameUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">이름 변경</button>
-  </div>
+  <div id="cloudStatus" style="max-width:1100px;margin:0 auto;width:100%;padding:14px 32px 0;font-size:10.5px;letter-spacing:.3px;color:#e07a5f;text-align:center;display:none;box-sizing:border-box;"></div>
 
-  <!-- MAIN CARD -->
-  <div style="width:100%;max-width:1000px;padding:0 20px;">
-    <div style="background:#f1ede6;color:#111;position:relative;">
-      <div style="display:flex;align-items:stretch;border-bottom:2px solid #111;">
-        <div style="background:#111;color:#e7b8da;font-family:'Anton',sans-serif;font-size:26px;padding:14px 22px;display:flex;align-items:center;min-width:64px;justify-content:center;">01</div>
-        <div style="display:flex;align-items:center;padding:0 22px;font-family:'Anton',sans-serif;font-size:20px;letter-spacing:1px;">SYLLABLE / LETTER DRILL</div>
+  <!-- PRACTICE -->
+  <section style="padding:10px 32px 70px;max-width:1100px;margin:0 auto;width:100%;box-sizing:border-box;">
+    <div aria-hidden="true" style="position:relative;height:clamp(64px,8vw,110px);overflow:hidden;">
+      <div style="position:absolute;top:4px;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(40px,7vw,92px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(242,237,226,.14);">PRACTICE</div>
+    </div>
+
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-top:-18px;position:relative;">
+      <!-- PRACTICE CARD -->
+      <div style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+          <div id="pageCounter" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;letter-spacing:-.01em;"></div>
+          <div style="display:flex;gap:8px;">
+            <button id="favoriteBtn" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
+            <button id="notesBtn" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
+            <button id="restartBtn" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
+          </div>
+        </div>
+
+        <div style="border-top:1.5px solid #0a0a0a;border-bottom:1.5px solid #0a0a0a;padding:30px 0;text-align:center;">
+          <div id="romanization" style="font-size:11px;letter-spacing:.12em;font-weight:700;color:rgba(10,10,10,.5);margin-bottom:16px;min-height:14px;text-transform:uppercase;"></div>
+          <div class="word-row" id="koRow" style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
+          <div class="letter-row" id="enRow" style="display:none;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
+          <div id="statusBanner" style="text-align:center;font-size:12.5px;font-weight:700;height:18px;margin-top:14px;letter-spacing:.5px;text-transform:uppercase;"></div>
+          <input type="text" id="mobileInput" placeholder="여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off" style="margin-top:18px;width:100%;max-width:320px;text-align:center;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;padding:11px 14px;border:1.5px solid #0a0a0a;border-radius:2px;background:#fff;color:#0a0a0a;outline:none;">
+          <div id="mobileTip" style="font-size:10.5px;color:rgba(10,10,10,.45);text-align:center;letter-spacing:.3px;margin-top:6px;"></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:22px;">
+          <button id="prevBtn" style="all:unset;cursor:pointer;border:1.5px dashed #0a0a0a;padding:11px 16px;font-weight:700;font-size:12px;letter-spacing:.04em;border-radius:2px;color:#0a0a0a;">&#9668;----</button>
+          <button id="skipBtn" style="all:unset;cursor:pointer;border:1.5px dashed #0a0a0a;padding:11px 16px;font-weight:700;font-size:12px;letter-spacing:.04em;border-radius:2px;color:#0a0a0a;">----&#9658;</button>
+        </div>
       </div>
 
-      <div style="padding:32px 24px 24px;">
-        <div class="word-row" id="koRow" style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
-        <div class="letter-row" id="enRow" style="display:none;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
-        <div id="romanization" style="text-align:center;color:#8a857b;font-size:13px;letter-spacing:.5px;margin-top:6px;text-transform:uppercase;"></div>
-        <div id="statusBanner" style="text-align:center;font-size:13px;font-weight:700;height:20px;margin-top:6px;letter-spacing:.5px;text-transform:uppercase;"></div>
-      </div>
-
-      <div style="padding:0 24px 24px;">
-        <input type="text" id="mobileInput" placeholder="여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off" style="width:100%;max-width:340px;display:block;margin:0 auto 8px;padding:12px;font-size:16px;border:2px solid #111;background:#fff;color:#111;text-align:center;outline:none;font-family:'JetBrains Mono',monospace;">
-        <div id="mobileTip" style="font-size:10.5px;color:#8a857b;text-align:center;letter-spacing:.3px;"></div>
-      </div>
-
-      <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid #111;padding:16px 22px;">
-        <button id="prevBtn" style="all:unset;cursor:pointer;border:2px dashed #111;padding:10px 18px;font-size:13px;letter-spacing:1px;">&#9668;----</button>
-        <div id="pageCounter" style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;"></div>
-        <button id="skipBtn" style="all:unset;cursor:pointer;border:2px dashed #111;padding:10px 18px;font-size:13px;letter-spacing:1px;">----&#9658;</button>
+      <!-- SIDEBAR -->
+      <div style="flex:1 1 240px;max-width:320px;display:flex;flex-direction:column;gap:12px;">
+        <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
+          <div style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
+          <div id="progress" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;line-height:1.8;letter-spacing:.02em;color:#f2ede2;"></div>
+        </div>
+        <div style="border:1px solid rgba(242,237,226,.16);padding:18px;border-radius:4px;">
+          <div style="font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
+          <div id="favCountLabel" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;"></div>
+        </div>
+        <div style="border:1px solid rgba(242,237,226,.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
+            <input type="checkbox" id="dictationToggle" style="accent-color:#e3b8d6;">딕테이션 모드
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(242,237,226,.65);cursor:pointer;">
+            <input type="checkbox" id="reviewModeToggle" style="accent-color:#e3b8d6;">🔁 복습 모드
+          </label>
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- CONTROLS -->
-  <div style="width:100%;max-width:1000px;padding:20px 20px 0;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-    <button id="restartBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">&#8635; 다시 시작</button>
-    <button id="favoriteBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">☆ 즐겨찾기</button>
-    <button id="notesBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">📝 노트</button>
-    <button id="openDrawerBtn" style="all:unset;cursor:pointer;background:#e7b8da;color:#0c0c0c;padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 목록</button>
-    <button id="openHistoryBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">📅 학습 기록</button>
-    <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
-      <input type="checkbox" id="dictationToggle" style="accent-color:#e7b8da;">딕테이션 모드
-    </label>
-    <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
-      <input type="checkbox" id="reviewModeToggle" style="accent-color:#e7b8da;">🔁 복습 모드
-    </label>
-  </div>
+  </section>
 
   <!-- DRAWER -->
-  <div id="drawer" style="position:fixed;top:0;right:-360px;width:340px;max-width:92vw;height:100%;background:#111;border-left:1px solid rgba(255,255,255,.15);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
-    <div style="padding:18px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">단어 & 기록</div>
-      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:22px;color:#8f8f8f;padding:2px 8px;">&times;</button>
+  <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:#0a0a0a;border-left:1px solid rgba(242,237,226,.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
+    <div style="padding:22px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어 & 기록</div>
+      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:#f2ede2;padding:2px 8px;">&times;</button>
     </div>
-    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.15);">
-      <button id="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">단어 목록</button>
-      <button id="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">학습 기록</button>
+    <div style="display:flex;border-bottom:1px solid rgba(242,237,226,.14);">
+      <button id="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
+      <button id="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">학습 기록</button>
     </div>
-    <div id="wordsFilterRow" style="padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;flex-direction:column;gap:8px;">
-      <input type="text" id="wordSearchInput" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:8px 10px;font-size:12px;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,.3);background:#0c0c0c;color:#f1ede6;outline:none;">
-      <div style="display:flex;gap:16px;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
-          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e7b8da;">★ 즐겨찾기만
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
-          <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e7b8da;">📝 노트만
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
-          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e7b8da;">❌ 오답만
-        </label>
-      </div>
-    </div>
-    <div id="drawerContent" style="flex:1;overflow-y:auto;padding:10px;"></div>
-  </div>
-
-  <!-- ADDER -->
-  <div style="width:100%;max-width:640px;padding:32px 20px 0;">
-    <div style="background:#f1ede6;color:#111;padding:22px;">
-      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;text-align:center;margin-bottom:14px;">+ 단어 추가하기</div>
+    <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(242,237,226,.14);display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <input type="text" id="newWord" placeholder="단어 (예: 한국어 / apple)" autocomplete="off" style="flex:1;min-width:140px;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
-        <input type="text" id="newMeaning" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:140px;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e3b8d6;">★ 즐겨찾기만
+        </label>
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e3b8d6;">📝 노트만
+        </label>
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e3b8d6;">❌ 오답만
+        </label>
       </div>
-      <button id="addWordBtn" style="all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:10px;background:#111;color:#e7b8da;padding:11px;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 추가</button>
-      <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
-        <button id="openBulkBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#5b5650;">일괄 가져오기/내보내기</button>
-        <button id="openAiPromptBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#5b5650;">🤖 AI 프롬프트 복사</button>
-        <button id="clearWordsBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#c0392b;">초기화</button>
+      <input type="text" id="wordSearchInput" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;outline:none;border-radius:2px;">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="newWord" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <input type="text" id="newMeaning" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
+        <button id="addWordBtn" style="all:unset;cursor:pointer;background:#e3b8d6;color:#0a0a0a;padding:0 16px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;">+</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
+        <button id="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
+        <button id="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:#e07a5f;padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
       </div>
     </div>
+    <div id="drawerContent" style="flex:1;overflow-y:auto;padding:8px 16px;"></div>
   </div>
 
   <!-- AI PROMPT MODAL -->
-  <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
-    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:520px;display:flex;flex-direction:column;gap:10px;">
-      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;">🤖 AI 프롬프트</div>
-      <div style="font-size:11px;color:#5b5650;line-height:1.5;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "일괄 가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
-      <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:10px;border:1px solid #111;font-family:'JetBrains Mono',monospace;font-size:11.5px;resize:none;background:#fff;"></textarea>
+  <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:520px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">🤖 AI 프롬프트</div>
+      <div style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
+      <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:11.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeAiPromptModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
-        <button id="copyAiPromptBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">복사하기</button>
+        <button id="closeAiPromptModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="copyAiPromptBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">복사하기</button>
       </div>
     </div>
   </div>
 
   <!-- BULK MODAL -->
-  <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
-    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:480px;display:flex;flex-direction:column;gap:10px;">
-      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;">일괄 가져오기/내보내기</div>
-      <div style="font-size:11px;color:#5b5650;line-height:1.5;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
-      <textarea id="bulkTextarea" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:10px;border:1px solid #111;font-family:'JetBrains Mono',monospace;font-size:12px;resize:none;"></textarea>
+  <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:#0a0a0a;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:26px;width:100%;max-width:480px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">일괄 가져오기/내보내기</div>
+      <div style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
+      <textarea id="bulkTextarea" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:11px;border:1px solid rgba(242,237,226,.2);background:#141414;color:#f2ede2;font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
-        <button id="importBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">가져오기</button>
+        <button id="closeModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
       </div>
     </div>
   </div>
 
   <!-- NOTES MODAL -->
-  <div id="notesModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
-    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:480px;display:flex;flex-direction:column;gap:10px;">
-      <div id="notesModalTitle" style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;"></div>
-      <div style="font-size:11px;color:#5b5650;line-height:1.5;">예문, 관련 지식 등을 자유롭게 적어두세요.</div>
-      <textarea id="notesTextarea" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;padding:10px;border:1px solid #111;font-family:'JetBrains Mono',monospace;font-size:12px;resize:none;"></textarea>
+  <div id="notesModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:#f2ede2;color:#0a0a0a;padding:26px;width:100%;max-width:460px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+      <div id="notesModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
+      <div style="font-size:11px;color:rgba(10,10,10,.55);line-height:1.5;">예문, 관련 지식 등을 자유롭게 적어두세요.</div>
+      <textarea id="notesTextarea" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;padding:11px;border:1.5px solid #0a0a0a;font-family:'Space Grotesk',sans-serif;font-size:12.5px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeNotesModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
-        <button id="saveNotesBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">저장</button>
+        <button id="closeNotesModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1.5px solid #0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">취소</button>
+        <button id="saveNotesBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#0a0a0a;color:#f2ede2;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
       </div>
     </div>
   </div>
 
   <!-- WHO ARE YOU MODAL (first visit only) -->
-  <div id="whoAmIOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
-    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
-      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👋 이름을 알려주세요</div>
-      <div style="font-size:11px;color:#5b5650;line-height:1.5;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
-      <input type="text" id="whoAmIInput" placeholder="예: shiya" autocomplete="off" style="width:100%;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
-      <button id="whoAmISubmitBtn" style="all:unset;cursor:pointer;display:block;width:100%;text-align:center;background:#111;color:#e7b8da;padding:11px;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">시작하기</button>
+  <div id="whoAmIOverlay" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="width:100%;max-width:400px;text-align:center;">
+      <div style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:24px;margin-bottom:10px;">👋 이름을 알려주세요</div>
+      <div style="font-size:12.5px;color:rgba(242,237,226,.5);line-height:1.6;margin:0 0 22px;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
+      <input type="text" id="whoAmIInput" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.25);color:#f2ede2;padding:13px;text-align:center;font-size:14px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
+      <button id="whoAmISubmitBtn" style="all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;text-align:center;background:#e3b8d6;color:#0a0a0a;padding:13px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-radius:2px;font-weight:700;">시작하기</button>
     </div>
   </div>
 
   <!-- LOADING OVERLAY -->
-  <div id="loadingOverlay" style="position:fixed;inset:0;background:#0c0c0c;display:flex;align-items:center;justify-content:center;z-index:1500;color:#8f8f8f;font-size:12px;letter-spacing:1px;text-transform:uppercase;">
+  <div id="loadingOverlay" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:1500;color:rgba(242,237,226,.5);font-size:11px;letter-spacing:.05em;text-transform:uppercase;">
     불러오는 중...
   </div>
 
   <!-- SWITCH USER MODAL -->
-  <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
-    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
-      <div id="switchUserModalTitle" style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👤 계정 전환</div>
-      <div id="switchUserModalDesc" style="font-size:11px;color:#5b5650;line-height:1.5;">다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.</div>
-      <input type="text" id="switchUserInput" placeholder="예: shiya" autocomplete="off" style="width:100%;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+  <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(10,10,10,.75);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="width:100%;max-width:400px;background:#0a0a0a;border:1px solid rgba(242,237,226,.2);padding:26px;border-radius:4px;box-sizing:border-box;">
+      <div id="switchUserModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;margin-bottom:8px;"></div>
+      <div id="switchUserModalDesc" style="font-size:11px;color:rgba(242,237,226,.5);line-height:1.6;margin-bottom:14px;"></div>
+      <input type="text" id="switchUserInput" placeholder="예: shiya" autocomplete="off" style="width:100%;box-sizing:border-box;background:#141414;border:1px solid rgba(242,237,226,.2);color:#f2ede2;padding:11px;font-size:13px;border-radius:2px;font-family:inherit;margin-bottom:14px;">
       <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button id="closeSwitchUserModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
-        <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">전환하기</button>
+        <button id="closeSwitchUserModalBtn" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(242,237,226,.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:#f2ede2;">취소</button>
+        <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#e3b8d6;color:#0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">전환하기</button>
       </div>
     </div>
   </div>
 
-  <div style="max-width:600px;padding:26px 20px 0;font-size:10.5px;line-height:1.6;color:#6b665f;text-align:center;">
-    <b style="color:#8f8f8f;">[PC]</b> 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연). Backspace 수정, Enter 다음 단어.<br>
-    <b style="color:#8f8f8f;">[모바일]</b> 상단 입력창을 터치하여 직접 타이핑하세요.
-  </div>
+  <!-- FOOTER -->
+  <footer style="max-width:1100px;margin:0 auto;width:100%;border-top:1px solid rgba(242,237,226,.14);padding:20px 32px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:10.5px;letter-spacing:.03em;color:rgba(242,237,226,.4);box-sizing:border-box;">
+    <span>TYPE/TRAINER — 2026</span>
+    <span style="text-align:right;line-height:1.6;">[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요</span>
+  </footer>
 </div>
 
 <script>
 (function(){
   "use strict";
-  const COL = { black:'#111111', pink:'#e7b8da', pinkDeep:'#c26fae', gray:'#c7c3ba', red:'#e0433a', green:'#2a9d55', mutedInk:'#8a857b' };
+  const COL = { black:'#0a0a0a', pink:'#e3b8d6', pinkDeep:'#c26fae', gray:'#c9c2b3', red:'#c0392b', green:'#0a7a3d', mutedInk:'rgba(10,10,10,.5)' };
 
   const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
   const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
@@ -453,6 +474,7 @@
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
   const currentUserLabel=$('currentUserLabel');
+  const favCountLabel=$('favCountLabel');
   const switchUserModalOverlay=$('switchUserModalOverlay'), switchUserInput=$('switchUserInput');
 
   /* =========================================================
@@ -560,22 +582,23 @@
     item.favorite = !item.favorite;
     persistCurrentWordList();
     renderDrawer();
+    favCountLabel.textContent = String(list.filter(x=>x.favorite).length);
     if(index===wordIndex) updateFavoriteBtn();
   }
 
   function updateFavoriteBtn(){
     const w = currentWordObj();
     const fav = !!(w && w.favorite);
-    favoriteBtn.textContent = fav ? '★ 즐겨찾기' : '☆ 즐겨찾기';
-    favoriteBtn.style.color = fav ? COL.pink : '#f1ede6';
-    favoriteBtn.style.borderColor = fav ? COL.pink : 'rgba(255,255,255,.3)';
+    favoriteBtn.style.background = fav ? '#0a0a0a' : 'transparent';
+    favoriteBtn.style.color = fav ? '#e3b8d6' : '#0a0a0a';
+    favCountLabel.textContent = String(currentWordList().filter(x=>x.favorite).length);
   }
 
   function updateNotesBtn(){
     const w = currentWordObj();
     const hasNotes = !!(w && w.notes && w.notes.trim());
-    notesBtn.style.color = hasNotes ? COL.pink : '#f1ede6';
-    notesBtn.style.borderColor = hasNotes ? COL.pink : 'rgba(255,255,255,.3)';
+    notesBtn.style.background = hasNotes ? '#0a0a0a' : 'transparent';
+    notesBtn.style.color = hasNotes ? '#e3b8d6' : '#0a0a0a';
   }
 
   function openNotesModal(){
@@ -610,8 +633,8 @@
     pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
 
     if(total===0){
-      koRow.innerHTML='<div style="color:#aaa;font-size:14px;">단어를 추가해 주세요!</div>';
-      enRow.innerHTML='<div style="color:#aaa;font-size:14px;">Please add words!</div>';
+      koRow.innerHTML='<div style="color:rgba(10,10,10,.4);font-size:14px;">단어를 추가해 주세요!</div>';
+      enRow.innerHTML='<div style="color:rgba(10,10,10,.4);font-size:14px;">Please add words!</div>';
       romanizationEl.textContent=''; statusBanner.textContent=''; return;
     }
 
@@ -635,7 +658,7 @@
         }
         const charEl=document.createElement('div');
         const color = r.mode==='light'?COL.gray : r.mode==='dark'?COL.black : r.mode==='blue'?COL.pinkDeep : COL.red;
-        charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:44px;line-height:1;min-height:52px;display:flex;align-items:center;color:${color};`;
+        charEl.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:700;font-size:40px;line-height:1;min-height:48px;display:flex;align-items:center;color:${color};`;
         charEl.textContent=r.text; block.appendChild(charEl);
         const dashes=document.createElement('div');
         dashes.style.cssText='display:flex;gap:4px;margin-top:6px;';
@@ -667,7 +690,7 @@
           const block=document.createElement('div');
           block.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:22px;';
           const charEl=document.createElement('div');
-          charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:38px;line-height:1;min-height:46px;display:flex;align-items:center;color:${COL.gray};`;
+          charEl.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:700;font-size:34px;line-height:1;min-height:42px;display:flex;align-items:center;color:${COL.gray};`;
           charEl.textContent = r.showHint ? ch : '';
           block.appendChild(charEl);
           const under=document.createElement('div');
@@ -681,7 +704,7 @@
           block.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:22px;';
           const charEl=document.createElement('div');
           const color = c.mode==='green'?COL.green : c.mode==='red'?COL.red : COL.gray;
-          charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:38px;line-height:1;min-height:46px;display:flex;align-items:center;color:${color};`;
+          charEl.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:700;font-size:34px;line-height:1;min-height:42px;display:flex;align-items:center;color:${color};`;
           charEl.textContent=c.text; block.appendChild(charEl);
           const under=document.createElement('div');
           under.style.cssText=`width:100%;height:4px;border-radius:2px;margin-top:6px;background:${color};`;
@@ -697,7 +720,7 @@
   function renderDrawer(){
     drawerContent.innerHTML='';
     const total=currentWordCount();
-    if(total===0){ drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">단어가 없습니다.</div>'; return; }
+    if(total===0){ drawerContent.innerHTML='<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">단어가 없습니다.</div>'; return; }
     const list = mode==='ko' ? KO_WORDS : EN_WORDS;
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
@@ -719,32 +742,32 @@
     });
     if(shown===0){
       const msg = query ? '검색 결과가 없습니다.' : (notesOnly ? '노트를 남긴 단어가 없습니다.' : (wrongOnly ? '오답 단어가 없습니다.' : '즐겨찾기한 단어가 없습니다.'));
-      drawerContent.innerHTML=`<div style="color:#8f8f8f;text-align:center;padding:20px;">${msg}</div>`;
+      drawerContent.innerHTML=`<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">${msg}</div>`;
     }
   }
 
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(231,184,218,.12)':'transparent'};color:${active?COL.pink:'#f1ede6'};`;
-    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-360px'; });
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(227,184,214,.12)':'transparent'};color:${active?COL.pink:'#f2ede2'};`;
+    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-520px'; setNavActive('practice'); });
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
     const mainSpan=document.createElement('span');
     mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongCount>0?'❌'+wrongCount+' ':''}${displayIndex}. ${mainText}`;
     info.appendChild(mainSpan);
-    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:#8f8f8f;'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(242,237,226,.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
     const actions=document.createElement('div');
     actions.style.cssText='display:flex;align-items:center;gap:2px;';
     const favBtn=document.createElement('button');
     favBtn.dataset.role='fav';
     favBtn.textContent = isFavorite ? '★' : '☆';
-    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?COL.pink:'#8f8f8f'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
+    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?COL.pink:'rgba(242,237,226,.4)'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
     favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
     const delBtn=document.createElement('button');
     delBtn.dataset.role='del';
     delBtn.textContent='✕';
-    delBtn.style.cssText='border:none;background:none;color:#e0433a;font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
+    delBtn.style.cssText='border:none;background:none;color:rgba(242,237,226,.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
     delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(`'${mainText}' 단어를 삭제할까요?`)) deleteWordAt(index); });
     actions.appendChild(favBtn); actions.appendChild(delBtn);
     container.appendChild(info); container.appendChild(actions);
@@ -757,8 +780,8 @@
 
   function setDrawerView(view){
     drawerView=view;
-    const activeStyle={color:'#f1ede6',borderBottom:`2px solid ${COL.pink}`};
-    const inactiveStyle={color:'#8f8f8f',borderBottom:'2px solid transparent'};
+    const activeStyle={color:'#f2ede2',borderBottom:`2px solid ${COL.pink}`};
+    const inactiveStyle={color:'rgba(242,237,226,.45)',borderBottom:'2px solid transparent'};
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
     Object.assign(drawerTabHistory.style, view==='history'?activeStyle:inactiveStyle);
     wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
@@ -784,7 +807,7 @@
     drawerContent.innerHTML='';
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     if(history.length===0){
-      drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.</div>';
+      drawerContent.innerHTML='<div style="color:rgba(242,237,226,.45);text-align:center;padding:20px;">학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.</div>';
       return;
     }
     for(let i=history.length-1;i>=0;i--){
@@ -794,26 +817,26 @@
 
   function createHistoryItemDOM(entry, index){
     const container=document.createElement('div');
-    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(255,255,255,.15);';
+    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(242,237,226,.14);border-radius:2px;';
     const row=document.createElement('div');
     row.style.cssText='display:flex;justify-content:space-between;align-items:center;';
     const dateSpan=document.createElement('span');
-    dateSpan.style.cssText="font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.5px;color:#f1ede6;";
+    dateSpan.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:#f2ede2;";
     dateSpan.textContent=entry.date;
     const countSpan=document.createElement('span');
-    countSpan.style.cssText='font-size:11px;color:#8f8f8f;';
+    countSpan.style.cssText='font-size:11px;color:rgba(242,237,226,.45);';
     countSpan.textContent=`${entry.words.length}개`;
     row.appendChild(dateSpan); row.appendChild(countSpan);
     container.appendChild(row);
 
     const preview=document.createElement('div');
-    preview.style.cssText='font-size:11px;color:#8a857b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    preview.style.cssText='font-size:11px;color:rgba(242,237,226,.4);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
     preview.textContent=entry.words.map(w=>w.word).join(', ');
     container.appendChild(preview);
 
     const studyBtn=document.createElement('button');
     studyBtn.textContent='▶ 이 날짜로 연습하기';
-    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:#e7b8da;color:#0c0c0c;padding:7px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;';
+    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:#e3b8d6;color:#0a0a0a;padding:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;border-radius:2px;';
     studyBtn.addEventListener('click', ()=>studyHistoryEntry(index));
     container.appendChild(studyBtn);
 
@@ -828,7 +851,8 @@
     if(mode==='ko') KO_WORDS=snapshot; else EN_WORDS=snapshot;
     persistCurrentWordList();
     wordIndex=0;
-    drawer.style.right='-360px';
+    drawer.style.right='-520px';
+    setNavActive('practice');
     setDrawerView('words');
     loadWord();
   }
@@ -900,8 +924,8 @@
   });
 
   function setActiveTab(m){
-    document.querySelectorAll('.tab-btn').forEach(b=>{ b.style.color = b.dataset.mode===m ? '#f1ede6' : '#8f8f8f'; });
-    document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? COL.pink : '#8f8f8f'; });
+    document.querySelectorAll('.tab-btn').forEach(b=>{ b.style.color = b.dataset.mode===m ? '#f2ede2' : 'rgba(242,237,226,.45)'; });
+    document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? COL.pink : 'rgba(242,237,226,.45)'; });
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -921,9 +945,14 @@
   $('skipBtn').addEventListener('click', ()=>nextWord(false));
   $('prevBtn').addEventListener('click', prevWord);
 
-  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words'); });
-  $('openHistoryBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('history'); });
-  $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-360px'; });
+  function setNavActive(which){
+    const map = {practice:'navPracticeBtn', words:'openDrawerBtn', history:'openHistoryBtn'};
+    Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? '#f2ede2' : 'rgba(242,237,226,.45)'; });
+  }
+  $('navPracticeBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
+  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words'); setNavActive('words'); });
+  $('openHistoryBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('history'); setNavActive('history'); });
+  $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
   drawerTabWords.addEventListener('click', ()=>setDrawerView('words'));
   drawerTabHistory.addEventListener('click', ()=>setDrawerView('history'));
 
