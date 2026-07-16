@@ -579,13 +579,15 @@ typer.addEventListener('input', () => {
   // DOM work mid-event can, on some browser/IME combinations, disturb the
   // Hangul composition session that's still in progress for this keystroke.
   requestAnimationFrame(() => {
-    // Belt-and-suspenders: re-assert the caret at the end after every
-    // keystroke (but never while an IME composition is still in progress,
-    // to avoid disturbing it) in case something keeps dragging it back to 0.
-    if(!isComposingNow){
-      const len = typer.value.length;
-      typer.setSelectionRange(len, len);
-    }
+    // Deliberately NOT re-asserting the caret here on every keystroke. That
+    // per-keystroke correction ran a frame late (after requestAnimationFrame),
+    // which is itself a plausible source of desync with the browser's own IME
+    // composition anchor during continuous typing — poking selectionRange
+    // asynchronously, after the browser may have already moved on to the next
+    // keystroke's composition update, rather than fixing anything. The browser
+    // is left to manage the caret on its own for normal typing; we only ever
+    // force it explicitly at well-defined boundaries (focus, word transitions)
+    // via focusAtEnd(), where there's no in-flight composition to race with.
     updateWordState();
     const target = currentWord();
     const typed = typer.value;
