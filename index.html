@@ -2,536 +2,588 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Typing Vocab — 打字背单词</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>타자 연습 도구 / Typing Trainer</title>
 <style>
   :root{
-    --blue:#1a56c4;
-    --bg:#f4f6f9;
     --gray-light:#c7cbd1;
-    --gray-mid:#52565c;
-    --gray-dark:#8a8f98;
-    --done-blue:#1a56c4;
-    --red:#e0453c;
-    --ink:#22262c;
+    --gray-dark:#5b6068;
+    --blue:#0a56c4;
+    --red:#e0433a;
+    --green:#2a9d55;
+    --bg:#f2f4f7;
+    --card-bg:#ffffff;
+    --border:#dfe3e8;
   }
   *{box-sizing:border-box;}
   body{
-    margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
-    font-family:"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
-    display:flex; flex-direction:column;
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
+    background:var(--bg);
+    color:#222;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 64px;
   }
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 20px; background:#fff; border-bottom:1px solid #e4e7eb;
-    flex-wrap:wrap; gap:10px;
-  }
-  .topbar h1{font-size:16px; letter-spacing:2px; margin:0; color:var(--blue);}
-  .topbar .right{display:flex; align-items:center; gap:16px; font-size:13px; color:var(--gray-dark);}
-  .topbar button{
-    border:1px solid var(--blue); background:#fff; color:var(--blue);
-    border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer;
-  }
-  .topbar button.active{background:var(--blue); color:#fff;}
-  .progress-track{width:160px; height:6px; background:#e4e7eb; border-radius:3px; overflow:hidden;}
-  .progress-fill{height:100%; background:var(--blue); width:0%; transition:width .25s;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .subtitle{color:#767c85;font-size:13px;margin-bottom:20px;}
 
-  .stage{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:40px 20px; gap:28px; cursor:text;
+  .tabs{display:flex;gap:8px;margin-bottom:20px;}
+  .tab-btn{
+    padding:8px 18px;border-radius:20px;border:1px solid var(--border);
+    background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:#555;
   }
-  .syllables{display:flex; gap:22px; align-items:flex-end;}
-  .syl-group{display:flex; flex-direction:column; align-items:center; gap:8px;}
-  .syl-hint{font-size:14px; color:var(--gray-dark); min-height:18px; letter-spacing:1px;}
-  .syl-char{
-    font-size:64px; font-weight:700;
-    min-width:1em; text-align:center; line-height:1;
-  }
-  .syl-char.future{color:var(--gray-light);}
-  .syl-char.active{color:var(--gray-mid);}
-  .syl-char.done{color:var(--done-blue);}
-  .syl-char.wrong{color:var(--red);}
-  .bars{display:flex; gap:5px;}
-  .bar{width:26px; height:5px; border-radius:3px; background:var(--gray-light);}
-  .bar.correct{background:var(--done-blue);}
-  .bar.wrong{background:var(--red);}
-  .meaning{font-size:16px; color:#555; text-align:center;}
-  .meaning b{color:var(--ink);}
+  .tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
 
-  .track{
-    display:flex; align-items:center; justify-content:center; gap:0;
-    background:var(--blue); border-radius:40px; padding:14px 30px; width:min(880px,92%);
-  }
-  .track .cell{flex:1; display:flex; flex-direction:column; align-items:center; color:#cfe0ff; gap:2px;}
-  .track .cell.current{color:#fff;}
-  .track .cell .w{font-size:20px; font-weight:700;}
-  .track .cell.current .w{font-size:26px;}
-  .track .cell small{font-size:11px; opacity:.8;}
-  .track .sep{width:1px; align-self:stretch; background:rgba(255,255,255,.25); margin:0 6px;}
+  .progress{font-size:13px;color:#767c85;margin-bottom:10px;}
 
-  #typer{
-    position:fixed; opacity:0; pointer-events:none; top:0; left:0; width:1px; height:1px;
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:40px 32px;
+    min-width:320px;
+    max-width:90vw;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.04);
   }
 
-  .stats{
-    display:flex; gap:26px; justify-content:center; padding:14px; background:#fff;
-    border-top:1px solid #e4e7eb; font-size:13px; color:var(--gray-dark);
+  /* ---- Korean subway-style syllable blocks ---- */
+  .word-row{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:90px;}
+  .syll-block{display:flex;flex-direction:column;align-items:center;position:relative;min-width:44px;}
+  .syll-hint{
+    position:absolute;top:-20px;font-size:13px;color:#9aa1a9;font-weight:600;
+    white-space:nowrap;
   }
-  .stats b{color:var(--ink); font-size:15px;}
+  .syll-char{font-size:48px;font-weight:800;line-height:1;min-height:58px;display:flex;align-items:center;}
+  .syll-char.light{color:var(--gray-light);}
+  .syll-char.dark{color:var(--gray-dark);}
+  .syll-char.blue{color:var(--blue);}
+  .syll-char.red{color:var(--red);}
+  .dashes{display:flex;gap:4px;margin-top:6px;}
+  .dash{width:16px;height:4px;border-radius:2px;background:var(--gray-light);}
+  .dash.blue{background:var(--blue);}
+  .dash.red{background:var(--red);}
 
-  .done-screen{
-    position:fixed; inset:0; background:rgba(20,25,35,.75); display:none;
-    align-items:center; justify-content:center; z-index:10;
+  /* ---- English letter blocks ---- */
+  .letter-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:90px;}
+  .letter-block{display:flex;flex-direction:column;align-items:center;min-width:22px;}
+  .letter-char{font-size:38px;font-weight:800;line-height:1;min-height:46px;display:flex;align-items:center;}
+  .letter-char.light{color:var(--gray-light);}
+  .letter-char.green{color:var(--green);}
+  .letter-char.red{color:var(--red);}
+  .letter-underline{width:22px;height:4px;border-radius:2px;margin-top:6px;background:var(--gray-light);}
+  .letter-underline.green{background:var(--green);}
+  .letter-underline.red{background:var(--red);}
+
+  .romanization{color:#9aa1a9;font-size:13px;margin-top:-6px;}
+  .status-banner{font-size:14px;font-weight:700;height:18px;}
+  .status-banner.ok{color:var(--green);}
+
+  .controls{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap;justify-content:center;}
+  .controls button{
+    padding:8px 16px;border-radius:8px;border:1px solid var(--border);
+    background:#fff;cursor:pointer;font-size:13px;
   }
-  .done-screen.show{display:flex;}
-  .done-card{
-    background:#fff; padding:32px 40px; border-radius:14px; text-align:center; min-width:260px;
+  .controls button:hover{background:#f5f6f8;}
+  .controls label{font-size:13px;color:#555;display:flex;gap:6px;align-items:center;cursor:pointer;}
+
+  .hint-box{
+    margin-top:26px;max-width:520px;font-size:12.5px;line-height:1.6;color:#8a919a;
+    text-align:center;
   }
-  .done-card h2{margin-top:0;}
-  .done-card button{
-    margin-top:16px; background:var(--blue); color:#fff; border:none; border-radius:20px;
-    padding:10px 22px; font-size:14px; cursor:pointer;
+  kbd{
+    background:#eef0f3;border:1px solid var(--border);border-radius:4px;
+    padding:1px 5px;font-family:inherit;font-size:11.5px;
   }
 </style>
 </head>
 <body>
-  <div class="topbar">
-    <h1>TYPING VOCAB</h1>
-    <div class="right">
-      <button id="modeKo" class="active">한국어</button>
-      <button id="modeEn">English</button>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <span id="progressLabel">0 / 0</span>
-      <span>정확도 <b id="accLabel">0%</b></span>
-      <button id="soundBtn">🔊 소리</button>
-    </div>
-  </div>
 
-  <div class="stage" id="stage">
-    <div class="syllables" id="syllables"></div>
-    <div class="meaning" id="meaning"></div>
-  </div>
+<h1>타자 연습 도구 / Typing Trainer</h1>
+<div class="subtitle">지하철 타자 스타일 한글 연습 + 실시간 채점 영어 단어 연습</div>
 
-  <div class="track">
-    <div class="cell" id="prevCell"><div class="w"></div><small></small></div>
-    <div class="sep"></div>
-    <div class="cell current" id="curCell"><div class="w"></div><small></small></div>
-    <div class="sep"></div>
-    <div class="cell" id="nextCell"><div class="w"></div><small></small></div>
-  </div>
+<div class="tabs">
+  <button class="tab-btn active" data-mode="ko">한국어 (음절 단위)</button>
+  <button class="tab-btn" data-mode="en">English (letter by letter)</button>
+</div>
 
-  <input id="typer" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+<div class="progress" id="progress"></div>
 
-  <div class="stats">
-    <div>속도(타/분) <b id="speedLabel">0</b></div>
-    <div>경과 <b id="timeLabel">00:00</b></div>
-  </div>
+<div class="card">
+  <div class="word-row" id="koRow" ></div>
+  <div class="letter-row" id="enRow" style="display:none;"></div>
+  <div class="romanization" id="romanization"></div>
+  <div class="status-banner" id="statusBanner"></div>
+</div>
 
-  <div class="done-screen" id="doneScreen">
-    <div class="done-card">
-      <h2>완료! 🎉</h2>
-      <p>정확도 <b id="finalAcc">0%</b> · 속도 <b id="finalSpeed">0</b> 타/분</p>
-      <button id="restartBtn">다시하기 / Restart</button>
-    </div>
-  </div>
+<div class="controls">
+  <button id="restartBtn">↺ 다시 시작</button>
+  <button id="skipBtn">다음 단어 →</button>
+  <label><input type="checkbox" id="dictationToggle"> 딕테이션 모드 (정답 미리보기 숨기기)</label>
+</div>
+
+<div class="hint-box">
+  이 도구는 한국어 IME(입력기) 없이 물리 키보드를 <b>두벌식 자판</b> 규칙으로 직접 해석합니다.
+  키보드 언어 설정을 바꿀 필요 없이 영문 자판 그대로 타이핑하세요 (예: <kbd>d</kbd><kbd>u</kbd><kbd>s</kbd> → 연).
+  영어 모드에서는 알파벳을 그대로 입력하면 됩니다. <kbd>Backspace</kbd>로 수정, 완료 후 <kbd>Enter</kbd>로 다음 단어.
+</div>
 
 <script>
-/* ---------- Hangul jamo tables ---------- */
-const CHO = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
-const JUNG = ["ㅏ","ㅐ","ㅑ","ㅒ","ㅓ","ㅔ","ㅕ","ㅖ","ㅗ","ㅘ","ㅙ","ㅚ","ㅛ","ㅜ","ㅝ","ㅞ","ㅟ","ㅠ","ㅡ","ㅢ","ㅣ"];
-const JONG = ["","ㄱ","ㄲ","ㄳ","ㄴ","ㄵ","ㄶ","ㄷ","ㄹ","ㄺ","ㄻ","ㄼ","ㄽ","ㄾ","ㄿ","ㅀ","ㅁ","ㅂ","ㅄ","ㅅ","ㅆ","ㅇ","ㅈ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+(function(){
+  "use strict";
 
-// vowels/finals that take TWO physical keystrokes on a standard 2-beolsik keyboard
-// (a single jungseong/jongseong in Unicode, but two key presses to type) — this is
-// why e.g. 화 needs 3 bars (cho + 2 for the compound ㅘ), not 2.
-const COMPOUND_JUNG = {
-  "ㅘ":["ㅗ","ㅏ"], "ㅙ":["ㅗ","ㅐ"], "ㅚ":["ㅗ","ㅣ"],
-  "ㅝ":["ㅜ","ㅓ"], "ㅞ":["ㅜ","ㅔ"], "ㅟ":["ㅜ","ㅣ"],
-  "ㅢ":["ㅡ","ㅣ"]
-};
-const COMPOUND_JONG = {
-  "ㄳ":["ㄱ","ㅅ"], "ㄵ":["ㄴ","ㅈ"], "ㄶ":["ㄴ","ㅎ"],
-  "ㄺ":["ㄹ","ㄱ"], "ㄻ":["ㄹ","ㅁ"], "ㄼ":["ㄹ","ㅂ"],
-  "ㄽ":["ㄹ","ㅅ"], "ㄾ":["ㄹ","ㅌ"], "ㄿ":["ㄹ","ㅍ"], "ㅀ":["ㄹ","ㅎ"]
-};
+  /* =========================================================
+   * 1. Hangul jamo tables (Unicode standard decomposition order)
+   * ======================================================= */
+  const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+  const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+  const JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
-function decomposeSyllable(ch){
-  if(!ch) return null;
-  const code = ch.codePointAt(0) - 0xAC00;
-  if(code < 0 || code > 11171) return null; // not a composed hangul syllable
-  const jong = code % 28;
-  const jung = Math.floor(code / 28) % 21;
-  const cho = Math.floor(code / 28 / 21);
-  return { cho: CHO[cho], jung: JUNG[jung], jong: JONG[jong] };
-}
-// standalone (still-composing) jamo characters live in the compatibility block
-function jamoRole(ch){
-  if(CHO.includes(ch)) return 'cho';
-  if(JUNG.includes(ch)) return 'jung';
-  return null;
-}
+  // 두벌식 물리 키(코드) -> 자모
+  const KEY_TO_JAMO = {
+    KeyQ:'ㅂ', KeyW:'ㅈ', KeyE:'ㄷ', KeyR:'ㄱ', KeyT:'ㅅ',
+    KeyY:'ㅛ', KeyU:'ㅕ', KeyI:'ㅑ', KeyO:'ㅐ', KeyP:'ㅔ',
+    KeyA:'ㅁ', KeyS:'ㄴ', KeyD:'ㅇ', KeyF:'ㄹ', KeyG:'ㅎ',
+    KeyH:'ㅗ', KeyJ:'ㅓ', KeyK:'ㅏ', KeyL:'ㅣ',
+    KeyZ:'ㅋ', KeyX:'ㅌ', KeyC:'ㅊ', KeyV:'ㅍ', KeyB:'ㅠ', KeyN:'ㅜ', KeyM:'ㅡ',
+  };
+  const KEY_TO_JAMO_SHIFT = {
+    KeyQ:'ㅃ', KeyW:'ㅉ', KeyE:'ㄸ', KeyR:'ㄲ', KeyT:'ㅆ',
+    KeyO:'ㅒ', KeyP:'ㅖ',
+  };
+  const VOWELS_BASE = new Set(['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅜ','ㅛ','ㅠ','ㅡ','ㅣ']);
 
-// how many keystroke "slots" (bars) a target character needs
-function getSlots(targetChar){
-  const d = decomposeSyllable(targetChar);
-  if(!d) return [{ type:'literal', expected: targetChar }];
-  const slots = [{ type:'cho', expected: d.cho }];
-  if(COMPOUND_JUNG[d.jung]){
-    const [a,b] = COMPOUND_JUNG[d.jung];
-    slots.push({ type:'jung1', expected:a }, { type:'jung2', expected:b });
-  } else {
-    slots.push({ type:'jung', expected: d.jung });
+  const JUNG_COMBINE = {
+    'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ',
+    'ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ',
+    'ㅡㅣ':'ㅢ'
+  };
+
+  const JONG_COMBINE = {
+    'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ',
+    'ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ',
+    'ㅂㅅ':'ㅄ'
+  };
+  // consonants that are valid as a final (batchim) - ㄸ/ㅃ/ㅉ are not.
+  const VALID_JONG = new Set(CHO.filter(c => c!=='ㄸ' && c!=='ㅃ' && c!=='ㅉ'));
+
+  // Reverse lookups: given a combined jung/jong, what were its two component
+  // keystrokes? Needed to count bars by *physical keystrokes* rather than by
+  // raw cho/jung/jong slot count — a syllable like 화 (ㅎ+ㅘ, no batchim) still
+  // took 3 key presses (ㅎ, ㅗ, ㅏ) even though it has no final consonant, so
+  // it must show 3 bars, not 2.
+  const JUNG_SPLIT = {};
+  for (const k in JUNG_COMBINE) JUNG_SPLIT[JUNG_COMBINE[k]] = [k[0], k[1]];
+  const JONG_SPLIT = {};
+  for (const k in JONG_COMBINE) JONG_SPLIT[JONG_COMBINE[k]] = [k[0], k[1]];
+
+  function composeSyllable(cho, jung, jong){
+    const ci = CHO.indexOf(cho), ji = JUNG.indexOf(jung), fi = jong ? JONG.indexOf(jong) : 0;
+    if (ci<0 || ji<0 || fi<0) return (cho||'')+(jung||'')+(jong||'');
+    return String.fromCodePoint(0xAC00 + (ci*21+ji)*28 + fi);
   }
-  if(d.jong){
-    if(COMPOUND_JONG[d.jong]){
-      const [a,b] = COMPOUND_JONG[d.jong];
-      slots.push({ type:'jong1', expected:a }, { type:'jong2', expected:b });
-    } else {
-      slots.push({ type:'jong', expected: d.jong });
+
+  function decomposeChar(ch){
+    const code = ch.codePointAt(0) - 0xAC00;
+    if (code < 0 || code > 11171) return null;
+    const cho = CHO[Math.floor(code / (21*28))];
+    const jung = JUNG[Math.floor((code % (21*28))/28)];
+    const jongIdx = code % 28;
+    const jong = jongIdx===0 ? null : JONG[jongIdx];
+    return {char:ch, cho, jung, jong};
+  }
+
+  function decomposeWord(word){
+    return Array.from(word).map(decomposeChar).filter(Boolean);
+  }
+
+  // Keystroke-slot descriptors for a target syllable: 1 for cho, 1 or 2 for
+  // jung (2 if it's a compound vowel), 0/1/2 for jong (2 if compound final).
+  function getSlotDescriptors(target){
+    if (!target) return [{type:'cho'}];
+    const slots = [{type:'cho', expected: target.cho}];
+    const jungParts = JUNG_SPLIT[target.jung];
+    if (jungParts) slots.push({type:'jung1', expected:jungParts[0]}, {type:'jung2', expected:jungParts[1]});
+    else slots.push({type:'jung', expected: target.jung});
+    if (target.jong){
+      const jongParts = JONG_SPLIT[target.jong];
+      if (jongParts) slots.push({type:'jong1', expected:jongParts[0]}, {type:'jong2', expected:jongParts[1]});
+      else slots.push({type:'jong', expected: target.jong});
     }
-  }
-  return slots;
-}
-
-// state ('pending'/'correct'/'wrong') for each slot, given what's typed so far at this position
-function evaluateSlots(targetChar, typedChar, isComposingHere){
-  const slots = getSlots(targetChar);
-  if(typedChar === undefined) return slots.map(() => 'pending');
-
-  const d = decomposeSyllable(targetChar);
-  if(!d){
-    return [ typedChar === targetChar ? 'correct' : 'wrong' ];
+    return slots;
   }
 
-  const yd = decomposeSyllable(typedChar);
-  if(!yd){
-    const role = jamoRole(typedChar);
-    return slots.map(s => {
-      if(s.type === 'cho') return role === 'cho' ? (typedChar === s.expected ? 'correct' : 'wrong') : 'pending';
-      if(s.type === 'jung' || s.type === 'jung1') return role === 'jung' ? (typedChar === s.expected ? 'correct' : 'wrong') : 'pending';
+  /* =========================================================
+   * 2. Korean composer engine
+   * ======================================================= */
+  function makeKoreanEngine(word){
+    const targets = decomposeWord(word);
+    let typed = [ {cho:null, jung:null, jong:null} ]; // typed[activeIndex] is current in-progress syllable
+    let activeIndex = 0;
+
+    function current(){ return typed[activeIndex]; }
+
+    function removeLastSlot(s){
+      if (s.jong!==null) s.jong = null;
+      else if (s.jung!==null) s.jung = null;
+      else if (s.cho!==null) s.cho = null;
+    }
+
+    function advance(newCho){
+      activeIndex++;
+      typed[activeIndex] = {cho:newCho, jung:null, jong:null};
+    }
+
+    function inputConsonant(j){
+      const s = current();
+      if (s.cho===null){
+        s.cho = j;
+      } else if (s.jung===null){
+        // consonant right after consonant, no vowel yet -> can't attach, start new syllable
+        advance(j);
+      } else if (s.jong===null){
+        if (VALID_JONG.has(j)) s.jong = j;
+        else advance(j); // e.g. ㄸ/ㅃ/ㅉ can't be a batchim -> must start new syllable
+      } else {
+        const combined = JONG_COMBINE[s.jong+j];
+        if (combined) s.jong = combined;
+        else advance(j);
+      }
+    }
+
+    function inputVowel(j){
+      const s = current();
+      if (s.cho===null && s.jung===null){
+        s.jung = j; // edge case: vowel typed with no leading consonant
+      } else if (s.jung===null){
+        s.jung = j;
+      } else if (s.jong===null){
+        const combined = JUNG_COMBINE[s.jung+j];
+        if (combined) s.jung = combined;
+        // else: a second independent vowel with no batchim between them - not valid input, ignore
+      } else {
+        // batchim already present -> it slides into the next syllable as its initial
+        const movingCho = s.jong;
+        s.jong = null;
+        advance(movingCho);
+        current().jung = j;
+      }
+    }
+
+    function backspace(){
+      const s = current();
+      if (s.cho===null && s.jung===null && s.jong===null){
+        if (activeIndex>0){
+          activeIndex--;
+          typed.length = activeIndex+1;
+          removeLastSlot(current());
+        }
+        return;
+      }
+      removeLastSlot(s);
+    }
+
+    function feed(jamo, isVowel){
+      if (isVowel) inputVowel(jamo); else inputConsonant(jamo);
+    }
+
+    return {
+      targets,
+      get typed(){ return typed; },
+      get activeIndex(){ return activeIndex; },
+      feed, backspace,
+    };
+  }
+
+  function composeDisplay(s){
+    if (s.cho===null && s.jung===null) return '';
+    if (s.cho===null) return s.jung || '';
+    if (s.jung===null) return s.cho;
+    return composeSyllable(s.cho, s.jung, s.jong);
+  }
+
+  // Per-slot state ('ok'/'bad'/'pending') for one syllable's keystroke slots,
+  // matching the physical-keystroke slot descriptors from getSlotDescriptors.
+  function evaluateSlotStates(target, s, descs){
+    return descs.map(desc => {
+      if (desc.type === 'cho') return s.cho===null ? 'pending' : (s.cho===desc.expected ? 'ok':'bad');
+      if (desc.type === 'jung') return s.jung===null ? 'pending' : (s.jung===desc.expected ? 'ok':'bad');
+      if (desc.type === 'jung1'){
+        if (s.jung===null) return 'pending';
+        if (s.jung===target.jung) return 'ok'; // fully combined compound vowel, matches
+        return s.jung===desc.expected ? 'ok' : 'bad'; // still just the first component typed
+      }
+      if (desc.type === 'jung2'){
+        if (s.jung===null) return 'pending';
+        return s.jung===target.jung ? 'ok' : 'pending'; // second key not in yet, or already resolved
+      }
+      if (desc.type === 'jong') return s.jong===null ? 'pending' : (s.jong===desc.expected ? 'ok':'bad');
+      if (desc.type === 'jong1'){
+        if (s.jong===null) return 'pending';
+        if (s.jong===target.jong) return 'ok';
+        return s.jong===desc.expected ? 'ok' : 'bad';
+      }
+      if (desc.type === 'jong2'){
+        if (s.jong===null) return 'pending';
+        return s.jong===target.jong ? 'ok' : 'pending';
+      }
       return 'pending';
     });
   }
 
-  const results = [ yd.cho === d.cho ? 'correct' : 'wrong' ];
-
-  const jungCompound = COMPOUND_JUNG[d.jung];
-  if(jungCompound){
-    const [a] = jungCompound;
-    if(isComposingHere && yd.jung !== d.jung){
-      results.push(yd.jung ? (yd.jung === a ? 'correct' : 'wrong') : 'pending');
-      results.push('pending');
-    } else {
-      const ok = yd.jung === d.jung;
-      results.push(ok ? 'correct' : 'wrong', ok ? 'correct' : 'wrong');
+  function renderSyllable(i, engine){
+    const target = engine.targets[i];
+    const descs = getSlotDescriptors(target);
+    if (i > engine.activeIndex){
+      return {mode:'light', text: target ? target.char : '', slotStates: descs.map(()=>null)};
     }
-  } else {
-    if(isComposingHere && !yd.jung){
-      results.push('pending');
-    } else {
-      results.push(yd.jung === d.jung ? 'correct' : 'wrong');
+    const s = engine.typed[i];
+    if (s.cho===null && s.jung===null && s.jong===null){
+      return {mode:'dark', text: target ? target.char : '', slotStates: descs.map(()=>null)};
     }
+    const states = evaluateSlotStates(target, s, descs);
+    const hasError = states.includes('bad');
+    const isComplete = !!target && s.cho===target.cho && s.jung===target.jung && (s.jong||null)===(target.jong||null);
+    let mode = 'dark';
+    if (hasError) mode = 'red';
+    else if (isComplete) mode = 'blue';
+    return {mode, text: composeDisplay(s), hint: (hasError && target) ? target.char : null, slotStates: states};
   }
 
-  if(d.jong){
-    const jongCompound = COMPOUND_JONG[d.jong];
-    if(jongCompound){
-      const [a] = jongCompound;
-      if(isComposingHere && yd.jong !== d.jong){
-        results.push(yd.jong ? (yd.jong === a ? 'correct' : 'wrong') : 'pending');
-        results.push('pending');
+  /* =========================================================
+   * 3. English engine (live per-letter feedback)
+   * ======================================================= */
+  function makeEnglishEngine(word){
+    let typed = [];
+    return {
+      word,
+      get typed(){ return typed; },
+      type(ch){ typed.push(ch); },
+      backspace(){ typed.pop(); },
+    };
+  }
+
+  function renderEnglish(engine, dictation){
+    const target = engine.word;
+    const typed = engine.typed;
+    const n = Math.max(target.length, typed.length);
+    const cells = [];
+    for (let i=0;i<n;i++){
+      if (i < typed.length){
+        const correct = i < target.length && typed[i].toLowerCase() === target[i].toLowerCase();
+        cells.push({mode: correct ? 'green':'red', text: typed[i]});
       } else {
-        const ok = yd.jong === d.jong;
-        results.push(ok ? 'correct' : 'wrong', ok ? 'correct' : 'wrong');
+        cells.push({mode:'blank', text:''});
       }
+    }
+    const started = typed.length>0;
+    const complete = typed.length===target.length && cells.every(c=>c.mode==='green');
+    return {cells, started, complete, showHint: !started && !dictation};
+  }
+
+  /* =========================================================
+   * 4. Word lists
+   * ======================================================= */
+  const KO_WORDS = [
+    {word:'연천', roman:'Yeoncheon'},
+    {word:'전곡', roman:'Jeongok'},
+    {word:'서울', roman:'Seoul'},
+    {word:'강남', roman:'Gangnam'},
+    {word:'잠실', roman:'Jamsil'},
+    {word:'합정', roman:'Hapjeong'},
+    {word:'관악', roman:'Gwanak'},
+    {word:'닭고기', roman:'dakgogi (chicken)'},
+    {word:'과자', roman:'gwaja (snack)'},
+    {word:'의자', roman:'uija (chair)'},
+  ];
+  const EN_WORDS = [
+    'embalm','apple','banana','computer','keyboard',
+    'mountain','sandwich','elephant','umbrella','calendar'
+  ];
+
+  /* =========================================================
+   * 5. App state & DOM wiring
+   * ======================================================= */
+  let mode = 'ko';
+  let wordIndex = 0;
+  let koEngine = makeKoreanEngine(KO_WORDS[0].word);
+  let enEngine = makeEnglishEngine(EN_WORDS[0]);
+  let dictation = false;
+  let stats = {correct:0, skipped:0};
+
+  const koRow = document.getElementById('koRow');
+  const enRow = document.getElementById('enRow');
+  const romanizationEl = document.getElementById('romanization');
+  const statusBanner = document.getElementById('statusBanner');
+  const progressEl = document.getElementById('progress');
+
+  function currentWordCount(){ return mode==='ko' ? KO_WORDS.length : EN_WORDS.length; }
+
+  function loadWord(){
+    if (mode==='ko'){
+      koEngine = makeKoreanEngine(KO_WORDS[wordIndex].word);
     } else {
-      if(isComposingHere && !yd.jong){
-        results.push('pending');
+      enEngine = makeEnglishEngine(EN_WORDS[wordIndex]);
+    }
+    render();
+  }
+
+  function render(){
+    progressEl.textContent = `${wordIndex+1} / ${currentWordCount()}  (정답 ${stats.correct} · 건너뜀 ${stats.skipped})`;
+
+    if (mode==='ko'){
+      koRow.style.display='flex'; enRow.style.display='none';
+      romanizationEl.textContent = KO_WORDS[wordIndex].roman;
+      koRow.innerHTML='';
+      let allComplete = koEngine.activeIndex === koEngine.targets.length-1;
+      let allCorrect = true;
+      for (let i=0;i<koEngine.targets.length;i++){
+        const r = renderSyllable(i, koEngine);
+        if (r.mode!=='blue') allCorrect = false;
+        if (i>koEngine.activeIndex) allComplete = false;
+        const block = document.createElement('div');
+        block.className='syll-block';
+        if (r.hint){
+          const hint = document.createElement('div');
+          hint.className='syll-hint';
+          hint.textContent = r.hint;
+          block.appendChild(hint);
+        }
+        const charEl = document.createElement('div');
+        charEl.className = 'syll-char ' + (r.mode==='light'?'light': r.mode==='dark'?'dark': r.mode==='blue'?'blue':'red');
+        charEl.textContent = r.text;
+        block.appendChild(charEl);
+        const dashes = document.createElement('div');
+        dashes.className='dashes';
+        for (let k=0;k<r.slotStates.length;k++){
+          const d = document.createElement('div');
+          const st = r.slotStates[k];
+          d.className = 'dash' + (st==='ok'?' blue': st==='bad'?' red':'');
+          dashes.appendChild(d);
+        }
+        block.appendChild(dashes);
+        koRow.appendChild(block);
+      }
+      // final slot filled check for last syllable
+      const lastTarget = koEngine.targets[koEngine.targets.length-1];
+      const lastTyped = koEngine.typed[koEngine.activeIndex];
+      const lastFilled = lastTarget.jong ? (lastTyped.cho&&lastTyped.jung&&lastTyped.jong) : (lastTyped.cho&&lastTyped.jung);
+      const wordDone = allComplete && !!lastFilled;
+      statusBanner.textContent = wordDone && allCorrect ? '정답! Enter로 다음' : '';
+      statusBanner.className = 'status-banner ' + (wordDone && allCorrect ? 'ok':'');
+    } else {
+      koRow.style.display='none'; enRow.style.display='flex';
+      romanizationEl.textContent='';
+      enRow.innerHTML='';
+      const r = renderEnglish(enEngine, dictation);
+      if (!r.started){
+        // show hidden/hint state
+        const word = EN_WORDS[wordIndex];
+        for (const ch of word){
+          const block = document.createElement('div');
+          block.className='letter-block';
+          const charEl = document.createElement('div');
+          charEl.className='letter-char light';
+          charEl.textContent = r.showHint ? ch : '';
+          block.appendChild(charEl);
+          const under = document.createElement('div');
+          under.className='letter-underline';
+          block.appendChild(under);
+          enRow.appendChild(block);
+        }
       } else {
-        results.push(yd.jong === d.jong ? 'correct' : 'wrong');
+        for (const c of r.cells){
+          const block = document.createElement('div');
+          block.className='letter-block';
+          const charEl = document.createElement('div');
+          charEl.className='letter-char ' + (c.mode==='green'?'green': c.mode==='red'?'red':'light');
+          charEl.textContent = c.text;
+          block.appendChild(charEl);
+          const under = document.createElement('div');
+          under.className='letter-underline' + (c.mode==='green'?' green': c.mode==='red'?' red':'');
+          block.appendChild(under);
+          enRow.appendChild(block);
+        }
       }
+      statusBanner.textContent = r.complete ? '정답! Enter로 다음 (Correct! Press Enter)' : '';
+      statusBanner.className = 'status-banner ' + (r.complete ? 'ok':'');
     }
   }
-  return results;
-}
 
-/* ---------- Word lists ---------- */
-const WORDS_KO = [
-  ["사과","苹果"],["사랑","爱"],["학교","学校"],["친구","朋友"],["감사","感谢"],
-  ["음식","食物"],["날씨","天气"],["시간","时间"],["여행","旅行"],["공부","学习"],
-  ["가족","家人"],["행복","幸福"],["문제","问题"],["생각","想法"],["사람","人"],
-  ["물건","东西"],["자유","自由"],["취미","爱好"],["계획","计划"],["경험","经验"],
-  ["운동","运动"],["음악","音乐"],["영화","电影"],["병원","医院"],["은행","银行"],
-  ["서울","首尔"],["한국","韩国"],["학생","学生"],["선생","老师"],["방학","放假"]
-];
-const WORDS_EN = [
-  ["apple","苹果"],["banana","香蕉"],["orange","橙子"],["guitar","吉他"],["mountain","山"],
-  ["river","河流"],["computer","电脑"],["keyboard","键盘"],["elephant","大象"],["giraffe","长颈鹿"],
-  ["holiday","假期"],["weather","天气"],["morning","早晨"],["evening","傍晚"],["kitchen","厨房"],
-  ["window","窗户"],["bicycle","自行车"],["airport","机场"],["hospital","医院"],["teacher","老师"],
-  ["student","学生"],["science","科学"],["history","历史"],["weekend","周末"],["birthday","生日"],
-  ["umbrella","雨伞"],["sandwich","三明治"],["chocolate","巧克力"],["adventure","冒险"],["sunshine","阳光"]
-];
-
-/* ---------- State ---------- */
-let mode = 'ko';
-let list = shuffle(WORDS_KO.slice());
-let idx = 0;
-let correctKeys = 0, totalKeys = 0;
-let startTime = null;
-let soundOn = true;
-
-const typer = document.getElementById('typer');
-const syllablesEl = document.getElementById('syllables');
-const meaningEl = document.getElementById('meaning');
-const progressFill = document.getElementById('progressFill');
-const progressLabel = document.getElementById('progressLabel');
-const accLabel = document.getElementById('accLabel');
-const speedLabel = document.getElementById('speedLabel');
-const timeLabel = document.getElementById('timeLabel');
-const prevCell = document.getElementById('prevCell');
-const curCell = document.getElementById('curCell');
-const nextCell = document.getElementById('nextCell');
-const doneScreen = document.getElementById('doneScreen');
-
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i],arr[j]]=[arr[j],arr[i]];
-  }
-  return arr;
-}
-
-/* ---------- Audio (tiny beep, no assets) ---------- */
-let actx;
-function beep(freq, dur){
-  if(!soundOn) return;
-  try{
-    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.frequency.value = freq; o.type = 'sine';
-    g.gain.value = 0.05;
-    o.connect(g); g.connect(actx.destination);
-    o.start(); o.stop(actx.currentTime + dur);
-  }catch(e){}
-}
-
-/* ---------- Rendering ----------
-   Simple and direct, on purpose: read typer.value straight, rebuild the
-   syllable cards fresh each time. No composition-event interception, no
-   deferred/async caret correction, no separate committed-text bookkeeping —
-   just react to what the browser reports and trust it. The only two pieces
-   of logic that are NOT a plain 1:1 port of "just read the string" are the
-   two fixes below, which are there because the naive version demonstrably
-   gets them wrong: */
-function currentWord(){ return list[idx][0]; }
-function currentMeaning(){ return list[idx][1]; }
-
-function render(){
-  const target = currentWord();
-  const typed = typer.value;
-  syllablesEl.innerHTML = '';
-
-  // FIX 1: a not-yet-typed position only becomes "up next" (dark gray) once
-  // the position right before it is structurally *settled* — every one of
-  // its slots resolved, correct or wrong — not merely because the string
-  // happens to have grown to that length. A single Hangul syllable can sit
-  // at one string length for several keystrokes while still mid-composition
-  // (e.g. "ㅇ" -> "여" -> "연" are all length 1), so length alone can't tell
-  // you the previous syllable is done. Using raw length here is what makes
-  // the next syllable flash "active" before the current one is finished.
-  let activeIndex = 0;
-  if(typed.length > 0){
-    const lastIdx = typed.length - 1;
-    const lastStates = evaluateSlots(target[lastIdx], typed[lastIdx], true);
-    const lastSettled = !lastStates.includes('pending');
-    activeIndex = lastSettled ? typed.length : lastIdx;
-  }
-
-  for(let i=0;i<target.length;i++){
-    const tChar = target[i];
-    const typedChar = typed[i];
-    const isComposingHere = (i === typed.length - 1);
-    const started = typedChar !== undefined;
-    // FIX 2: bar count comes from getSlots(), which counts physical
-    // keystrokes on a 2-beolsik keyboard (splitting compound vowels/finals
-    // like ㅘ or ㄺ into 2 slots each) — not the raw cho/jung/jong count,
-    // which would under-count e.g. 화 as 2 bars instead of 3.
-    const states = evaluateSlots(tChar, typedChar, isComposingHere);
-    const hasWrong = states.includes('wrong');
-    const isFullyDone = started && !hasWrong && states.every(s => s === 'correct');
-
-    const group = document.createElement('div');
-    group.className = 'syl-group';
-
-    // small correct-answer hint: only shown for a syllable that currently has
-    // an error, persists until it's actually fixed.
-    const hintEl = document.createElement('div');
-    hintEl.className = 'syl-hint';
-    hintEl.textContent = hasWrong ? tChar : '';
-
-    // big display: once typing starts here, show what was actually typed
-    // (not the target) — dark-gray in progress, blue once fully correct,
-    // red if it has any wrong part.
-    const charEl = document.createElement('div');
-    if(started){
-      charEl.textContent = typedChar;
-      charEl.className = 'syl-char ' + (hasWrong ? 'wrong' : (isFullyDone ? 'done' : 'active'));
+  function isWordCorrectNow(){
+    if (mode==='ko'){
+      if (koEngine.activeIndex !== koEngine.targets.length-1) return false;
+      for (let i=0;i<koEngine.targets.length;i++){
+        const r = renderSyllable(i, koEngine);
+        if (r.mode!=='blue') return false;
+      }
+      return true;
     } else {
-      charEl.textContent = tChar;
-      charEl.className = 'syl-char ' + (i === activeIndex ? 'active' : 'future');
+      const r = renderEnglish(enEngine, dictation);
+      return r.complete;
     }
+  }
 
-    const barsEl = document.createElement('div');
-    barsEl.className = 'bars';
-    states.forEach(state => {
-      const bar = document.createElement('div');
-      bar.className = 'bar' + (state !== 'pending' ? (' ' + state) : '');
-      barsEl.appendChild(bar);
+  function nextWord(markCorrect){
+    if (markCorrect) stats.correct++; else stats.skipped++;
+    wordIndex = (wordIndex+1) % currentWordCount();
+    loadWord();
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = btn.dataset.mode;
+      wordIndex = 0;
+      loadWord();
     });
+  });
 
-    group.appendChild(hintEl);
-    group.appendChild(charEl);
-    group.appendChild(barsEl);
-    syllablesEl.appendChild(group);
-  }
+  document.getElementById('restartBtn').addEventListener('click', loadWord);
+  document.getElementById('skipBtn').addEventListener('click', ()=> nextWord(false));
+  document.getElementById('dictationToggle').addEventListener('change', (e)=>{
+    dictation = e.target.checked;
+    render();
+  });
 
-  meaningEl.innerHTML = '뜻: <b>' + currentMeaning() + '</b>';
+  window.addEventListener('keydown', (e)=>{
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-  const prev = list[idx-1], next = list[idx+1];
-  prevCell.querySelector('.w').textContent = prev ? prev[0] : '';
-  prevCell.querySelector('small').textContent = prev ? prev[1] : '';
-  curCell.querySelector('.w').textContent = target;
-  curCell.querySelector('small').textContent = currentMeaning();
-  nextCell.querySelector('.w').textContent = next ? next[0] : '';
-  nextCell.querySelector('small').textContent = next ? next[1] : '';
-
-  progressLabel.textContent = idx + ' / ' + list.length;
-  progressFill.style.width = (100 * idx / list.length) + '%';
-  const acc = totalKeys ? Math.round(100 * correctKeys / totalKeys) : 0;
-  accLabel.textContent = acc + '%';
-}
-
-function updateStats(){
-  if(!startTime) return;
-  const elapsedMs = Date.now() - startTime;
-  const mins = elapsedMs / 60000;
-  speedLabel.textContent = mins > 0 ? Math.round(correctKeys / mins) : 0;
-  const s = Math.floor(elapsedMs/1000);
-  timeLabel.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
-}
-setInterval(updateStats, 500);
-
-function isWordComplete(){
-  const target = currentWord();
-  const typed = typer.value;
-  if(mode === 'en'){
-    return typed.toLowerCase() === target.toLowerCase();
-  }
-  if(typed.length !== target.length) return false;
-  for(let i=0;i<target.length;i++){
-    const td = decomposeSyllable(target[i]);
-    const yd = decomposeSyllable(typed[i]);
-    if(td){
-      if(!yd || yd.cho!==td.cho || yd.jung!==td.jung || yd.jong!==td.jong) return false;
-    } else if(target[i] !== typed[i]) return false;
-  }
-  return true;
-}
-
-function nextWord(){
-  if(!isWordComplete()) return;
-  // Never clear the input's value while the browser still has an active
-  // Hangul composition session open — doing so desyncs the IME's internal
-  // composition anchor from the (now-cleared) DOM value, and the next
-  // keystroke gets inserted at the wrong position (the "second syllable
-  // jumps in front of the first" symptom). If we're mid-composition, do
-  // nothing here; compositionend below will call nextWord() again once
-  // it's actually safe to clear.
-  if(isComposingNow) return;
-  idx++;
-  typer.value = '';
-  if(idx >= list.length){
-    finishRound();
-    return;
-  }
-  render();
-  typer.focus();
-}
-
-function finishRound(){
-  const acc = totalKeys ? Math.round(100*correctKeys/totalKeys) : 0;
-  document.getElementById('finalAcc').textContent = acc + '%';
-  document.getElementById('finalSpeed').textContent = speedLabel.textContent;
-  doneScreen.classList.add('show');
-}
-
-function restart(){
-  list = shuffle((mode==='ko'?WORDS_KO:WORDS_EN).slice());
-  idx = 0; correctKeys = 0; totalKeys = 0; startTime = null;
-  typer.value = '';
-  doneScreen.classList.remove('show');
-  render();
-  typer.focus();
-}
-
-/* ---------- Input handling ---------- */
-// The one piece of composition-awareness that's actually necessary (see
-// nextWord() above): track whether the browser has an IME composition
-// session open, so we know it's unsafe to clear typer.value right now.
-let isComposingNow = false;
-typer.addEventListener('compositionstart', () => { isComposingNow = true; });
-typer.addEventListener('compositionend', () => {
-  isComposingNow = false;
-  if(isWordComplete()) nextWord();
-});
-
-typer.addEventListener('input', () => {
-  if(!startTime) startTime = Date.now();
-  totalKeys++;
-  render();
-
-  const target = currentWord();
-  const typed = typer.value;
-  const i = typed.length - 1;
-  if(i >= 0 && i < target.length){
-    let ok = false;
-    if(mode === 'en'){
-      ok = typed[i].toLowerCase() === target[i].toLowerCase();
-    } else {
-      const td = decomposeSyllable(target[i]);
-      const yd = decomposeSyllable(typed[i]);
-      if(td && yd) ok = (yd.cho===td.cho && yd.jung===td.jung && yd.jong===td.jong);
+    if (e.code === 'Backspace'){
+      e.preventDefault();
+      if (mode==='ko') koEngine.backspace(); else enEngine.backspace();
+      render();
+      return;
     }
-    if(ok){ correctKeys++; beep(880,0.06); } else { beep(220,0.08); }
-  }
-  if(isWordComplete()){
-    setTimeout(nextWord, 150);
-  }
-});
+    if (e.code === 'Enter'){
+      e.preventDefault();
+      nextWord(isWordCorrectNow());
+      return;
+    }
 
-document.getElementById('stage').addEventListener('click', () => typer.focus());
-document.addEventListener('click', (e) => { if(!doneScreen.contains(e.target)) typer.focus(); });
+    if (mode==='ko'){
+      const jamo = e.shiftKey ? (KEY_TO_JAMO_SHIFT[e.code] || KEY_TO_JAMO[e.code]) : KEY_TO_JAMO[e.code];
+      if (!jamo) return;
+      e.preventDefault();
+      koEngine.feed(jamo, VOWELS_BASE.has(jamo));
+      render();
+    } else {
+      if (/^Key[A-Z]$/.test(e.code)){
+        e.preventDefault();
+        enEngine.type(e.code.slice(3).toLowerCase());
+        render();
+      }
+    }
+  });
 
-document.getElementById('modeKo').addEventListener('click', () => setMode('ko'));
-document.getElementById('modeEn').addEventListener('click', () => setMode('en'));
-function setMode(m){
-  mode = m;
-  document.getElementById('modeKo').classList.toggle('active', m==='ko');
-  document.getElementById('modeEn').classList.toggle('active', m==='en');
-  restart();
-}
-
-document.getElementById('soundBtn').addEventListener('click', (e) => {
-  soundOn = !soundOn;
-  e.target.textContent = soundOn ? '🔊 소리' : '🔇 소리';
-});
-
-document.getElementById('restartBtn').addEventListener('click', restart);
-
-/* ---------- Init ---------- */
-render();
-typer.focus();
+  loadWord();
+})();
 </script>
 </body>
 </html>
