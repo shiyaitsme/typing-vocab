@@ -320,7 +320,13 @@
           if(s.cho===null&&s.jung===null) s.jung=jamo;
           else if(s.jung===null) s.jung=jamo;
           else if(s.jong===null){ const c=JUNG_COMBINE[s.jung+jamo]; if(c) s.jung=c; }
-          else { const moving=s.jong; s.jong=null; advance(moving); current().jung=jamo; }
+          else {
+            const jong=s.jong;
+            const split=JONG_SPLIT[jong];
+            if(split){ s.jong=split[0]; advance(split[1]); }
+            else { s.jong=null; advance(jong); }
+            current().jung=jamo;
+          }
         } else {
           if(s.cho===null) s.cho=jamo;
           else if(s.jung===null) advance(jamo);
