@@ -157,17 +157,20 @@
       <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
     </div>
     <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;flex-direction:column;gap:12px;">
-      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(var(--ink-rgb),.16);border-radius:4px;">
-        <div id="currentNotebookCover" style="width:34px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;"></div>
+      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid rgba(var(--ink-rgb),.16);border-radius:4px;">
+        <div id="currentNotebookCover" style="width:40px;height:40px;border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;"></div>
         <div style="flex:1;min-width:0;">
-          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-          <div id="currentNotebookMeta" style="font-size:10px;color:rgba(var(--ink-rgb),.45);"></div>
+          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="currentNotebookMeta" style="font-size:10.5px;color:rgba(var(--ink-rgb),.45);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
         </div>
-        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;font-size:10px;font-weight:700;color:var(--accent);white-space:nowrap;padding:4px 2px;">전환</button>
+        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:7px 11px;border-radius:2px;letter-spacing:.02em;">⇄ 전환</button>
       </div>
       <div>
-        <div data-i18n="dateFilterTitle" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);font-weight:700;text-transform:uppercase;margin-bottom:6px;">날짜별 필터</div>
-        <div id="dateFilterRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+          <div data-i18n="dateFilterTitle" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);font-weight:700;text-transform:uppercase;">날짜별 필터</div>
+          <button id="dateFilterExpandBtn" data-i18n="dateFilterMore" style="all:unset;cursor:pointer;font-size:9.5px;color:var(--accent);font-weight:700;display:none;">더보기</button>
+        </div>
+        <div id="dateFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;"></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
@@ -193,6 +196,10 @@
       </div>
     </div>
     <div id="drawerContent" style="flex:1;overflow-y:auto;padding:8px 16px;"></div>
+    <div id="notebooksPanel" style="display:none;flex:1;overflow-y:auto;padding:12px 16px 16px;flex-direction:column;gap:10px;">
+      <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;text-align:center;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgb(var(--ink-rgb));padding:14px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.03em;">+ 새 단어장</button>
+      <div id="notebooksGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+    </div>
   </div>
 
   <!-- AI PROMPT MODAL -->
@@ -223,28 +230,50 @@
 
   <!-- NOTEBOOK EDIT MODAL -->
   <div id="notebookModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
-    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:420px;border-radius:4px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:420px;border-radius:4px;display:flex;flex-direction:column;gap:14px;box-sizing:border-box;max-height:88vh;overflow-y:auto;">
       <div id="notebookModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
-      <input type="text" id="notebookNameInput" data-i18n-placeholder="notebookNamePlaceholder" placeholder="단어장 이름" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px;font-size:13px;border-radius:2px;font-family:inherit;">
-      <textarea id="notebookDescInput" data-i18n-placeholder="notebookDescPlaceholder" placeholder="간단한 설명(선택)" style="width:100%;height:60px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
-      <div>
-        <div data-i18n="notebookCoverLabel" style="font-size:10px;letter-spacing:.05em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
-        <div id="notebookGradientRow" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" id="notebookNameInput" data-i18n-placeholder="notebookNamePlaceholder" placeholder="단어장 이름" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px;font-size:13px;border-radius:2px;font-family:inherit;">
+        <textarea id="notebookDescInput" data-i18n-placeholder="notebookDescPlaceholder" placeholder="간단한 설명(선택)" style="width:100%;height:52px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
       </div>
-      <div>
-        <div data-i18n="notebookEmojiLabel" style="font-size:10px;letter-spacing:.05em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">아이콘</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div id="notebookEmojiRow" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
-          <input type="text" id="notebookEmojiInput" maxlength="4" autocomplete="off" style="width:44px;text-align:center;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 4px;font-size:16px;border-radius:2px;font-family:inherit;flex:none;">
+      <div style="display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:start;">
+        <div id="notebookPreview" style="width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:36px;flex:none;"></div>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+          <div>
+            <div data-i18n="notebookCoverLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
+            <div id="notebookGradientRow" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+          </div>
+          <div>
+            <div data-i18n="notebookEmojiLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">아이콘</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <div id="notebookEmojiRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+              <input type="text" id="notebookEmojiInput" maxlength="4" placeholder="＋" autocomplete="off" style="width:34px;height:30px;text-align:center;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));font-size:15px;border-radius:2px;font-family:inherit;flex:none;">
+            </div>
+          </div>
         </div>
       </div>
-      <div id="notebookPreview" style="width:100%;height:64px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:26px;"></div>
-      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;">
-        <button id="deleteNotebookBtn" data-i18n="deleteNotebookBtn" style="all:unset;cursor:pointer;padding:9px 12px;font-size:11px;letter-spacing:.03em;color:var(--warn);font-weight:700;display:none;">삭제</button>
+      <div data-i18n="notebookCoverPhotoComingSoon" style="font-size:9.5px;color:rgba(var(--ink-rgb),.35);line-height:1.5;">📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.</div>
+      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:14px;">
+        <button id="deleteNotebookBtn" data-i18n="deleteNotebookBtn" style="all:unset;cursor:pointer;padding:9px 4px;font-size:11px;letter-spacing:.03em;color:var(--warn);font-weight:700;display:none;">삭제</button>
         <div style="display:flex;gap:8px;margin-left:auto;">
           <button id="closeNotebookModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
           <button id="saveNotebookBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTEBOOK DELETE CONFIRM MODAL -->
+  <div id="deleteNotebookOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1100;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(224,122,95,.4);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:380px;border-radius:4px;display:flex;flex-direction:column;gap:14px;box-sizing:border-box;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:50%;background:rgba(224,122,95,.15);color:var(--warn);display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;font-weight:700;">!</div>
+        <div data-i18n="deleteNotebookModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:15px;">단어장을 삭제할까요?</div>
+      </div>
+      <div id="deleteNotebookModalBody" style="font-size:12px;line-height:1.6;color:rgba(var(--ink-rgb),.6);"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="closeDeleteNotebookBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
+        <button id="confirmDeleteNotebookBtn" data-i18n="deleteNotebookConfirmBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--warn);color:#fff;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">삭제하기</button>
       </div>
     </div>
   </div>
@@ -510,7 +539,12 @@
       noWords: '단어가 없습니다.', noSearchResults: '검색 결과가 없습니다.', noNotesWords: '노트를 남긴 단어가 없습니다.',
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
-      switchNotebookBtn: '전환', dateFilterTitle: '날짜별 필터', allDatesLabel: '전체',
+      switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
+      dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
+      notebookWordCountWithDesc: '단어 {{count}}개 · {{description}}',
+      notebookCoverPhotoComingSoon: '📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.',
+      deleteNotebookModalBody: "<b>{{name}}</b> 안에 있는 단어 <b>{{count}}</b>개가 함께 삭제됩니다. <b>이 작업은 되돌릴 수 없습니다.</b>",
+      deleteNotebookConfirmBtn: '삭제하기', deleteNotebookModalTitle: '단어장을 삭제할까요?',
       notebookWordCount: '단어 {{count}}개', noNotebooks: '단어장이 없습니다.<br>새 단어장을 만들어 보세요.',
       newNotebookBtn: '+ 새 단어장', notebookModalTitleNew: '📖 새 단어장', notebookModalTitleEdit: '✎ 단어장 편집',
       notebookNamePlaceholder: '단어장 이름', notebookDescPlaceholder: '간단한 설명(선택)',
@@ -577,7 +611,12 @@
       noWords: 'No words yet.', noSearchResults: 'No search results.', noNotesWords: 'No words with notes.',
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
-      switchNotebookBtn: 'Switch', dateFilterTitle: 'Filter by date', allDatesLabel: 'All',
+      switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
+      dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
+      notebookWordCountWithDesc: '{{count}} words · {{description}}',
+      notebookCoverPhotoComingSoon: '📷 Uploading your own photo as a cover is coming soon.',
+      deleteNotebookModalBody: "<b>{{count}}</b> word(s) inside <b>{{name}}</b> will be deleted too. <b>This can't be undone.</b>",
+      deleteNotebookConfirmBtn: 'Delete', deleteNotebookModalTitle: 'Delete this notebook?',
       notebookWordCount: '{{count}} words', noNotebooks: 'No notebooks yet.<br>Create one to get started.',
       newNotebookBtn: '+ New notebook', notebookModalTitleNew: '📖 New notebook', notebookModalTitleEdit: '✎ Edit notebook',
       notebookNamePlaceholder: 'Notebook name', notebookDescPlaceholder: 'Short description (optional)',
@@ -643,22 +682,48 @@
   let notebooks = { ko: [], en: [] };
   let currentNotebookIdByMode = { ko: null, en: null };
   let selectedDatesByMode = { ko: null, en: null }; // null = "All"; else Set of 'YYYY-MM-DD'
+  let dateFilterExpandedByMode = { ko: false, en: false };
   let localIdSeq = 0;
   function nextLocalId(){ return --localIdSeq; } // negative ids = never-synced-to-cloud
 
-  const COVER_GRADIENTS = {
-    purple: 'linear-gradient(135deg,#8b5cf6,#c4b5fd)',
-    pink:   'linear-gradient(135deg,#ec4899,#f9a8d4)',
-    blue:   'linear-gradient(135deg,#3b82f6,#93c5fd)',
-    green:  'linear-gradient(135deg,#10b981,#6ee7b7)',
-    orange: 'linear-gradient(135deg,#f97316,#fdba74)',
-    gray:   'linear-gradient(135deg,#57534e,#a8a29e)',
+  const NOTEBOOK_GRADIENTS = {
+    sakura:    'linear-gradient(135deg,#ffc7d6,#fedfe9)',
+    taro:      'linear-gradient(135deg,#facde0,#d9e8ff)',
+    blueberry: 'linear-gradient(135deg,#88abf2,#f2f6ff)',
+    seasalt:   'linear-gradient(135deg,#87bdff,#e6f5ff)',
+    glacier:   'linear-gradient(135deg,#a8d2ff,#e0f0ff)',
+    mint:      'linear-gradient(135deg,#8ed6de,#bcf1e0)',
+    muscat:    'linear-gradient(135deg,#bdf9d8,#edffdb)',
+    pear:      'linear-gradient(135deg,#bac9a7,#f5faed)',
+    matcha:    'linear-gradient(135deg,#60787a,#bce8d5)',
   };
-  const NOTEBOOK_EMOJI_PRESETS = ['📖','✏️','🎯','🔥','🌱','⭐','🗂️','💡'];
+  const NOTEBOOK_EMOJI_PRESETS = ['📖','✏️','🎯','🔥','🌱','⭐','🗂️','💡','🍀','🎧','🧠','📚'];
 
   function notebookCoverCSS(nb){
     if(nb && nb.coverUrl) return `background-image:url('${nb.coverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
-    return `background:${COVER_GRADIENTS[nb && nb.coverGradient] || COVER_GRADIENTS.purple};`;
+    return `background:${NOTEBOOK_GRADIENTS[nb && nb.coverGradient] || NOTEBOOK_GRADIENTS.sakura};`;
+  }
+
+  // Cover/preset emoji render as actual Apple-style emoji images (not the system emoji
+  // font) so they look the same across Windows/Android/etc, not just macOS/iOS.
+  function appleEmojiUrl(emoji, withVariationSelector){
+    const codepoints = Array.from(emoji).map(c=>c.codePointAt(0).toString(16)).filter(cp=>withVariationSelector||cp!=='fe0f');
+    return `https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.1.2/img/apple/64/${codepoints.join('-')}.png`;
+  }
+  function makeEmojiImg(emoji, size){
+    const img=document.createElement('img');
+    img.src=appleEmojiUrl(emoji,false); img.alt=emoji; img.draggable=false;
+    img.style.cssText=`width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;flex:none;`;
+    let triedVariation=false;
+    img.onerror=()=>{
+      if(!triedVariation){ triedVariation=true; img.src=appleEmojiUrl(emoji,true); }
+      else img.remove();
+    };
+    return img;
+  }
+  function setEmojiInto(el, emoji, size){
+    el.innerHTML='';
+    el.appendChild(makeEmojiImg(emoji, size));
   }
 
   function mode2(){ return mode; }
@@ -723,7 +788,7 @@
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const progressEl=$('progress'), pageCounter=$('pageCounter');
   const drawer=$('drawer'), drawerContent=$('drawerContent');
-  const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow');
+  const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow'), notebooksPanel=$('notebooksPanel');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
@@ -1204,7 +1269,7 @@
   }
 
   function renderActiveDrawerView(scrollToActive){
-    if(drawerView==='notebooks') renderNotebooks(); else if(drawerView==='stats') renderStats(); else renderDrawer(scrollToActive);
+    if(drawerView==='notebooks') renderNotebooksGrid(); else if(drawerView==='stats') renderStats(); else renderDrawer(scrollToActive);
   }
 
   function setDrawerView(view, scrollToActive){
@@ -1215,6 +1280,8 @@
     Object.assign(drawerTabNotebooks.style, view==='notebooks'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
     wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
+    drawerContent.style.display = view==='notebooks' ? 'none' : 'block';
+    notebooksPanel.style.display = view==='notebooks' ? 'flex' : 'none';
     if(view==='words'){ updateCurrentNotebookBar(); renderDateFilterRow(); }
     renderActiveDrawerView(scrollToActive);
   }
@@ -1240,26 +1307,35 @@
     const nb = currentNotebook();
     const coverEl = $('currentNotebookCover');
     if(!nb){
-      coverEl.style.cssText='width:34px;height:34px;border-radius:4px;flex:none;background:rgba(var(--ink-rgb),.08);';
-      coverEl.textContent='';
+      coverEl.style.cssText='width:40px;height:40px;border-radius:4px;flex:none;background:rgba(var(--ink-rgb),.08);';
+      coverEl.innerHTML='';
       $('currentNotebookName').textContent=''; $('currentNotebookMeta').textContent='';
       return;
     }
-    coverEl.style.cssText=`width:34px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;${notebookCoverCSS(nb)}`;
-    coverEl.textContent = nb.coverUrl ? '' : nb.coverEmoji;
+    coverEl.style.cssText=`width:40px;height:40px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex:none;${notebookCoverCSS(nb)}`;
+    if(nb.coverUrl) coverEl.innerHTML=''; else setEmojiInto(coverEl, nb.coverEmoji, 19);
     $('currentNotebookName').textContent = nb.name;
-    $('currentNotebookMeta').textContent = t('notebookWordCount', {count: currentNotebookAllWords().length});
+    const count = currentNotebookAllWords().length;
+    $('currentNotebookMeta').textContent = nb.description ? t('notebookWordCountWithDesc',{count,description:nb.description}) : t('notebookWordCount',{count});
   }
 
+  // Date pills: "전체" (all) + "최근 7일" (last 7 days) quick filters, then one pill per
+  // date the notebook actually has words on. Collapses to a single scrollable row past
+  // 6 dates with a "더보기/접기" toggle so a long history doesn't push the rest of the
+  // drawer down.
   function renderDateFilterRow(){
     const row = $('dateFilterRow');
     row.innerHTML='';
     const dates = Array.from(new Set(currentNotebookAllWords().map(w=>w.createdDate).filter(Boolean))).sort().reverse();
     const sel = currentSelectedDates();
-    const makePill=(label, active, onClick)=>{
+    const expanded = dateFilterExpandedByMode[mode];
+    row.style.flexWrap = expanded ? 'wrap' : 'nowrap';
+    row.style.overflowX = expanded ? 'visible' : 'auto';
+
+    const makePill=(label, active, onClick, title)=>{
       const btn=document.createElement('button');
-      btn.type='button'; btn.textContent=label;
-      btn.style.cssText=`all:unset;cursor:pointer;padding:6px 11px;font-size:10.5px;font-weight:700;border-radius:100px;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.25)'};background:${active?'var(--accent)':'transparent'};color:${active?'var(--accent-ink)':'rgb(var(--ink-rgb))'};`;
+      btn.type='button'; btn.textContent=label; if(title) btn.title=title;
+      btn.style.cssText=`all:unset;cursor:pointer;flex:none;padding:6px 12px;font-size:10.5px;font-weight:700;border-radius:100px;white-space:nowrap;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.22)'};background:${active?'var(--accent)':'transparent'};color:${active?'var(--accent-ink)':'rgb(var(--ink-rgb))'};`;
       btn.addEventListener('click', onClick);
       return btn;
     };
@@ -1267,107 +1343,120 @@
       selectedDatesByMode[mode]=null;
       renderDateFilterRow(); wordIndex=0; loadWord();
     }));
+    row.appendChild(makePill(t('last7DaysLabel'), false, ()=>{
+      const cutoff = addDays(todayStr(), -6);
+      const s = new Set(dates.filter(d=>d>=cutoff));
+      selectedDatesByMode[mode] = s.size ? s : null;
+      renderDateFilterRow(); wordIndex=0; loadWord();
+    }));
     dates.forEach(d=>{
       const active = !!sel && sel.has(d);
-      row.appendChild(makePill(d, active, ()=>{
+      row.appendChild(makePill(d.slice(5), active, ()=>{
         let s = selectedDatesByMode[mode];
         if(!s){ s=new Set(); selectedDatesByMode[mode]=s; }
         if(s.has(d)) s.delete(d); else s.add(d);
         if(s.size===0) selectedDatesByMode[mode]=null;
         renderDateFilterRow(); wordIndex=0; loadWord();
-      }));
+      }, d));
     });
+    const expandBtn = $('dateFilterExpandBtn');
+    if(dates.length>6){
+      expandBtn.style.display='block';
+      expandBtn.textContent = expanded ? t('dateFilterLess') : t('dateFilterMore');
+      expandBtn.onclick = ()=>{ dateFilterExpandedByMode[mode]=!expanded; renderDateFilterRow(); };
+    } else {
+      expandBtn.style.display='none';
+    }
   }
 
-  function renderNotebooks(){
-    drawerContent.innerHTML='';
-    const wrap=document.createElement('div');
-    wrap.style.cssText='display:flex;flex-direction:column;gap:10px;padding:8px 0 16px;';
-    const addBtn=document.createElement('button');
-    addBtn.type='button'; addBtn.textContent=t('newNotebookBtn');
-    addBtn.style.cssText='all:unset;cursor:pointer;text-align:center;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgb(var(--ink-rgb));padding:14px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.03em;';
-    addBtn.addEventListener('click', ()=>openNotebookModal(null));
-    wrap.appendChild(addBtn);
+  function renderNotebooksGrid(){
+    const grid = $('notebooksGrid');
+    grid.innerHTML='';
     const list = currentNotebooks();
     if(list.length===0){
-      const empty=document.createElement('div');
-      empty.style.cssText='color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;';
-      empty.innerHTML=t('noNotebooks');
-      wrap.appendChild(empty);
-    } else {
-      list.forEach(nb=>wrap.appendChild(createNotebookCardDOM(nb)));
+      grid.innerHTML=`<div style="grid-column:1/-1;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${t('noNotebooks')}</div>`;
+      return;
     }
-    drawerContent.appendChild(wrap);
+    list.forEach(nb=>grid.appendChild(createNotebookCardDOM(nb)));
   }
 
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
     const card=document.createElement('div');
-    card.style.cssText=`display:flex;gap:12px;align-items:center;padding:10px;border-radius:4px;cursor:pointer;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.16)'};background:${active?'rgba(var(--accent-rgb),.1)':'transparent'};`;
-    card.addEventListener('click', ()=>{
-      selectNotebook(mode, nb.id);
-      setDrawerView('words', true);
-      setNavActive('words');
-    });
+    card.style.cssText=`display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:4px;cursor:pointer;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.16)'};background:${active?'rgba(var(--accent-rgb),.08)':'transparent'};`;
+    card.addEventListener('click',(e)=>{ if(e.target.dataset.role==='edit') return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
+
     const cover=document.createElement('div');
-    cover.style.cssText=`width:44px;height:44px;border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;${notebookCoverCSS(nb)}`;
-    cover.textContent = nb.coverUrl ? '' : nb.coverEmoji;
+    cover.style.cssText=`width:100%;aspect-ratio:1.6;border-radius:3px;display:flex;align-items:center;justify-content:center;position:relative;${notebookCoverCSS(nb)}`;
+    if(!nb.coverUrl) setEmojiInto(cover, nb.coverEmoji, 30);
+    if(active){
+      const badge=document.createElement('div');
+      badge.textContent=t('practicingBadge');
+      badge.style.cssText='position:absolute;top:6px;left:6px;background:rgba(10,10,10,.55);color:#fff;font-size:8.5px;font-weight:700;letter-spacing:.03em;padding:3px 7px;border-radius:100px;';
+      cover.appendChild(badge);
+    }
+    const editBtn=document.createElement('button');
+    editBtn.type='button'; editBtn.dataset.role='edit'; editBtn.textContent='✎';
+    editBtn.style.cssText='all:unset;cursor:pointer;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:4px;background:rgba(10,10,10,.4);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;';
+    editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
+    cover.appendChild(editBtn);
     card.appendChild(cover);
-    const info=document.createElement('div');
-    info.style.cssText='flex:1;min-width:0;';
+
     const nameEl=document.createElement('div');
-    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgb(var(--ink-rgb));";
     nameEl.textContent=nb.name;
-    info.appendChild(nameEl);
+    card.appendChild(nameEl);
+
     const metaEl=document.createElement('div');
-    metaEl.style.cssText='font-size:10.5px;color:rgba(var(--ink-rgb),.45);margin-top:2px;';
+    metaEl.style.cssText='font-size:10px;color:rgba(var(--ink-rgb),.45);';
     metaEl.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
-    info.appendChild(metaEl);
+    card.appendChild(metaEl);
+
     if(nb.description){
       const descEl=document.createElement('div');
-      descEl.style.cssText='font-size:10.5px;color:rgba(var(--ink-rgb),.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      descEl.style.cssText='font-size:10px;color:rgba(var(--ink-rgb),.4);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
       descEl.textContent=nb.description;
-      info.appendChild(descEl);
+      card.appendChild(descEl);
     }
-    card.appendChild(info);
-    const editBtn=document.createElement('button');
-    editBtn.type='button'; editBtn.textContent='✎';
-    editBtn.style.cssText='all:unset;cursor:pointer;padding:8px;font-size:14px;color:rgba(var(--ink-rgb),.4);flex:none;';
-    editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
-    card.appendChild(editBtn);
     return card;
   }
 
-  let editingNotebookId = null;
-  let pendingGradient = 'purple', pendingEmoji = '📖';
+  let editingNotebookId = null, pendingDeleteNotebookId = null;
+  let pendingGradient = 'sakura', pendingEmoji = '📖';
   const notebookModalOverlay = $('notebookModalOverlay');
   const notebookNameInput = $('notebookNameInput'), notebookDescInput = $('notebookDescInput');
   const notebookEmojiInput = $('notebookEmojiInput');
   const notebookGradientRow = $('notebookGradientRow'), notebookEmojiRow = $('notebookEmojiRow');
   const notebookPreview = $('notebookPreview');
+  const deleteNotebookOverlay = $('deleteNotebookOverlay');
 
-  Object.keys(COVER_GRADIENTS).forEach(g=>{
+  Object.keys(NOTEBOOK_GRADIENTS).forEach(g=>{
     const sw=document.createElement('button');
     sw.type='button'; sw.dataset.gradient=g;
-    sw.style.cssText=`all:unset;cursor:pointer;width:30px;height:30px;border-radius:100px;background:${COVER_GRADIENTS[g]};border:2px solid transparent;`;
+    sw.style.cssText=`all:unset;cursor:pointer;width:26px;height:26px;border-radius:100px;background:${NOTEBOOK_GRADIENTS[g]};border:2px solid transparent;box-shadow:0 0 0 1px rgba(var(--ink-rgb),.1);`;
     sw.addEventListener('click', ()=>{ pendingGradient=g; refreshNotebookModalSwatches(); updateNotebookPreview(); });
     notebookGradientRow.appendChild(sw);
   });
   NOTEBOOK_EMOJI_PRESETS.forEach(em=>{
     const b=document.createElement('button');
-    b.type='button'; b.textContent=em;
-    b.style.cssText='all:unset;cursor:pointer;width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid rgba(var(--ink-rgb),.2);';
-    b.addEventListener('click', ()=>{ pendingEmoji=em; notebookEmojiInput.value=''; updateNotebookPreview(); });
+    b.type='button'; b.dataset.emoji=em;
+    b.style.cssText='all:unset;cursor:pointer;width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(var(--ink-rgb),.18);';
+    b.appendChild(makeEmojiImg(em, 17));
+    b.addEventListener('click', ()=>{ pendingEmoji=em; notebookEmojiInput.value=''; refreshNotebookModalSwatches(); updateNotebookPreview(); });
     notebookEmojiRow.appendChild(b);
   });
-  notebookEmojiInput.addEventListener('input', ()=>{ if(notebookEmojiInput.value.trim()) pendingEmoji=notebookEmojiInput.value.trim(); updateNotebookPreview(); });
+  notebookEmojiInput.addEventListener('input', ()=>{ if(notebookEmojiInput.value.trim()){ pendingEmoji=notebookEmojiInput.value.trim(); refreshNotebookModalSwatches(); updateNotebookPreview(); } });
 
   function refreshNotebookModalSwatches(){
     notebookGradientRow.querySelectorAll('button').forEach(b=>{ b.style.borderColor = b.dataset.gradient===pendingGradient ? 'rgb(var(--ink-rgb))' : 'transparent'; });
+    notebookEmojiRow.querySelectorAll('button').forEach(b=>{
+      b.style.background = b.dataset.emoji===pendingEmoji ? 'rgba(var(--accent-rgb),.25)' : 'transparent';
+      b.style.borderColor = b.dataset.emoji===pendingEmoji ? 'var(--accent)' : 'rgba(var(--ink-rgb),.18)';
+    });
   }
   function updateNotebookPreview(){
-    notebookPreview.style.cssText=`width:100%;height:64px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:26px;background:${COVER_GRADIENTS[pendingGradient]};`;
-    notebookPreview.textContent=pendingEmoji;
+    notebookPreview.style.cssText=`width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;background:${NOTEBOOK_GRADIENTS[pendingGradient]};`;
+    setEmojiInto(notebookPreview, pendingEmoji, 44);
   }
 
   function openNotebookModal(nb){
@@ -1375,7 +1464,7 @@
     $('notebookModalTitle').textContent = nb ? t('notebookModalTitleEdit') : t('notebookModalTitleNew');
     notebookNameInput.value = nb ? nb.name : '';
     notebookDescInput.value = nb ? nb.description : '';
-    pendingGradient = nb ? nb.coverGradient : 'purple';
+    pendingGradient = nb ? nb.coverGradient : 'sakura';
     pendingEmoji = nb ? nb.coverEmoji : '📖';
     notebookEmojiInput.value='';
     refreshNotebookModalSwatches();
@@ -1410,23 +1499,40 @@
       notebookWords[mode].set(nb.id, []);
     }
     closeNotebookModal();
-    renderNotebooks();
+    renderNotebooksGrid();
   }
+  $('newNotebookBtn').addEventListener('click', ()=>openNotebookModal(null));
   $('closeNotebookModalBtn').addEventListener('click', closeNotebookModal);
   $('saveNotebookBtn').addEventListener('click', saveNotebookModal);
-  $('deleteNotebookBtn').addEventListener('click', ()=>{
-    const nb = currentNotebooks().find(n=>n.id===editingNotebookId);
+
+  function openDeleteNotebookConfirm(nb){
+    pendingDeleteNotebookId = nb.id;
+    $('deleteNotebookModalBody').innerHTML = t('deleteNotebookModalBody', {name: nb.name, count: (notebookWords[mode].get(nb.id)||[]).length});
+    deleteNotebookOverlay.style.opacity='1'; deleteNotebookOverlay.style.pointerEvents='auto';
+  }
+  function closeDeleteNotebookConfirm(){
+    deleteNotebookOverlay.style.opacity='0'; deleteNotebookOverlay.style.pointerEvents='none'; pendingDeleteNotebookId=null;
+  }
+  function confirmDeleteNotebook(){
+    const nb = currentNotebooks().find(n=>n.id===pendingDeleteNotebookId);
     if(!nb) return;
-    if(currentNotebooks().length<=1){ alert(t('cantDeleteLastNotebook')); return; }
-    if(!confirm(t('deleteNotebookConfirm',{name:nb.name}))) return;
+    if(currentNotebooks().length<=1){ closeDeleteNotebookConfirm(); alert(t('cantDeleteLastNotebook')); return; }
     deleteNotebookRemote(nb.id);
     notebooks[mode] = notebooks[mode].filter(n=>n.id!==nb.id);
     (notebookWords[mode].get(nb.id)||[]).forEach(w=>wordsById.delete(w.id));
     notebookWords[mode].delete(nb.id);
     if(currentNotebookId()===nb.id) selectNotebook(mode, notebooks[mode][0].id);
+    closeDeleteNotebookConfirm();
     closeNotebookModal();
-    renderNotebooks();
+    renderNotebooksGrid();
+  }
+  $('deleteNotebookBtn').addEventListener('click', ()=>{
+    const nb = currentNotebooks().find(n=>n.id===editingNotebookId);
+    if(nb) openDeleteNotebookConfirm(nb);
   });
+  $('closeDeleteNotebookBtn').addEventListener('click', closeDeleteNotebookConfirm);
+  $('confirmDeleteNotebookBtn').addEventListener('click', confirmDeleteNotebook);
+
   $('switchNotebookBtn').addEventListener('click', ()=>{ setDrawerView('notebooks'); setNavActive('notebooks'); });
   drawerTabNotebooks.addEventListener('click', ()=>setDrawerView('notebooks'));
 
@@ -1894,7 +2000,7 @@
   });
 
   function makeLocalNotebook(m){
-    return { id: nextLocalId(), name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'purple', coverEmoji:'📖', coverUrl:'' };
+    return { id: nextLocalId(), name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'sakura', coverEmoji:'📖', coverUrl:'' };
   }
 
   // wordList/nbList null = cloud unreachable, fall back to a local-only default
@@ -1925,7 +2031,7 @@
   // client-only state the way the old design did (defaults were only local until the
   // first edit implicitly pushed the whole list).
   async function seedDefaultNotebook(m, defaults){
-    const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'purple', coverEmoji:'📖', coverUrl:'' });
+    const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'sakura', coverEmoji:'📖', coverUrl:'' });
     const words = defaults.length ? await bulkImportRemote(m, nb.id, defaults) : [];
     return { notebooks:[nb], words };
   }
