@@ -3,1170 +3,568 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>타자 연습 도구 / Typing Trainer</title>
+<title>TYPE/TRAINER · 타자 연습 도구</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --gray-light:#c7cbd1;
-    --gray-dark:#5b6068;
-    --blue:#0a56c4;
-    --red:#e0433a;
-    --green:#2a9d55;
-    --bg:#f2f4f7;
-    --card-bg:#ffffff;
-    --border:#dfe3e8;
-  }
   *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;
-    background:var(--bg);
-    color:#222;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:16px 8px 120px; /* 底部留空，防止手机键盘挡住 */
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  @media (min-width: 768px) {
-    body { padding: 32px 16px 64px; }
-  }
-
-  h1{font-size:18px; margin:8px 0 4px; text-align:center;}
-  @media (min-width: 768px) { h1 { font-size: 22px; } }
-
-  .subtitle{color:#767c85;font-size:12px;margin-bottom:16px; text-align:center;}
-
-  .tabs{display:flex;gap:8px;margin-bottom:16px;}
-  .tab-btn{
-    padding:6px 14px;border-radius:20px;border:1px solid var(--border);
-    background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:#555;
-  }
-  .tab-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
-
-  .progress{font-size:12px;color:#767c85;margin-bottom:8px;}
-
-  .card{
-    background:var(--card-bg);
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:24px 16px;
-    min-width:280px;
-    max-width:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:14px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.04);
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .card { padding: 40px 32px; max-width: 600px; }
-  }
-
-  /* ---- Korean syllable blocks ---- */
-  .word-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:70px;}
-  .syll-block{display:flex;flex-direction:column;align-items:center;position:relative;min-width:36px;}
-  .syll-hint{
-    position:absolute;top:-18px;font-size:11px;color:#9aa1a9;font-weight:600;
-    white-space:nowrap;
-  }
-  .syll-char{font-size:32px;font-weight:800;line-height:1;min-height:40px;display:flex;align-items:center;}
-  @media (min-width: 768px) {
-    .word-row { gap: 22px; min-height: 90px; }
-    .syll-block { min-width: 44px; }
-    .syll-hint { top: -20px; font-size: 13px; }
-    .syll-char { font-size: 48px; min-height: 58px; }
-  }
-  .syll-char.light{color:var(--gray-light);}
-  .syll-char.dark{color:var(--gray-dark);}
-  .syll-char.blue{color:var(--blue);}
-  .syll-char.red{color:var(--red);}
-  .dashes{display:flex;gap:3px;margin-top:4px;}
-  .dash{width:12px;height:3px;border-radius:2px;background:var(--gray-light);}
-  @media (min-width: 768px) {
-    .dashes { gap: 4px; margin-top: 6px; }
-    .dash { width: 16px; height: 4px; }
-  }
-  .dash.blue{background:var(--blue);}
-  .dash.red{background:var(--red);}
-
-  /* ---- English letter blocks ---- */
-  .letter-row{display:flex;gap:6px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:70px;}
-  .letter-block{display:flex;flex-direction:column;align-items:center;min-width:16px;}
-  .letter-char{font-size:28px;font-weight:800;line-height:1;min-height:36px;display:flex;align-items:center;}
-  @media (min-width: 768px) {
-    .letter-row { gap: 10px; min-height: 90px; }
-    .letter-block { min-width: 22px; }
-    .letter-char { font-size: 38px; min-height: 46px; }
-  }
-  .letter-char.light{color:var(--gray-light);}
-  .letter-char.green{color:var(--green);}
-  .letter-char.red{color:var(--red);}
-  .letter-underline{width:100%;height:3px;border-radius:2px;margin-top:4px;background:var(--gray-light);}
-  @media (min-width: 768px) {
-    .letter-underline { height: 4px; margin-top: 6px; }
-  }
-  .letter-underline.green{background:var(--green);}
-  .letter-underline.red{background:var(--red);}
-
-  .romanization{color:#9aa1a9;font-size:14px;margin-top:-2px; text-align:center; font-weight: 500;}
-  .status-banner{font-size:13px;font-weight:700;height:18px; text-align:center;}
-  .status-banner.ok{color:var(--green);}
-
-  /* ---- Mobile Input Focus Area ---- */
-  .mobile-input-container {
-    width: 100%;
-    max-width: 100%;
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-  .mobile-input-box {
-    width: 100%;
-    max-width: 320px;
-    padding: 12px;
-    font-size: 16px; /* 防止 iOS 自动缩放 */
-    border: 2px solid var(--blue);
-    border-radius: 12px;
-    text-align: center;
-    outline: none;
-    box-shadow: 0 4px 12px rgba(10, 86, 196, 0.1);
-  }
-  .mobile-tip {
-    font-size: 11px;
-    color: var(--gray-dark);
-    text-align: center;
-  }
-
-  /* ---- Controls ---- */
-  .controls{display:flex;gap:6px;margin-top:14px;align-items:center;flex-wrap:wrap;justify-content:center; width:100%;}
-  .controls button{
-    padding:6px 12px;border-radius:8px;border:1px solid var(--border);
-    background:#fff;cursor:pointer;font-size:12px;
-  }
-  @media (min-width: 768px) {
-    .controls { gap: 10px; margin-top: 18px; }
-    .controls button { padding: 8px 16px; font-size: 13px; }
-  }
-  .controls button:hover{background:#f5f6f8;}
-  .controls label{font-size:12px;color:#555;display:flex;gap:6px;align-items:center;cursor:pointer;}
-
-  /* ---- Word List Drawer ---- */
-  .drawer {
-    position: fixed;
-    top: 0; right: -100%; width: 100%; height: 100%;
-    background: #fff;
-    border-left: 1px solid var(--border);
-    box-shadow: -4px 0 15px rgba(0,0,0,0.05);
-    z-index: 999;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-  }
-  @media (min-width: 480px) {
-    .drawer { width: 320px; right: -320px; }
-  }
-  .drawer.active { right: 0; }
-  .drawer-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fafafa;
-  }
-  .drawer-header h3 { margin: 0; font-size: 15px; }
-  .drawer-close {
-    border: none; background: none; font-size: 22px; cursor: pointer; color: var(--gray-dark); padding: 4px 12px;
-  }
-  .drawer-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-  }
-  .word-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.1s;
-    border: 1px solid transparent;
-  }
-  .word-item:hover { background: #f0f2f5; }
-  .word-item.active-word {
-    background: #eef4ff;
-    border: 1px solid var(--blue);
-    font-weight: bold;
-    color: var(--blue);
-  }
-  .word-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    max-width: 80%;
-  }
-  .word-text { font-size: 14px; }
-  .word-meaning { font-size: 11px; color: #888; }
-  .word-del-btn {
-    border: none; background: none; color: var(--red); font-weight: bold;
-    cursor: pointer; padding: 6px 10px; border-radius: 4px; font-size: 14px;
-  }
-  .word-del-btn:hover { background: #ffebeb; }
-
-  /* ---- Word Adder Section ---- */
-  .adder-section {
-    margin-top: 16px;
-    padding: 16px;
-    border-radius: 16px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    width: 100%;
-    max-width: 520px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-  }
-  @media (min-width: 768px) {
-    .adder-section { margin-top: 24px; padding: 24px; }
-  }
-  .adder-title {
-    font-size: 13px;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-    color: var(--gray-dark);
-    text-align: center;
-  }
-  .adder-form {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .adder-inputs {
-    display: flex;
-    gap: 6px;
-    flex-direction: column;
-  }
-  @media (min-width: 480px) {
-    .adder-inputs { flex-direction: row; }
-  }
-  .adder-inputs input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    outline: none;
-  }
-  .adder-inputs input:focus {
-    border-color: var(--blue);
-  }
-  .adder-btn {
-    padding: 10px 16px;
-    background: var(--blue);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .adder-btn:hover { opacity: 0.9; }
-
-  .btn-group {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-top: 6px;
-    flex-wrap: wrap;
-  }
-  .minor-btn {
-    background: none;
-    border: none;
-    color: var(--gray-dark);
-    font-size: 11px;
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 4px;
-  }
-  .minor-btn.danger { color: var(--red); }
-
-  /* ---- Bulk Import Overlay/Modal ---- */
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  .modal-overlay.active { opacity: 1; pointer-events: auto; }
-  .modal {
-    background: #fff;
-    padding: 16px;
-    border-radius: 16px;
-    width: 95%;
-    max-width: 500px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  @media (min-width: 768px) {
-    .modal { padding: 24px; gap: 14px; }
-  }
-  .modal h3 { margin: 0; font-size: 15px; }
-  .modal textarea {
-    width: 100%;
-    height: 140px;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: monospace;
-    font-size: 12px;
-    resize: none;
-  }
-  .modal-desc { font-size: 11px; color: #767c85; line-height: 1.4; }
-
-  .hint-box{
-    margin-top: 16px;max-width:520px;font-size:11.5px;line-height:1.5;color:#8a919a;
-    text-align:center;
-    padding: 0 8px;
-  }
-  @media (min-width: 768px) {
-    .hint-box { margin-top: 26px; font-size: 12.5px; }
-  }
-  kbd{
-    background:#eef0f3;border:1px solid var(--border);border-radius:4px;
-    padding:1px 5px;font-family:inherit;font-size:11px;
-  }
+  body{margin:0;background:#0c0c0c;}
+  ::selection{background:#e7b8da;color:#0c0c0c;}
+  input::placeholder, textarea::placeholder{color:#8f8f8f;}
+  a{color:#e7b8da;}
+  a:hover{color:#f3d3ea;}
 </style>
 </head>
 <body>
+<div style="min-height:100vh;background:#0c0c0c;color:#f1ede6;font-family:'JetBrains Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:0 0 80px;overflow-x:hidden;">
 
-<h1>타자 연습 도구 / Typing Trainer</h1>
-<div class="subtitle">지하철 타자 스타일 한글 연습 + 실시간 채점 영어 단어 연습</div>
-
-<div class="tabs">
-  <button class="tab-btn active" data-mode="ko">한국어 (음절 단위)</button>
-  <button class="tab-btn" data-mode="en">English (letter by letter)</button>
-</div>
-
-<div class="progress" id="progress"></div>
-
-<div class="card">
-  <div class="word-row" id="koRow" ></div>
-  <div class="letter-row" id="enRow" style="display:none;"></div>
-  <div class="romanization" id="romanization"></div>
-  <div class="status-banner" id="statusBanner"></div>
-</div>
-
-<!-- 📱 移动端专属输入交互区 -->
-<div class="mobile-input-container">
-  <input type="text" class="mobile-input-box" id="mobileInput" placeholder="👉 여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off">
-  <div class="mobile-tip" id="mobileTip">※ 한국어 모드일 때는 휴대폰의 <b>한국어 키보드</b>를 사용해 주세요.</div>
-</div>
-
-<div class="controls">
-  <button id="restartBtn">↺ 다시 시작</button>
-  <button id="prevBtn" style="color: var(--blue); font-weight: bold;">← 이전 단어</button>
-  <button id="skipBtn" style="color: var(--blue); font-weight: bold;">다음 단어 →</button>
-  <button id="openDrawerBtn" style="background-color: #eef4ff; border-color: var(--blue); color: var(--blue); font-weight: bold;">📖 단어 목록 (单词列表)</button>
-  <label><input type="checkbox" id="dictationToggle"> 딕테이션 모드 (정답 미리보기 숨기기)</label>
-</div>
-
-<!-- 侧边栏：单词列表 -->
-<div class="drawer" id="drawer">
-  <div class="drawer-header">
-    <h3 id="drawerTitle">단어 목록 (单词列表)</h3>
-    <button class="drawer-close" id="closeDrawerBtn">×</button>
-  </div>
-  <div class="drawer-content" id="drawerContent"></div>
-</div>
-
-<!-- 单个添加区域 -->
-<div class="adder-section">
-  <div class="adder-title">＋ 단어 추가하기 / Add Word</div>
-  <div class="adder-form">
-    <div class="adder-inputs">
-      <input type="text" id="newWord" placeholder="단어 (예: 한국어 / apple)" autocomplete="off">
-      <input type="text" id="newMeaning" placeholder="뜻/로마자 (예: Korean / 苹果)" autocomplete="off">
-    </div>
-    <button class="adder-btn" id="addWordBtn">단어 추가 (Save)</button>
-    <div class="btn-group">
-      <button class="minor-btn" id="openBulkBtn">📁 <b>일괄 가져오기/내보내기 (Bulk Import)</b></button>
-      <button class="minor-btn danger" id="clearWordsBtn">초기화 (Reset to Default)</button>
+  <!-- NAV -->
+  <div style="width:100%;max-width:1100px;display:flex;justify-content:space-between;align-items:center;padding:22px 20px 18px;flex-wrap:wrap;gap:14px;">
+    <div style="font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;color:#f1ede6;">TYPE<span style="color:#e7b8da;">/</span>TRAINER</div>
+    <div style="font-size:10.5px;letter-spacing:1.5px;color:#8f8f8f;text-transform:uppercase;">+ 한글 &amp; 영어 타자 연습기</div>
+    <div id="tabs" style="display:flex;gap:16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;">
+      <button class="tab-btn" data-mode="ko" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#f1ede6;">
+        <span class="tab-glyph" data-mode="ko">■</span>한국어
+      </button>
+      <button class="tab-btn" data-mode="en" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;color:#8f8f8f;">
+        <span class="tab-glyph" data-mode="en">□</span>english
+      </button>
     </div>
   </div>
-</div>
 
-<!-- 批量导入弹窗 -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h3 id="modalTitle">일괄 가져오기/내보내기 (Bulk Import/Export)</h3>
-    <div class="modal-desc" id="modalDesc">
-      아래 상자에 단어들을 붙여넣으세요. 한 줄에 단어 하나씩 입력합니다.<br>
-      格式：<b>单词,释义/罗马音</b> (逗号必须是英文逗号)<br>
-      예: <code style="background:#eee;padding:2px;">apple,苹果</code> 或 <code style="background:#eee;padding:2px;">서울,Seoul</code>
-    </div>
-    <textarea id="bulkTextarea" placeholder="여기에 붙여넣으세요..."></textarea>
-    <div class="btn-group" style="justify-content: flex-end;">
-      <button id="closeModalBtn" style="padding: 8px 14px; border: 1px solid var(--border); background: #fff; border-radius: 6px; cursor: pointer;">취소 (Cancel)</button>
-      <button id="importBtn" style="padding: 8px 14px; background: var(--blue); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">가져오기 (Import)</button>
+  <div style="width:100%;max-width:1100px;height:1px;background:rgba(255,255,255,.18);"></div>
+
+  <!-- HERO -->
+  <div style="width:100%;max-width:1100px;padding:36px 20px 10px;text-align:center;">
+    <div style="font-family:'Anton',sans-serif;font-size:clamp(32px,7vw,74px);line-height:.94;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.5);letter-spacing:1px;">PRACTICE</div>
+    <div style="font-family:'Black Han Sans',sans-serif;font-size:clamp(34px,8vw,86px);line-height:1.05;color:#e7b8da;margin-top:-4px;letter-spacing:1px;">타자 연습 도구</div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="progress" style="max-width:1100px;width:100%;padding:4px 24px 18px;font-size:11px;letter-spacing:1px;color:#8f8f8f;text-align:center;"></div>
+
+  <!-- MAIN CARD -->
+  <div style="width:100%;max-width:1000px;padding:0 20px;">
+    <div style="background:#f1ede6;color:#111;position:relative;">
+      <div style="display:flex;align-items:stretch;border-bottom:2px solid #111;">
+        <div style="background:#111;color:#e7b8da;font-family:'Anton',sans-serif;font-size:26px;padding:14px 22px;display:flex;align-items:center;min-width:64px;justify-content:center;">01</div>
+        <div style="display:flex;align-items:center;padding:0 22px;font-family:'Anton',sans-serif;font-size:20px;letter-spacing:1px;">SYLLABLE / LETTER DRILL</div>
+      </div>
+
+      <div style="padding:32px 24px 24px;">
+        <div class="word-row" id="koRow" style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
+        <div class="letter-row" id="enRow" style="display:none;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
+        <div id="romanization" style="text-align:center;color:#8a857b;font-size:13px;letter-spacing:.5px;margin-top:6px;text-transform:uppercase;"></div>
+        <div id="statusBanner" style="text-align:center;font-size:13px;font-weight:700;height:20px;margin-top:6px;letter-spacing:.5px;text-transform:uppercase;"></div>
+      </div>
+
+      <div style="padding:0 24px 24px;">
+        <input type="text" id="mobileInput" placeholder="여기를 눌러 입력을 시작하세요" autocomplete="off" autocapitalize="none" autocorrect="off" style="width:100%;max-width:340px;display:block;margin:0 auto 8px;padding:12px;font-size:16px;border:2px solid #111;background:#fff;color:#111;text-align:center;outline:none;font-family:'JetBrains Mono',monospace;">
+        <div id="mobileTip" style="font-size:10.5px;color:#8a857b;text-align:center;letter-spacing:.3px;"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid #111;padding:16px 22px;">
+        <button id="prevBtn" style="all:unset;cursor:pointer;border:2px dashed #111;padding:10px 18px;font-size:13px;letter-spacing:1px;">&#9668;----</button>
+        <div id="pageCounter" style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;"></div>
+        <button id="skipBtn" style="all:unset;cursor:pointer;border:2px dashed #111;padding:10px 18px;font-size:13px;letter-spacing:1px;">----&#9658;</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="hint-box" id="desktopHint">
-  <b>[💻 PC 이용 시]:</b> 영문 자판 그대로 타이핑하세요 (예: <kbd>d</kbd><kbd>u</kbd><kbd>s</kbd> → 연). <kbd>Backspace</kbd>로 수정, <kbd>Enter</kbd>로 다음 단어.<br>
-  <b>[📱 모바일 이용 시]:</b> 상단 입력창을 터치하여 각 언어에 맞는 키보드로 직접 타이핑해 주세요.
+  <!-- CONTROLS -->
+  <div style="width:100%;max-width:1000px;padding:20px 20px 0;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+    <button id="restartBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">&#8635; 다시 시작</button>
+    <button id="openDrawerBtn" style="all:unset;cursor:pointer;background:#e7b8da;color:#0c0c0c;padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 목록</button>
+    <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
+      <input type="checkbox" id="dictationToggle" style="accent-color:#e7b8da;">딕테이션 모드
+    </label>
+  </div>
+
+  <!-- DRAWER -->
+  <div id="drawer" style="position:fixed;top:0;right:-360px;width:340px;max-width:92vw;height:100%;background:#111;border-left:1px solid rgba(255,255,255,.15);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
+    <div style="padding:18px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">단어 목록</div>
+      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:22px;color:#8f8f8f;padding:2px 8px;">&times;</button>
+    </div>
+    <div id="drawerContent" style="flex:1;overflow-y:auto;padding:10px;"></div>
+  </div>
+
+  <!-- ADDER -->
+  <div style="width:100%;max-width:640px;padding:32px 20px 0;">
+    <div style="background:#f1ede6;color:#111;padding:22px;">
+      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;text-align:center;margin-bottom:14px;">+ 단어 추가하기</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" id="newWord" placeholder="단어 (예: 한국어 / apple)" autocomplete="off" style="flex:1;min-width:140px;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+        <input type="text" id="newMeaning" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:140px;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+      </div>
+      <button id="addWordBtn" style="all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:10px;background:#111;color:#e7b8da;padding:11px;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 추가</button>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:10px;">
+        <button id="openBulkBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#5b5650;">일괄 가져오기/내보내기</button>
+        <button id="clearWordsBtn" style="all:unset;cursor:pointer;font-size:10.5px;text-decoration:underline;color:#c0392b;">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK MODAL -->
+  <div id="modalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:480px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;">일괄 가져오기/내보내기</div>
+      <div style="font-size:11px;color:#5b5650;line-height:1.5;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
+      <textarea id="bulkTextarea" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:10px;border:1px solid #111;font-family:'JetBrains Mono',monospace;font-size:12px;resize:none;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="closeModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
+        <button id="importBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">가져오기</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:600px;padding:26px 20px 0;font-size:10.5px;line-height:1.6;color:#6b665f;text-align:center;">
+    <b style="color:#8f8f8f;">[PC]</b> 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연). Backspace 수정, Enter 다음 단어.<br>
+    <b style="color:#8f8f8f;">[모바일]</b> 상단 입력창을 터치하여 직접 타이핑하세요.
+  </div>
 </div>
 
 <script>
 (function(){
   "use strict";
+  const COL = { black:'#111111', pink:'#e7b8da', pinkDeep:'#c26fae', gray:'#c7c3ba', red:'#e0433a', green:'#2a9d55', mutedInk:'#8a857b' };
 
-  /* =========================================================
-   * 1. Hangul Jamo Helpers
-   * ======================================================= */
   const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
   const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
   const JONG = ['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
-  // PC keyboard map for Korean (Dubeolsik)
-  const KEY_TO_JAMO = {
-    KeyQ:'ㅂ', KeyW:'ㅈ', KeyE:'ㄷ', KeyR:'ㄱ', KeyT:'ㅅ',
-    KeyY:'ㅛ', KeyU:'ㅕ', KeyI:'ㅑ', KeyO:'ㅐ', KeyP:'ㅔ',
-    KeyA:'ㅁ', KeyS:'ㄴ', KeyD:'ㅇ', KeyF:'ㄹ', KeyG:'ㅎ',
-    KeyH:'ㅗ', KeyJ:'ㅓ', KeyK:'ㅏ', KeyL:'ㅣ',
-    KeyZ:'ㅋ', KeyX:'ㅌ', KeyC:'ㅊ', KeyV:'ㅍ', KeyB:'ㅠ', KeyN:'ㅜ', KeyM:'ㅡ',
-  };
-  const KEY_TO_JAMO_SHIFT = {
-    KeyQ:'ㅃ', KeyW:'ㅉ', KeyE:'ㄸ', KeyR:'ㄲ', KeyT:'ㅆ',
-    KeyO:'ㅒ', KeyP:'ㅖ',
-  };
+  const KEY_TO_JAMO = { KeyQ:'ㅂ',KeyW:'ㅈ',KeyE:'ㄷ',KeyR:'ㄱ',KeyT:'ㅅ',KeyY:'ㅛ',KeyU:'ㅕ',KeyI:'ㅑ',KeyO:'ㅐ',KeyP:'ㅔ',KeyA:'ㅁ',KeyS:'ㄴ',KeyD:'ㅇ',KeyF:'ㄹ',KeyG:'ㅎ',KeyH:'ㅗ',KeyJ:'ㅓ',KeyK:'ㅏ',KeyL:'ㅣ',KeyZ:'ㅋ',KeyX:'ㅌ',KeyC:'ㅊ',KeyV:'ㅍ',KeyB:'ㅠ',KeyN:'ㅜ',KeyM:'ㅡ' };
+  const KEY_TO_JAMO_SHIFT = { KeyQ:'ㅃ',KeyW:'ㅉ',KeyE:'ㄸ',KeyR:'ㄲ',KeyT:'ㅆ',KeyO:'ㅒ',KeyP:'ㅖ' };
   const VOWELS_BASE = new Set(['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅜ','ㅛ','ㅠ','ㅡ','ㅣ']);
-  const JUNG_COMBINE = { 'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ' };
-  const JONG_COMBINE = {
-    'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ','ㅂㅅ':'ㅄ'
-  };
-  const VALID_JONG = new Set(CHO.filter(c => c!=='ㄸ' && c!=='ㅃ' && c!=='ㅉ'));
+  const JUNG_COMBINE = {'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ'};
+  const JONG_COMBINE = {'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ','ㅂㅅ':'ㅄ'};
+  const VALID_JONG = new Set(CHO.filter(c=>c!=='ㄸ'&&c!=='ㅃ'&&c!=='ㅉ'));
+  const JUNG_SPLIT = {}; for (const k in JUNG_COMBINE) JUNG_SPLIT[JUNG_COMBINE[k]]=[k[0],k[1]];
+  const JONG_SPLIT = {}; for (const k in JONG_COMBINE) JONG_SPLIT[JONG_COMBINE[k]]=[k[0],k[1]];
 
-  const JUNG_SPLIT = {}; for (const k in JUNG_COMBINE) JUNG_SPLIT[JUNG_COMBINE[k]] = [k[0], k[1]];
-  const JONG_SPLIT = {}; for (const k in JONG_COMBINE) JONG_SPLIT[JONG_COMBINE[k]] = [k[0], k[1]];
-
-  function composeSyllable(cho, jung, jong){
-    const ci = CHO.indexOf(cho), ji = JUNG.indexOf(jung), fi = jong ? JONG.indexOf(jong) : 0;
-    if (ci<0 || ji<0 || fi<0) return (cho||'')+(jung||'')+(jong||'');
-    return String.fromCodePoint(0xAC00 + (ci*21+ji)*28 + fi);
+  function composeSyllable(cho,jung,jong){
+    const ci=CHO.indexOf(cho),ji=JUNG.indexOf(jung),fi=jong?JONG.indexOf(jong):0;
+    if(ci<0||ji<0||fi<0) return (cho||'')+(jung||'')+(jong||'');
+    return String.fromCodePoint(0xAC00+(ci*21+ji)*28+fi);
   }
-
   function decomposeChar(ch){
-    const code = ch.codePointAt(0) - 0xAC00;
-    if (code < 0 || code > 11171) return null;
-    const cho = CHO[Math.floor(code / (21*28))];
-    const jung = JUNG[Math.floor((code % (21*28))/28)];
-    const jongIdx = code % 28;
-    const jong = jongIdx===0 ? null : JONG[jongIdx];
-    return {char:ch, cho, jung, jong};
+    const code=ch.codePointAt(0)-0xAC00;
+    if(code<0||code>11171) return null;
+    const cho=CHO[Math.floor(code/(21*28))];
+    const jung=JUNG[Math.floor((code%(21*28))/28)];
+    const jongIdx=code%28;
+    const jong=jongIdx===0?null:JONG[jongIdx];
+    return {char:ch,cho,jung,jong};
   }
-
-  function decomposeWord(word){
-    return Array.from(word).map(decomposeChar).filter(Boolean);
-  }
-
+  function decomposeWord(word){ return Array.from(word).map(decomposeChar).filter(Boolean); }
   function getSlotDescriptors(target){
-    if (!target) return [{type:'cho'}];
-    const slots = [{type:'cho', expected: target.cho}];
-    const jungParts = JUNG_SPLIT[target.jung];
-    if (jungParts) slots.push({type:'jung1', expected:jungParts[0]}, {type:'jung2', expected:jungParts[1]});
-    else slots.push({type:'jung', expected: target.jung});
-    if (target.jong){
-      const jongParts = JONG_SPLIT[target.jong];
-      if (jongParts) slots.push({type:'jong1', expected:jongParts[0]}, {type:'jong2', expected:jongParts[1]});
-      else slots.push({type:'jong', expected: target.jong});
+    if(!target) return [{type:'cho'}];
+    const slots=[{type:'cho',expected:target.cho}];
+    const jp=JUNG_SPLIT[target.jung];
+    if(jp) slots.push({type:'jung1',expected:jp[0]},{type:'jung2',expected:jp[1]});
+    else slots.push({type:'jung',expected:target.jung});
+    if(target.jong){
+      const fp=JONG_SPLIT[target.jong];
+      if(fp) slots.push({type:'jong1',expected:fp[0]},{type:'jong2',expected:fp[1]});
+      else slots.push({type:'jong',expected:target.jong});
     }
     return slots;
   }
 
-  /* =========================================================
-   * 2. Keyboard Engine (PC Physical Keyboard)
-   * ======================================================= */
   function makeKoreanEngine(word){
-    const targets = decomposeWord(word);
-    let typed = [ {cho:null, jung:null, jong:null} ];
-    let activeIndex = 0;
-
+    const targets=decomposeWord(word);
+    let typed=[{cho:null,jung:null,jong:null}];
+    let activeIndex=0;
     function current(){ return typed[activeIndex]; }
-    function removeLastSlot(s){
-      if (s.jong!==null) s.jong = null;
-      else if (s.jung!==null) s.jung = null;
-      else if (s.cho!==null) s.cho = null;
-    }
-    function advance(newCho){
-      activeIndex++;
-      typed[activeIndex] = {cho:newCho, jung:null, jong:null};
-    }
-
+    function removeLastSlot(s){ if(s.jong!==null) s.jong=null; else if(s.jung!==null) s.jung=null; else if(s.cho!==null) s.cho=null; }
+    function advance(newCho){ activeIndex++; typed[activeIndex]={cho:newCho,jung:null,jong:null}; }
     return {
       targets,
       get typed(){ return typed; },
       get activeIndex(){ return activeIndex; },
-      feed(jamo, isVowel){
-        const s = current();
-        if (isVowel){
-          if (s.cho===null && s.jung===null) s.jung = jamo;
-          else if (s.jung===null) s.jung = jamo;
-          else if (s.jong===null){
-            const combined = JUNG_COMBINE[s.jung+jamo];
-            if (combined) s.jung = combined;
-          } else {
-            const movingCho = s.jong; s.jong = null;
-            advance(movingCho); current().jung = jamo;
-          }
+      feed(jamo,isVowel){
+        const s=current();
+        if(isVowel){
+          if(s.cho===null&&s.jung===null) s.jung=jamo;
+          else if(s.jung===null) s.jung=jamo;
+          else if(s.jong===null){ const c=JUNG_COMBINE[s.jung+jamo]; if(c) s.jung=c; }
+          else { const moving=s.jong; s.jong=null; advance(moving); current().jung=jamo; }
         } else {
-          if (s.cho===null) s.cho = jamo;
-          else if (s.jung===null) advance(jamo);
-          else if (s.jong===null){
-            if (VALID_JONG.has(jamo)) s.jong = jamo; else advance(jamo);
-          } else {
-            const combined = JONG_COMBINE[s.jong+jamo];
-            if (combined) s.jong = combined; else advance(jamo);
-          }
+          if(s.cho===null) s.cho=jamo;
+          else if(s.jung===null) advance(jamo);
+          else if(s.jong===null){ if(VALID_JONG.has(jamo)) s.jong=jamo; else advance(jamo); }
+          else { const c=JONG_COMBINE[s.jong+jamo]; if(c) s.jong=c; else advance(jamo); }
         }
       },
       backspace(){
-        const s = current();
-        if (s.cho===null && s.jung===null && s.jong===null){
-          if (activeIndex>0){
-            activeIndex--;
-            typed.length = activeIndex+1;
-            removeLastSlot(current());
-          }
+        const s=current();
+        if(s.cho===null&&s.jung===null&&s.jong===null){
+          if(activeIndex>0){ activeIndex--; typed.length=activeIndex+1; removeLastSlot(current()); }
           return;
         }
         removeLastSlot(s);
       },
       syncWithString(str){
-        typed = [];
-        for (let i=0; i<str.length; i++){
-          const dec = decomposeChar(str[i]);
-          if (dec) {
-            typed.push({ cho: dec.cho, jung: dec.jung, jong: dec.jong });
-          } else {
-            const char = str[i];
-            if (CHO.includes(char)) typed.push({ cho: char, jung: null, jong: null });
-            else if (JUNG.includes(char)) typed.push({ cho: null, jung: char, jong: null });
-            else typed.push({ cho: null, jung: null, jong: null });
-          }
+        typed=[];
+        for(let i=0;i<str.length;i++){
+          const dec=decomposeChar(str[i]);
+          if(dec) typed.push({cho:dec.cho,jung:dec.jung,jong:dec.jong});
+          else { const c=str[i]; if(CHO.includes(c)) typed.push({cho:c,jung:null,jong:null}); else if(JUNG.includes(c)) typed.push({cho:null,jung:c,jong:null}); else typed.push({cho:null,jung:null,jong:null}); }
         }
-        if (typed.length === 0) typed.push({ cho: null, jung: null, jong: null });
-        activeIndex = typed.length - 1;
+        if(typed.length===0) typed.push({cho:null,jung:null,jong:null});
+        activeIndex=typed.length-1;
       }
     };
   }
 
   function composeDisplay(s){
-    if (s.cho===null && s.jung===null) return '';
-    if (s.cho===null) return s.jung || '';
-    if (s.jung===null) return s.cho;
-    return composeSyllable(s.cho, s.jung, s.jong);
+    if(s.cho===null&&s.jung===null) return '';
+    if(s.cho===null) return s.jung||'';
+    if(s.jung===null) return s.cho;
+    return composeSyllable(s.cho,s.jung,s.jong);
   }
 
-  function evaluateSlotStates(target, s, descs){
-    return descs.map(desc => {
-      if (desc.type === 'cho') return s.cho===null ? 'pending' : (s.cho===desc.expected ? 'ok':'bad');
-      if (desc.type === 'jung') return s.jung===null ? 'pending' : (s.jung===desc.expected ? 'ok':'bad');
-      if (desc.type === 'jung1'){
-        if (s.jung===null) return 'pending';
-        if (s.jung===target.jung) return 'ok';
-        return s.jung===desc.expected ? 'ok' : 'bad';
-      }
-      if (desc.type === 'jung2'){
-        if (s.jung===null) return 'pending';
-        return s.jung===target.jung ? 'ok' : 'pending';
-      }
-      if (desc.type === 'jong') return s.jong===null ? 'pending' : (s.jong===desc.expected ? 'ok':'bad');
-      if (desc.type === 'jong1'){
-        if (s.jong===null) return 'pending';
-        if (s.jong===target.jong) return 'ok';
-        return s.jong===desc.expected ? 'ok' : 'bad';
-      }
-      if (desc.type === 'jong2'){
-        if (s.jong===null) return 'pending';
-        return s.jong===target.jong ? 'ok' : 'pending';
-      }
+  function evaluateSlotStates(target,s,descs){
+    return descs.map(desc=>{
+      if(desc.type==='cho') return s.cho===null?'pending':(s.cho===desc.expected?'ok':'bad');
+      if(desc.type==='jung') return s.jung===null?'pending':(s.jung===desc.expected?'ok':'bad');
+      if(desc.type==='jung1'){ if(s.jung===null) return 'pending'; if(s.jung===target.jung) return 'ok'; return s.jung===desc.expected?'ok':'bad'; }
+      if(desc.type==='jung2'){ if(s.jung===null) return 'pending'; return s.jung===target.jung?'ok':'pending'; }
+      if(desc.type==='jong') return s.jong===null?'pending':(s.jong===desc.expected?'ok':'bad');
+      if(desc.type==='jong1'){ if(s.jong===null) return 'pending'; if(s.jong===target.jong) return 'ok'; return s.jong===desc.expected?'ok':'bad'; }
+      if(desc.type==='jong2'){ if(s.jong===null) return 'pending'; return s.jong===target.jong?'ok':'pending'; }
       return 'pending';
     });
   }
 
-  function renderSyllable(i, engine){
-    const target = engine.targets[i];
-    const descs = getSlotDescriptors(target);
-    if (i > engine.activeIndex){
-      return {mode:'light', text: target ? target.char : '', slotStates: descs.map(()=>null)};
-    }
-    const s = engine.typed[i];
-    if (s.cho===null && s.jung===null && s.jong===null){
-      return {mode:'dark', text: target ? target.char : '', slotStates: descs.map(()=>null)};
-    }
-    const states = evaluateSlotStates(target, s, descs);
-    const hasError = states.includes('bad');
-    const isComplete = !!target && s.cho===target.cho && s.jung===target.jung && (s.jong||null)===(target.jong||null);
-    let mode = 'dark';
-    if (hasError) mode = 'red';
-    else if (isComplete) mode = 'blue';
-    return {mode, text: composeDisplay(s), hint: (hasError && target) ? target.char : null, slotStates: states};
+  function renderSyllable(i,engine){
+    const target=engine.targets[i];
+    const descs=getSlotDescriptors(target);
+    if(i>engine.activeIndex) return {mode:'light',text:target?target.char:'',slotStates:descs.map(()=>null)};
+    const s=engine.typed[i];
+    if(s.cho===null&&s.jung===null&&s.jong===null) return {mode:'dark',text:target?target.char:'',slotStates:descs.map(()=>null)};
+    const states=evaluateSlotStates(target,s,descs);
+    const hasError=states.includes('bad');
+    const isComplete=!!target&&s.cho===target.cho&&s.jung===target.jung&&(s.jong||null)===(target.jong||null);
+    let mode='dark'; if(hasError) mode='red'; else if(isComplete) mode='blue';
+    return {mode,text:composeDisplay(s),hint:(hasError&&target)?target.char:null,slotStates:states};
   }
 
-  /* =========================================================
-   * 3. English engine (Updated to support {word, meaning} object)
-   * ======================================================= */
   function makeEnglishEngine(wordObj){
-    let typed = [];
-    const wordStr = wordObj ? wordObj.word : '';
+    let typed=[];
+    const wordStr=wordObj?wordObj.word:'';
     return {
-      word: wordStr,
-      meaning: wordObj ? wordObj.meaning : '',
+      word:wordStr, meaning:wordObj?wordObj.meaning:'',
       get typed(){ return typed; },
       type(ch){ typed.push(ch); },
       backspace(){ typed.pop(); },
-      syncWithString(str){
-        typed = Array.from(str);
-      }
+      syncWithString(str){ typed=Array.from(str); }
     };
   }
 
-  function renderEnglish(engine, dictation){
-    const target = engine.word;
-    const typed = engine.typed;
-    const n = Math.max(target.length, typed.length);
-    const cells = [];
-    for (let i=0;i<n;i++){
-      if (i < typed.length){
-        const correct = i < target.length && typed[i].toLowerCase() === target[i].toLowerCase();
-        cells.push({mode: correct ? 'green':'red', text: typed[i]});
-      } else {
-        cells.push({mode:'blank', text:''});
-      }
+  function renderEnglish(engine,dictation){
+    const target=engine.word, typed=engine.typed;
+    const n=Math.max(target.length,typed.length);
+    const cells=[];
+    for(let i=0;i<n;i++){
+      if(i<typed.length){ const correct=i<target.length&&typed[i].toLowerCase()===target[i].toLowerCase(); cells.push({mode:correct?'green':'red',text:typed[i]}); }
+      else cells.push({mode:'blank',text:''});
     }
-    const started = typed.length>0;
-    const complete = typed.length===target.length && cells.every(c=>c.mode==='green');
-    return {cells, started, complete, showHint: !started && !dictation};
+    const started=typed.length>0;
+    const complete=typed.length===target.length&&cells.every(c=>c.mode==='green');
+    return {cells,started,complete,showHint:!started&&!dictation};
   }
 
-  /* =========================================================
-   * 4. Word lists & LocalStorage (English is now {word, meaning}!)
-   * ======================================================= */
-  const DEFAULT_KO_WORDS = [
-    {word:'연천', roman:'Yeoncheon'},
-    {word:'전곡', roman:'Jeongok'},
-    {word:'서울', roman:'Seoul'},
-    {word:'강남', roman:'Gangnam'},
-    {word:'잠실', roman:'Jamsil'},
-    {word:'합정', roman:'Hapjeong'},
-    {word:'관악', roman:'Gwanak'},
-    {word:'닭고기', roman:'dakgogi (chicken)'},
-    {word:'과자', roman:'gwaja (snack)'},
-    {word:'의자', roman:'uija (chair)'},
+  const DEFAULT_KO_WORDS=[
+    {word:'연천',roman:'Yeoncheon'},{word:'전곡',roman:'Jeongok'},{word:'서울',roman:'Seoul'},
+    {word:'강남',roman:'Gangnam'},{word:'잠실',roman:'Jamsil'},{word:'합정',roman:'Hapjeong'},
+    {word:'관악',roman:'Gwanak'},{word:'닭고기',roman:'dakgogi (chicken)'},{word:'과자',roman:'gwaja (snack)'},{word:'의자',roman:'uija (chair)'}
   ];
-  const DEFAULT_EN_WORDS = [
-    {word:'embalm', meaning:'涂以防腐防臭药剂，使不朽'},
-    {word:'apple', meaning:'苹果'},
-    {word:'banana', meaning:'香蕉'},
-    {word:'computer', meaning:'电脑'},
-    {word:'keyboard', meaning:'键盘'},
-    {word:'mountain', meaning:'山脉'},
-    {word:'sandwich', meaning:'三明治'},
-    {word:'elephant', meaning:'大象'},
-    {word:'umbrella', meaning:'雨伞'},
-    {word:'calendar', meaning:'日历'}
+  const DEFAULT_EN_WORDS=[
+    {word:'embalm',meaning:'涂以防腐防臭药剂，使不朽'},{word:'apple',meaning:'苹果'},{word:'banana',meaning:'香蕉'},
+    {word:'computer',meaning:'电脑'},{word:'keyboard',meaning:'键盘'},{word:'mountain',meaning:'山脉'},
+    {word:'sandwich',meaning:'三明治'},{word:'elephant',meaning:'大象'},{word:'umbrella',meaning:'雨伞'},{word:'calendar',meaning:'日历'}
   ];
 
-  // Load from storage, with smooth fallback
   let KO_WORDS = JSON.parse(localStorage.getItem('TRAINER_KO_WORDS')) || DEFAULT_KO_WORDS;
   let EN_WORDS_RAW = JSON.parse(localStorage.getItem('TRAINER_EN_WORDS')) || DEFAULT_EN_WORDS;
+  let EN_WORDS = EN_WORDS_RAW.map(item=> typeof item==='string' ? {word:item,meaning:'暂无释义'} : item);
 
-  // 兼容老版本用户的单纯字符串数组
-  let EN_WORDS = EN_WORDS_RAW.map(item => {
-    if (typeof item === 'string') {
-      return { word: item, meaning: '暂无释义' };
-    }
-    return item;
-  });
-
-  /* =========================================================
-   * 5. App State & DOM Wiring
-   * ======================================================= */
-  let mode = 'ko';
-  let wordIndex = 0;
-  let koEngine = makeKoreanEngine(KO_WORDS[0] ? KO_WORDS[0].word : '');
+  let mode='ko', wordIndex=0, dictation=false, stats={correct:0,skipped:0};
+  let koEngine = makeKoreanEngine(KO_WORDS[0]?KO_WORDS[0].word:'');
   let enEngine = makeEnglishEngine(EN_WORDS[0]);
-  let dictation = false;
-  let stats = {correct:0, skipped:0};
 
-  const koRow = document.getElementById('koRow');
-  const enRow = document.getElementById('enRow');
-  const romanizationEl = document.getElementById('romanization');
-  const statusBanner = document.getElementById('statusBanner');
-  const progressEl = document.getElementById('progress');
+  const $ = (id)=> document.getElementById(id);
+  const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
+  const progressEl=$('progress'), pageCounter=$('pageCounter');
+  const drawer=$('drawer'), drawerContent=$('drawerContent');
+  const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
 
-  const drawer = document.getElementById('drawer');
-  const drawerContent = document.getElementById('drawerContent');
-
-  const mobileInput = document.getElementById('mobileInput');
-  const mobileTip = document.getElementById('mobileTip');
-
-  function currentWordCount(){ return mode==='ko' ? KO_WORDS.length : EN_WORDS.length; }
+  function currentWordCount(){ return mode==='ko'?KO_WORDS.length:EN_WORDS.length; }
 
   function loadWord(){
-    const listCount = currentWordCount();
-
-    mobileInput.value = '';
-
-    if (listCount === 0) {
-      if (mode==='ko') koEngine = makeKoreanEngine('');
-      else enEngine = makeEnglishEngine(null);
-      render();
-      renderDrawer();
-      return;
+    const listCount=currentWordCount();
+    mobileInput.value='';
+    if(listCount===0){
+      if(mode==='ko') koEngine=makeKoreanEngine(''); else enEngine=makeEnglishEngine(null);
+      render(); renderDrawer(); return;
     }
-    if (wordIndex >= listCount) wordIndex = 0;
-    if (wordIndex < 0) wordIndex = listCount - 1;
-
-    if (mode==='ko'){
-      koEngine = makeKoreanEngine(KO_WORDS[wordIndex].word);
-      mobileInput.placeholder = "👉 한국어 키보드로 입력하세요";
-      mobileTip.innerHTML = "※ 한국어 모드일 때는 휴대폰의 <b>한국어 키보드</b>를 사용해 주세요.";
+    if(wordIndex>=listCount) wordIndex=0;
+    if(wordIndex<0) wordIndex=listCount-1;
+    if(mode==='ko'){
+      koEngine=makeKoreanEngine(KO_WORDS[wordIndex].word);
+      mobileInput.placeholder='한국어 키보드로 입력하세요';
+      mobileTip.textContent='※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.';
     } else {
-      enEngine = makeEnglishEngine(EN_WORDS[wordIndex]);
-      mobileInput.placeholder = "👉 English input here";
-      mobileTip.innerHTML = "※ 영어 모드일 때는 <b>영문 키보드</b>로 입력해 주세요.";
+      enEngine=makeEnglishEngine(EN_WORDS[wordIndex]);
+      mobileInput.placeholder='English input here';
+      mobileTip.textContent='※ 영어 모드일 때는 영문 키보드로 입력해 주세요.';
     }
-    render();
-    renderDrawer();
+    render(); renderDrawer();
   }
 
   function render(){
-    const total = currentWordCount();
-    progressEl.textContent = `${total > 0 ? wordIndex+1 : 0} / ${total}  (정답 ${stats.correct} · 건너뜀 ${stats.skipped})`;
+    const total=currentWordCount();
+    progressEl.textContent = `정답 ${stats.correct} · 건너뜀 ${stats.skipped}`;
+    pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
 
-    if (total === 0) {
-      koRow.innerHTML = '<div style="color:#aaa; font-size:14px;">단어를 추가해 주세요! (Please add words!)</div>';
-      enRow.innerHTML = '<div style="color:#aaa; font-size:14px;">Please add words!</div>';
-      romanizationEl.textContent = '';
-      statusBanner.textContent = '';
-      return;
+    if(total===0){
+      koRow.innerHTML='<div style="color:#aaa;font-size:14px;">단어를 추가해 주세요!</div>';
+      enRow.innerHTML='<div style="color:#aaa;font-size:14px;">Please add words!</div>';
+      romanizationEl.textContent=''; statusBanner.textContent=''; return;
     }
 
-    if (mode==='ko'){
+    if(mode==='ko'){
       koRow.style.display='flex'; enRow.style.display='none';
-      romanizationEl.textContent = KO_WORDS[wordIndex] ? KO_WORDS[wordIndex].roman : '';
+      romanizationEl.textContent = KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'';
       koRow.innerHTML='';
-      let allComplete = koEngine.activeIndex === koEngine.targets.length-1;
-      let allCorrect = true;
-      for (let i=0;i<koEngine.targets.length;i++){
-        const r = renderSyllable(i, koEngine);
-        if (r.mode!=='blue') allCorrect = false;
-        if (i>koEngine.activeIndex) allComplete = false;
-        const block = document.createElement('div');
-        block.className='syll-block';
-        if (r.hint){
-          const hint = document.createElement('div');
-          hint.className='syll-hint';
-          hint.textContent = r.hint;
-          block.appendChild(hint);
+      let allComplete=koEngine.activeIndex===koEngine.targets.length-1;
+      let allCorrect=true;
+      for(let i=0;i<koEngine.targets.length;i++){
+        const r=renderSyllable(i,koEngine);
+        if(r.mode!=='blue') allCorrect=false;
+        if(i>koEngine.activeIndex) allComplete=false;
+        const block=document.createElement('div');
+        block.style.cssText='display:flex;flex-direction:column;align-items:center;position:relative;min-width:40px;';
+        if(r.hint){
+          const hint=document.createElement('div');
+          hint.style.cssText='position:absolute;top:-20px;font-size:12px;color:'+COL.mutedInk+';font-weight:600;white-space:nowrap;';
+          hint.textContent=r.hint; block.appendChild(hint);
         }
-        const charEl = document.createElement('div');
-        charEl.className = 'syll-char ' + (r.mode==='light'?'light': r.mode==='dark'?'dark': r.mode==='blue'?'blue':'red');
-        charEl.textContent = r.text;
-        block.appendChild(charEl);
-        const dashes = document.createElement('div');
-        dashes.className='dashes';
-        for (let k=0;k<r.slotStates.length;k++){
-          const d = document.createElement('div');
-          const st = r.slotStates[k];
-          d.className = 'dash' + (st==='ok'?' blue': st==='bad'?' red':'');
+        const charEl=document.createElement('div');
+        const color = r.mode==='light'?COL.gray : r.mode==='dark'?COL.black : r.mode==='blue'?COL.pinkDeep : COL.red;
+        charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:44px;line-height:1;min-height:52px;display:flex;align-items:center;color:${color};`;
+        charEl.textContent=r.text; block.appendChild(charEl);
+        const dashes=document.createElement('div');
+        dashes.style.cssText='display:flex;gap:4px;margin-top:6px;';
+        for(let k=0;k<r.slotStates.length;k++){
+          const st=r.slotStates[k];
+          const d=document.createElement('div');
+          const dc = st==='ok'?COL.pinkDeep : st==='bad'?COL.red : COL.gray;
+          d.style.cssText=`width:16px;height:4px;border-radius:2px;background:${dc};`;
           dashes.appendChild(d);
         }
         block.appendChild(dashes);
         koRow.appendChild(block);
       }
-      const lastTarget = koEngine.targets[koEngine.targets.length-1];
-      const lastTyped = koEngine.typed[koEngine.activeIndex];
+      const lastTarget=koEngine.targets[koEngine.targets.length-1];
+      const lastTyped=koEngine.typed[koEngine.activeIndex];
       const lastFilled = lastTarget ? (lastTarget.jong ? (lastTyped.cho&&lastTyped.jung&&lastTyped.jong) : (lastTyped.cho&&lastTyped.jung)) : false;
       const wordDone = allComplete && !!lastFilled;
-      statusBanner.textContent = wordDone && allCorrect ? '정답! Enter로 다음' : '';
-      statusBanner.className = 'status-banner ' + (wordDone && allCorrect ? 'ok':'');
+      statusBanner.textContent = wordDone&&allCorrect ? '정답! Enter로 다음' : '';
+      statusBanner.style.color = wordDone&&allCorrect ? COL.green : 'inherit';
     } else {
       koRow.style.display='none'; enRow.style.display='flex';
-
-      // 显示英文单词的中文释义 (Dictation模式下隐藏，增强背诵记忆效果)
-      romanizationEl.textContent = dictation ? '???' : (EN_WORDS[wordIndex] ? EN_WORDS[wordIndex].meaning : '');
-
+      romanizationEl.textContent = dictation ? '???' : (EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'');
       enRow.innerHTML='';
-      const r = renderEnglish(enEngine, dictation);
-      if (!r.started){
-        const word = enEngine.word || '';
-        for (const ch of word){
-          const block = document.createElement('div');
-          block.className='letter-block';
-          const charEl = document.createElement('div');
-          charEl.className='letter-char light';
+      const r=renderEnglish(enEngine,dictation);
+      if(!r.started){
+        const word=enEngine.word||'';
+        for(const ch of word){
+          const block=document.createElement('div');
+          block.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:22px;';
+          const charEl=document.createElement('div');
+          charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:38px;line-height:1;min-height:46px;display:flex;align-items:center;color:${COL.gray};`;
           charEl.textContent = r.showHint ? ch : '';
           block.appendChild(charEl);
-          const under = document.createElement('div');
-          under.className='letter-underline';
+          const under=document.createElement('div');
+          under.style.cssText=`width:100%;height:4px;border-radius:2px;margin-top:6px;background:${COL.gray};`;
           block.appendChild(under);
           enRow.appendChild(block);
         }
       } else {
-        for (const c of r.cells){
-          const block = document.createElement('div');
-          block.className='letter-block';
-          const charEl = document.createElement('div');
-          charEl.className='letter-char ' + (c.mode==='green'?'green': c.mode==='red'?'red':'light');
-          charEl.textContent = c.text;
-          block.appendChild(charEl);
-          const under = document.createElement('div');
-          under.className='letter-underline' + (c.mode==='green'?' green': c.mode==='red'?' red':'');
+        for(const c of r.cells){
+          const block=document.createElement('div');
+          block.style.cssText='display:flex;flex-direction:column;align-items:center;min-width:22px;';
+          const charEl=document.createElement('div');
+          const color = c.mode==='green'?COL.green : c.mode==='red'?COL.red : COL.gray;
+          charEl.style.cssText=`font-family:'Anton',sans-serif;font-size:38px;line-height:1;min-height:46px;display:flex;align-items:center;color:${color};`;
+          charEl.textContent=c.text; block.appendChild(charEl);
+          const under=document.createElement('div');
+          under.style.cssText=`width:100%;height:4px;border-radius:2px;margin-top:6px;background:${color};`;
           block.appendChild(under);
           enRow.appendChild(block);
         }
       }
-      statusBanner.textContent = r.complete ? '정답! Enter로 다음 (Correct! Press Enter)' : '';
-      statusBanner.className = 'status-banner ' + (r.complete ? 'ok':'');
+      statusBanner.textContent = r.complete ? '정답! Enter로 다음' : '';
+      statusBanner.style.color = r.complete ? COL.green : 'inherit';
     }
   }
 
-  /* ---- 渲染单词侧边栏列表 ---- */
   function renderDrawer(){
-    drawerContent.innerHTML = '';
-    const total = currentWordCount();
-    if (total === 0) {
-      drawerContent.innerHTML = '<div style="color:#aaa; text-align:center; padding:20px;">단어가 없습니다.</div>';
-      return;
-    }
-
-    if (mode === 'ko') {
-      KO_WORDS.forEach((item, index) => {
-        const wordEl = createWordItemDOM(index, item.word, item.roman);
-        drawerContent.appendChild(wordEl);
-      });
-    } else {
-      EN_WORDS.forEach((item, index) => {
-        const wordEl = createWordItemDOM(index, item.word, item.meaning);
-        drawerContent.appendChild(wordEl);
-      });
-    }
+    drawerContent.innerHTML='';
+    const total=currentWordCount();
+    if(total===0){ drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">단어가 없습니다.</div>'; return; }
+    const list = mode==='ko' ? KO_WORDS : EN_WORDS;
+    list.forEach((item,index)=>{
+      const sub = mode==='ko' ? item.roman : item.meaning;
+      drawerContent.appendChild(createWordItemDOM(index,item.word,sub));
+    });
   }
 
-  function createWordItemDOM(index, mainText, subText) {
-    const container = document.createElement('div');
-    container.className = 'word-item' + (index === wordIndex ? ' active-word' : '');
-
-    container.addEventListener('click', (e) => {
-      if (e.target.classList.contains('word-del-btn')) return;
-      wordIndex = index;
-      loadWord();
-      drawer.classList.remove('active');
-    });
-
-    const info = document.createElement('div');
-    info.className = 'word-info';
-
-    const numSpan = document.createElement('span');
-    numSpan.style.color = '#888';
-    numSpan.style.marginRight = '6px';
-    numSpan.textContent = `${index + 1}.`;
-
-    const mainSpan = document.createElement('span');
-    mainSpan.className = 'word-text';
-    mainSpan.appendChild(numSpan);
-    mainSpan.appendChild(document.createTextNode(mainText));
-
+  function createWordItemDOM(index,mainText,subText){
+    const container=document.createElement('div');
+    const active = index===wordIndex;
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(231,184,218,.12)':'transparent'};color:${active?COL.pink:'#f1ede6'};`;
+    container.addEventListener('click',(e)=>{ if(e.target.dataset.role==='del') return; wordIndex=index; loadWord(); drawer.style.right='-360px'; });
+    const info=document.createElement('div');
+    info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
+    const mainSpan=document.createElement('span');
+    mainSpan.textContent = `${index+1}. ${mainText}`;
     info.appendChild(mainSpan);
-
-    if (subText) {
-      const subSpan = document.createElement('span');
-      subSpan.className = 'word-meaning';
-      subSpan.textContent = subText;
-      info.appendChild(subSpan);
-    }
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'word-del-btn';
-    delBtn.textContent = '✕';
-    delBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (confirm(`'${mainText}' 단어를 삭제할까요?`)) {
-        deleteWordAt(index);
-      }
-    });
-
-    container.appendChild(info);
-    container.appendChild(delBtn);
+    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:#8f8f8f;'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    const delBtn=document.createElement('button');
+    delBtn.dataset.role='del';
+    delBtn.textContent='✕';
+    delBtn.style.cssText='border:none;background:none;color:#e0433a;font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
+    delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(`'${mainText}' 단어를 삭제할까요?`)) deleteWordAt(index); });
+    container.appendChild(info); container.appendChild(delBtn);
     return container;
   }
 
-  function deleteWordAt(index) {
-    if (mode === 'ko') {
-      KO_WORDS.splice(index, 1);
-      localStorage.setItem('TRAINER_KO_WORDS', JSON.stringify(KO_WORDS));
-    } else {
-      EN_WORDS.splice(index, 1);
-      localStorage.setItem('TRAINER_EN_WORDS', JSON.stringify(EN_WORDS));
-    }
-    if (wordIndex >= currentWordCount()) {
-      wordIndex = Math.max(0, currentWordCount() - 1);
-    }
+  function deleteWordAt(index){
+    if(mode==='ko'){ KO_WORDS.splice(index,1); localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
+    else { EN_WORDS.splice(index,1); localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
+    if(wordIndex>=currentWordCount()) wordIndex=Math.max(0,currentWordCount()-1);
     loadWord();
   }
 
   function isWordCorrectNow(){
-    if (currentWordCount() === 0) return false;
-    if (mode==='ko'){
-      if (koEngine.activeIndex !== koEngine.targets.length-1) return false;
-      for (let i=0;i<koEngine.targets.length;i++){
-        const r = renderSyllable(i, koEngine);
-        if (r.mode!=='blue') return false;
-      }
+    if(currentWordCount()===0) return false;
+    if(mode==='ko'){
+      if(koEngine.activeIndex!==koEngine.targets.length-1) return false;
+      for(let i=0;i<koEngine.targets.length;i++){ if(renderSyllable(i,koEngine).mode!=='blue') return false; }
       return true;
-    } else {
-      const r = renderEnglish(enEngine, dictation);
-      return r.complete;
     }
+    return renderEnglish(enEngine,dictation).complete;
   }
 
   function nextWord(markCorrect){
-    if (currentWordCount() === 0) return;
-    if (markCorrect) stats.correct++; else stats.skipped++;
-    wordIndex = (wordIndex+1) % currentWordCount();
+    if(currentWordCount()===0) return;
+    if(markCorrect) stats.correct++; else stats.skipped++;
+    wordIndex=(wordIndex+1)%currentWordCount();
     loadWord();
   }
-
   function prevWord(){
-    if (currentWordCount() === 0) return;
-    wordIndex = (wordIndex - 1 + currentWordCount()) % currentWordCount();
+    if(currentWordCount()===0) return;
+    wordIndex=(wordIndex-1+currentWordCount())%currentWordCount();
     loadWord();
   }
 
-  /* =========================================================
-   * 6. Mobile Soft Keyboard Listener
-   * ======================================================= */
-  mobileInput.addEventListener('input', (e) => {
-    const val = e.target.value;
-    if (mode === 'ko') {
-      koEngine.syncWithString(val);
-    } else {
-      enEngine.syncWithString(val);
-    }
+  mobileInput.addEventListener('input',(e)=>{
+    const val=e.target.value;
+    if(mode==='ko') koEngine.syncWithString(val); else enEngine.syncWithString(val);
     render();
   });
+  mobileInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); nextWord(isWordCorrectNow()); } });
 
-  mobileInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      nextWord(isWordCorrectNow());
+  window.addEventListener('keydown',(e)=>{
+    const activeTag = document.activeElement.tagName;
+    if(activeTag==='INPUT'||activeTag==='TEXTAREA'){
+      if(e.code==='Enter' && (document.activeElement.id==='newWord'||document.activeElement.id==='newMeaning')) $('addWordBtn').click();
+      return;
     }
+    if(e.ctrlKey||e.metaKey||e.altKey) return;
+    if(currentWordCount()===0) return;
+    if(e.code==='Backspace'){ e.preventDefault(); if(mode==='ko') koEngine.backspace(); else enEngine.backspace(); render(); return; }
+    if(e.code==='Enter'){ e.preventDefault(); nextWord(isWordCorrectNow()); return; }
+    if(mode==='ko'){
+      const jamo = e.shiftKey ? (KEY_TO_JAMO_SHIFT[e.code]||KEY_TO_JAMO[e.code]) : KEY_TO_JAMO[e.code];
+      if(!jamo) return; e.preventDefault(); koEngine.feed(jamo,VOWELS_BASE.has(jamo)); render();
+    } else if(/^Key[A-Z]$/.test(e.code)){ e.preventDefault(); enEngine.type(e.code.slice(3).toLowerCase()); render(); }
   });
 
-  /* =========================================================
-   * 7. Desktop Keyboard Listener
-   * ======================================================= */
-  window.addEventListener('keydown', (e)=>{
-    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-      if (e.code === 'Enter' && (document.activeElement.id === 'newWord' || document.activeElement.id === 'newMeaning')) {
-        document.getElementById('addWordBtn').click();
-      }
-      return;
-    }
-
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (currentWordCount() === 0) return;
-
-    if (e.code === 'Backspace'){
-      e.preventDefault();
-      if (mode==='ko') koEngine.backspace(); else enEngine.backspace();
-      render();
-      return;
-    }
-    if (e.code === 'Enter'){
-      e.preventDefault();
-      nextWord(isWordCorrectNow());
-      return;
-    }
-
-    if (mode==='ko'){
-      const jamo = e.shiftKey ? (KEY_TO_JAMO_SHIFT[e.code] || KEY_TO_JAMO[e.code]) : KEY_TO_JAMO[e.code];
-      if (!jamo) return;
-      e.preventDefault();
-      koEngine.feed(jamo, VOWELS_BASE.has(jamo));
-      render();
-    } else {
-      if (/^Key[A-Z]$/.test(e.code)){
-        e.preventDefault();
-        enEngine.type(e.code.slice(3).toLowerCase());
-        render();
-      }
-    }
-  });
-
-  /* =========================================================
-   * 8. Other UI Events
-   * ======================================================= */
+  function setActiveTab(m){
+    document.querySelectorAll('.tab-btn').forEach(b=>{ b.style.color = b.dataset.mode===m ? '#f1ede6' : '#8f8f8f'; });
+    document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? COL.pink : '#8f8f8f'; });
+  }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      mode = btn.dataset.mode;
-      wordIndex = 0;
-      loadWord();
-    });
+    btn.addEventListener('click',()=>{ mode=btn.dataset.mode; wordIndex=0; setActiveTab(mode); loadWord(); });
   });
 
-  document.getElementById('restartBtn').addEventListener('click', loadWord);
-  document.getElementById('skipBtn').addEventListener('click', ()=> nextWord(false));
-  document.getElementById('prevBtn').addEventListener('click', prevWord);
+  $('restartBtn').addEventListener('click', loadWord);
+  $('skipBtn').addEventListener('click', ()=>nextWord(false));
+  $('prevBtn').addEventListener('click', prevWord);
 
-  const openDrawerBtn = document.getElementById('openDrawerBtn');
-  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; renderDrawer(); });
+  $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-360px'; });
 
-  openDrawerBtn.addEventListener('click', () => {
-    drawer.classList.add('active');
-    renderDrawer();
-    setTimeout(() => {
-      const activeEl = drawerContent.querySelector('.active-word');
-      if (activeEl) {
-        activeEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      }
-    }, 100);
-  });
+  $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
 
-  closeDrawerBtn.addEventListener('click', () => {
-    drawer.classList.remove('active');
-  });
-
-  document.getElementById('dictationToggle').addEventListener('change', (e)=>{
-    dictation = e.target.checked;
-    render();
-  });
-
-  // Add individual word (Supports English meaning!)
-  document.getElementById('addWordBtn').addEventListener('click', () => {
-    const wordInput = document.getElementById('newWord');
-    const meaningInput = document.getElementById('newMeaning');
-    const word = wordInput.value.trim();
-    const meaning = meaningInput.value.trim();
-
-    if (!word) {
-      alert('추가할 단어를 입력해 주세요!');
-      return;
-    }
-
+  $('addWordBtn').addEventListener('click', ()=>{
+    const wordInput=$('newWord'), meaningInput=$('newMeaning');
+    const word=wordInput.value.trim(), meaning=meaningInput.value.trim();
+    if(!word){ alert('추가할 단어를 입력해 주세요!'); return; }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
-
-    if (isKorean) {
-      KO_WORDS.push({ word, roman: meaning || 'Custom' });
-      localStorage.setItem('TRAINER_KO_WORDS', JSON.stringify(KO_WORDS));
-      if (mode !== 'ko') document.querySelector('[data-mode="ko"]').click();
+    if(isKorean){
+      KO_WORDS.push({word,roman:meaning||'Custom'});
+      localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS));
+      if(mode!=='ko'){ mode='ko'; setActiveTab('ko'); }
     } else {
-      EN_WORDS.push({ word, meaning: meaning || 'Custom' });
-      localStorage.setItem('TRAINER_EN_WORDS', JSON.stringify(EN_WORDS));
-      if (mode !== 'en') document.querySelector('[data-mode="en"]').click();
+      EN_WORDS.push({word,meaning:meaning||'Custom'});
+      localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS));
+      if(mode!=='en'){ mode='en'; setActiveTab('en'); }
     }
-
-    wordInput.value = '';
-    meaningInput.value = '';
-
-    wordIndex = currentWordCount() - 1;
+    wordInput.value=''; meaningInput.value='';
+    wordIndex=currentWordCount()-1;
     loadWord();
   });
 
-  // Clear Reset
-  document.getElementById('clearWordsBtn').addEventListener('click', () => {
-    if (confirm('모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?')) {
-      localStorage.removeItem('TRAINER_KO_WORDS');
-      localStorage.removeItem('TRAINER_EN_WORDS');
-      KO_WORDS = [...DEFAULT_KO_WORDS];
-      EN_WORDS = [...DEFAULT_EN_WORDS];
-      wordIndex = 0;
-      loadWord();
+  $('clearWordsBtn').addEventListener('click', ()=>{
+    if(confirm('모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?')){
+      localStorage.removeItem('TRAINER_KO_WORDS'); localStorage.removeItem('TRAINER_EN_WORDS');
+      KO_WORDS=[...DEFAULT_KO_WORDS]; EN_WORDS=[...DEFAULT_EN_WORDS];
+      wordIndex=0; loadWord();
     }
   });
 
-  /* ---- Bulk Modal (Updated for unified object parsing) ---- */
-  const modalOverlay = document.getElementById('modalOverlay');
-  const bulkTextarea = document.getElementById('bulkTextarea');
-  const openBulkBtn = document.getElementById('openBulkBtn');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const importBtn = document.getElementById('importBtn');
-
-  openBulkBtn.addEventListener('click', () => {
-    modalOverlay.classList.add('active');
-    if (mode === 'ko') {
-      const koText = KO_WORDS.map(item => `${item.word},${item.roman}`).join('\n');
-      bulkTextarea.value = koText;
-    } else {
-      const enText = EN_WORDS.map(item => `${item.word},${item.meaning}`).join('\n');
-      bulkTextarea.value = enText;
-    }
+  const modalOverlay=$('modalOverlay'), bulkTextarea=$('bulkTextarea');
+  $('openBulkBtn').addEventListener('click', ()=>{
+    modalOverlay.style.opacity='1'; modalOverlay.style.pointerEvents='auto';
+    bulkTextarea.value = mode==='ko' ? KO_WORDS.map(i=>`${i.word},${i.roman}`).join('\n') : EN_WORDS.map(i=>`${i.word},${i.meaning}`).join('\n');
   });
-
-  closeModalBtn.addEventListener('click', () => {
-    modalOverlay.classList.remove('active');
-  });
-
-  importBtn.addEventListener('click', () => {
-    const rawText = bulkTextarea.value.trim();
-    if (!rawText) {
-      alert('가져올 내용을 입력해 주세요!');
-      return;
-    }
-
-    const lines = rawText.split('\n').map(line => line.trim()).filter(Boolean);
-    const tempKo = [];
-    const tempEn = [];
-
-    lines.forEach(line => {
-      const parts = line.split(',');
-      const word = parts[0] ? parts[0].trim() : '';
-      const definition = parts[1] ? parts[1].trim() : 'Custom';
-
-      if (!word) return;
-
-      const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
-      if (isKorean) {
-        tempKo.push({ word, roman: definition });
-      } else {
-        tempEn.push({ word, meaning: definition });
-      }
+  $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
+  $('importBtn').addEventListener('click', ()=>{
+    const rawText=bulkTextarea.value.trim();
+    if(!rawText){ alert('가져올 내용을 입력해 주세요!'); return; }
+    const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
+    const tempKo=[], tempEn=[];
+    lines.forEach(line=>{
+      const parts=line.split(',');
+      const word=parts[0]?parts[0].trim():'';
+      const definition=parts[1]?parts[1].trim():'Custom';
+      if(!word) return;
+      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition});
+      else tempEn.push({word,meaning:definition});
     });
-
-    if (tempKo.length > 0) {
-      KO_WORDS = tempKo;
-      localStorage.setItem('TRAINER_KO_WORDS', JSON.stringify(KO_WORDS));
-    }
-    if (tempEn.length > 0) {
-      EN_WORDS = tempEn;
-      localStorage.setItem('TRAINER_EN_WORDS', JSON.stringify(EN_WORDS));
-    }
-
+    if(tempKo.length>0){ KO_WORDS=tempKo; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
+    if(tempEn.length>0){ EN_WORDS=tempEn; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
     alert(`가져오기 완료! (한국어: ${tempKo.length}개, 영어: ${tempEn.length}개)`);
-    modalOverlay.classList.remove('active');
-
-    wordIndex = 0;
-    loadWord();
+    modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
+    wordIndex=0; loadWord();
   });
 
+  setActiveTab('ko');
   loadWord();
 })();
 </script>
