@@ -344,71 +344,131 @@ function beep(freq, dur){
 function currentWord(){ return list[idx][0]; }
 function currentMeaning(){ return list[idx][1]; }
 
-function render(){
-  const target = currentWord();
-  const typed = typer.value;
-  syllablesEl.innerHTML = '';
+// Per-word state. This is the single source of truth for what's on screen —
+// rebuilt (charEls, charStatus, charBars) only when the target word itself
+// changes. Every keystroke only ever mutates these in place and patches the
+// already-existing DOM nodes; it never tears down or recreates them, and
+// activeIndex is tracked as its own explicit piece of state rather than
+// something re-derived inline from string length inside a render loop.
+let charEls = [];      // one persistent {group, hint, charEl, barEls[]} per position, for this word
+let charStatus = [];   // one of 'future' | 'active' | 'done' | 'wrong', per position
+let charBars = [];     // one array of 'pending' | 'correct' | 'wrong' per position's slots
+let activeIndex = 0;   // which position is currently up / being composed
 
-  // A not-yet-typed position only becomes "up next" (dark gray) once the position
-  // right before it is structurally *settled* — every one of its slots resolved,
-  // whether correct or wrong — not merely because the raw string happens to have
-  // grown to that length. A single Hangul syllable can sit at one string length
-  // for several keystrokes while still mid-composition (e.g. "ㅇ" -> "여" -> "연"
-  // are all length 1), so length alone can't tell us the previous syllable is done.
-  let nextActiveIdx = 0; // with nothing typed yet, position 0 is "up next"
-  if(typed.length > 0){
-    const lastIdx = typed.length - 1;
-    const lastStates = evaluateSlots(target[lastIdx], typed[lastIdx], true);
-    const lastSettled = !lastStates.includes('pending');
-    nextActiveIdx = lastSettled ? typed.length : -1;
-  }
+// Build fresh, persistent DOM nodes for the current word. Only called when
+// the word changes (nextWord/restart/setMode/init) — never on every keystroke.
+function buildWordDOM(){
+  const target = currentWord();
+  syllablesEl.innerHTML = '';
+  charEls = [];
+  charStatus = target.split('').map((_, i) => i === 0 ? 'active' : 'future');
+  charBars = target.split('').map(ch => getSlots(ch).map(() => 'pending'));
+  activeIndex = 0;
 
   for(let i=0;i<target.length;i++){
-    const tChar = target[i];
-    const typedChar = typed[i];
-    const isComposingHere = (i === typed.length - 1);
-    const started = typedChar !== undefined;
-    const states = evaluateSlots(tChar, typedChar, isComposingHere);
-    const hasWrong = states.includes('wrong');
-    const isFullyDone = started && !hasWrong && states.every(s => s === 'correct');
-
     const group = document.createElement('div');
     group.className = 'syl-group';
 
-    // small correct-answer hint: only ever shown for a syllable that currently has
-    // an error, as a corrective reminder — not during normal correct typing. It
-    // persists even after the cursor moves on to later syllables, until the error
-    // is actually fixed (e.g. via backspace).
     const hintEl = document.createElement('div');
     hintEl.className = 'syl-hint';
-    hintEl.textContent = hasWrong ? tChar : '';
 
-    // big display: once typing starts here, show what was actually typed instead of
-    // the target — colored dark-gray while in progress, blue once fully correct, red
-    // if it has any wrong part. Not-yet-reached characters stay a dim preview, except
-    // the very next one to type, which is dark-gray ("up next") even before any input.
     const charEl = document.createElement('div');
-    if(started){
-      charEl.textContent = typedChar;
-      charEl.className = 'syl-char ' + (hasWrong ? 'wrong' : (isFullyDone ? 'done' : 'active'));
-    } else {
-      charEl.textContent = tChar;
-      charEl.className = 'syl-char ' + (i === nextActiveIdx ? 'active' : 'future');
-    }
+    charEl.className = 'syl-char';
 
     const barsEl = document.createElement('div');
     barsEl.className = 'bars';
-    states.forEach(state => {
+    const barEls = getSlots(target[i]).map(() => {
       const bar = document.createElement('div');
-      bar.className = 'bar' + (state !== 'pending' ? (' ' + state) : '');
+      bar.className = 'bar';
       barsEl.appendChild(bar);
+      return bar;
     });
 
     group.appendChild(hintEl);
     group.appendChild(charEl);
     group.appendChild(barsEl);
     syllablesEl.appendChild(group);
+    charEls.push({ group, hint: hintEl, charEl, barEls });
   }
+
+  paintWordDOM();
+  renderMeta();
+}
+
+// Recompute charStatus / charBars / activeIndex from the live input, then
+// patch the existing DOM nodes to match — called on every keystroke.
+function updateWordState(){
+  const target = currentWord();
+  const typed = typer.value;
+
+  // A not-yet-typed position only becomes "up next" (active) once the position
+  // right before it is structurally *settled* — every one of its slots
+  // resolved, correct or wrong — not merely because the raw string happens to
+  // have grown to that length. A single Hangul syllable can sit at one string
+  // length for several keystrokes while still mid-composition (e.g. "ㅇ" ->
+  // "여" -> "연" are all length 1), so length alone can't signal "done".
+  if(typed.length === 0){
+    activeIndex = 0;
+  } else {
+    const lastIdx = typed.length - 1;
+    const lastStates = evaluateSlots(target[lastIdx], typed[lastIdx], true);
+    const lastSettled = !lastStates.includes('pending');
+    activeIndex = lastSettled ? typed.length : lastIdx;
+  }
+
+  for(let i=0;i<target.length;i++){
+    const typedChar = typed[i];
+    const started = typedChar !== undefined;
+    const isComposingHere = (i === typed.length - 1);
+    const states = started
+      ? evaluateSlots(target[i], typedChar, isComposingHere)
+      : getSlots(target[i]).map(() => 'pending');
+    charBars[i] = states;
+
+    if(!started){
+      charStatus[i] = (i === activeIndex) ? 'active' : 'future';
+    } else {
+      const hasWrong = states.includes('wrong');
+      const isFullyDone = !hasWrong && states.every(s => s === 'correct');
+      charStatus[i] = hasWrong ? 'wrong' : (isFullyDone ? 'done' : 'active');
+    }
+  }
+
+  paintWordDOM();
+  renderMeta();
+}
+
+// Pure DOM patch: only touches text/class attributes on the existing,
+// persistent nodes — never creates or removes an element.
+function paintWordDOM(){
+  const target = currentWord();
+  const typed = typer.value;
+
+  for(let i=0;i<target.length;i++){
+    const { hint, charEl, barEls } = charEls[i];
+    const status = charStatus[i];
+    const typedChar = typed[i];
+    const displayText = (typedChar !== undefined) ? typedChar : target[i];
+
+    if(charEl.textContent !== displayText) charEl.textContent = displayText;
+    const charClass = 'syl-char ' + status;
+    if(charEl.className !== charClass) charEl.className = charClass;
+
+    const hintText = (status === 'wrong') ? target[i] : '';
+    if(hint.textContent !== hintText) hint.textContent = hintText;
+
+    charBars[i].forEach((state, bi) => {
+      const barClass = 'bar' + (state !== 'pending' ? (' ' + state) : '');
+      if(barEls[bi].className !== barClass) barEls[bi].className = barClass;
+    });
+  }
+}
+
+// Everything that isn't per-character state: meaning, track strip, progress,
+// accuracy, debug line. Cheap to just overwrite each time.
+function renderMeta(){
+  const target = currentWord();
+  const typed = typer.value;
 
   meaningEl.innerHTML = '뜻: <b>' + currentMeaning() + '</b>';
 
@@ -418,7 +478,6 @@ function render(){
     debugLineEl.textContent = 'target="' + target + '" typed="' + typed + '" (len ' + typed.length + ') [' + codepoints + '] composing=' + isComposingNow + ' ' + sel;
   }
 
-  // track strip
   const prev = list[idx-1], next = list[idx+1];
   prevCell.querySelector('.w').textContent = prev ? prev[0] : '';
   prevCell.querySelector('small').textContent = prev ? prev[1] : '';
@@ -481,7 +540,7 @@ function nextWord(){
     finishRound();
     return;
   }
-  render();
+  buildWordDOM();
   focusAtEnd();
 }
 
@@ -497,7 +556,7 @@ function restart(){
   idx = 0; correctKeys = 0; totalKeys = 0; startTime = null;
   typer.value = '';
   doneScreen.classList.remove('show');
-  render();
+  buildWordDOM();
   focusAtEnd();
 }
 
@@ -509,7 +568,7 @@ typer.addEventListener('compositionend', () => {
     pendingAdvance = false;
     nextWord();
   }
-  if(debugOn) render();
+  if(debugOn) renderMeta();
 });
 
 typer.addEventListener('input', () => {
@@ -527,7 +586,7 @@ typer.addEventListener('input', () => {
       const len = typer.value.length;
       typer.setSelectionRange(len, len);
     }
-    render();
+    updateWordState();
     const target = currentWord();
     const typed = typer.value;
     const i = typed.length - 1;
@@ -570,13 +629,13 @@ document.getElementById('soundBtn').addEventListener('click', (e) => {
 document.getElementById('debugBtn').addEventListener('click', () => {
   debugOn = !debugOn;
   debugLineEl.classList.toggle('show', debugOn);
-  render();
+  renderMeta();
 });
 
 document.getElementById('restartBtn').addEventListener('click', restart);
 
 /* ---------- Init ---------- */
-render();
+buildWordDOM();
 focusAtEnd();
 </script>
 </body>
