@@ -1010,7 +1010,7 @@
         if(!haystack.includes(query)) return;
       }
       shown++;
-      const el = createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0);
+      const el = createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0,item.notes);
       if(index===wordIndex) activeEl=el;
       drawerContent.appendChild(el);
     });
@@ -1021,17 +1021,24 @@
     if(scrollToActive && activeEl) activeEl.scrollIntoView({block:'start'});
   }
 
-  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount){
+  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText){
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
     container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-520px'; setNavActive('practice'); });
     const info=document.createElement('div');
-    info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
+    info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;min-width:0;';
     const mainSpan=document.createElement('span');
     mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongCount>0?'❌'+wrongCount+' ':''}${displayIndex}. ${mainText}`;
     info.appendChild(mainSpan);
     if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    if(hasNotes && notesText){
+      const notePreview=document.createElement('span');
+      notePreview.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      const flat = notesText.trim().replace(/\s+/g,' ');
+      notePreview.textContent = flat.length>36 ? flat.slice(0,36)+'…' : flat;
+      info.appendChild(notePreview);
+    }
     const actions=document.createElement('div');
     actions.style.cssText='display:flex;align-items:center;gap:2px;';
     const favBtn=document.createElement('button');
