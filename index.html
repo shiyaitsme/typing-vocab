@@ -76,6 +76,7 @@
     <button id="restartBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">&#8635; 다시 시작</button>
     <button id="favoriteBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">☆ 즐겨찾기</button>
     <button id="openDrawerBtn" style="all:unset;cursor:pointer;background:#e7b8da;color:#0c0c0c;padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 목록</button>
+    <button id="openHistoryBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">📅 학습 기록</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
       <input type="checkbox" id="dictationToggle" style="accent-color:#e7b8da;">딕테이션 모드
     </label>
@@ -84,10 +85,14 @@
   <!-- DRAWER -->
   <div id="drawer" style="position:fixed;top:0;right:-360px;width:340px;max-width:92vw;height:100%;background:#111;border-left:1px solid rgba(255,255,255,.15);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
     <div style="padding:18px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;justify-content:space-between;align-items:center;">
-      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">단어 목록</div>
+      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">단어 & 기록</div>
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:22px;color:#8f8f8f;padding:2px 8px;">&times;</button>
     </div>
-    <div style="padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.15);">
+    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.15);">
+      <button id="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">단어 목록</button>
+      <button id="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">학습 기록</button>
+    </div>
+    <div id="wordsFilterRow" style="padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.15);">
       <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
         <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e7b8da;">★ 즐겨찾기만 보기
       </label>
@@ -296,6 +301,9 @@
   let EN_WORDS_RAW = JSON.parse(localStorage.getItem('TRAINER_EN_WORDS')) || DEFAULT_EN_WORDS;
   let EN_WORDS = EN_WORDS_RAW.map(item=> typeof item==='string' ? {word:item,meaning:'暂无释义'} : item);
 
+  let HISTORY_KO = JSON.parse(localStorage.getItem('TRAINER_HISTORY_KO')) || [];
+  let HISTORY_EN = JSON.parse(localStorage.getItem('TRAINER_HISTORY_EN')) || [];
+
   let mode='ko', wordIndex=0, dictation=false, stats={correct:0,skipped:0};
   let koEngine = makeKoreanEngine(KO_WORDS[0]?KO_WORDS[0].word:'');
   let enEngine = makeEnglishEngine(EN_WORDS[0]);
@@ -304,6 +312,8 @@
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const progressEl=$('progress'), pageCounter=$('pageCounter');
   const drawer=$('drawer'), drawerContent=$('drawerContent');
+  const drawerTabWords=$('drawerTabWords'), drawerTabHistory=$('drawerTabHistory'), wordsFilterRow=$('wordsFilterRow');
+  let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
 
@@ -314,7 +324,7 @@
     mobileInput.value='';
     if(listCount===0){
       if(mode==='ko') koEngine=makeKoreanEngine(''); else enEngine=makeEnglishEngine(null);
-      render(); renderDrawer(); return;
+      render(); renderActiveDrawerView(); return;
     }
     if(wordIndex>=listCount) wordIndex=0;
     if(wordIndex<0) wordIndex=listCount-1;
@@ -327,7 +337,7 @@
       mobileInput.placeholder='English input here';
       mobileTip.textContent='※ 영어 모드일 때는 영문 키보드로 입력해 주세요.';
     }
-    render(); renderDrawer(); updateFavoriteBtn();
+    render(); renderActiveDrawerView(); updateFavoriteBtn();
   }
 
   function currentWordList(){ return mode==='ko' ? KO_WORDS : EN_WORDS; }
@@ -485,6 +495,89 @@
     return container;
   }
 
+  function renderActiveDrawerView(){
+    if(drawerView==='history') renderHistory(); else renderDrawer();
+  }
+
+  function setDrawerView(view){
+    drawerView=view;
+    const activeStyle={color:'#f1ede6',borderBottom:`2px solid ${COL.pink}`};
+    const inactiveStyle={color:'#8f8f8f',borderBottom:'2px solid transparent'};
+    Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
+    Object.assign(drawerTabHistory.style, view==='history'?activeStyle:inactiveStyle);
+    wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
+    renderActiveDrawerView();
+  }
+
+  function todayStr(){
+    const d=new Date(), pad=n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  function addHistoryBatch(listMode, words){
+    const history = listMode==='ko' ? HISTORY_KO : HISTORY_EN;
+    const key = listMode==='ko' ? 'TRAINER_HISTORY_KO' : 'TRAINER_HISTORY_EN';
+    const date = todayStr();
+    const snapshot = words.map(w=>({...w}));
+    const existing = history.find(e=>e.date===date);
+    if(existing) existing.words = snapshot;
+    else history.push({date, words: snapshot});
+    localStorage.setItem(key, JSON.stringify(history));
+  }
+
+  function renderHistory(){
+    drawerContent.innerHTML='';
+    const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
+    if(history.length===0){
+      drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.</div>';
+      return;
+    }
+    for(let i=history.length-1;i>=0;i--){
+      drawerContent.appendChild(createHistoryItemDOM(history[i], i));
+    }
+  }
+
+  function createHistoryItemDOM(entry, index){
+    const container=document.createElement('div');
+    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(255,255,255,.15);';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;justify-content:space-between;align-items:center;';
+    const dateSpan=document.createElement('span');
+    dateSpan.style.cssText="font-family:'Anton',sans-serif;font-size:13px;letter-spacing:.5px;color:#f1ede6;";
+    dateSpan.textContent=entry.date;
+    const countSpan=document.createElement('span');
+    countSpan.style.cssText='font-size:11px;color:#8f8f8f;';
+    countSpan.textContent=`${entry.words.length}개`;
+    row.appendChild(dateSpan); row.appendChild(countSpan);
+    container.appendChild(row);
+
+    const preview=document.createElement('div');
+    preview.style.cssText='font-size:11px;color:#8a857b;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    preview.textContent=entry.words.map(w=>w.word).join(', ');
+    container.appendChild(preview);
+
+    const studyBtn=document.createElement('button');
+    studyBtn.textContent='▶ 이 날짜로 연습하기';
+    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:#e7b8da;color:#0c0c0c;padding:7px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;';
+    studyBtn.addEventListener('click', ()=>studyHistoryEntry(index));
+    container.appendChild(studyBtn);
+
+    return container;
+  }
+
+  function studyHistoryEntry(index){
+    const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
+    const entry = history[index];
+    if(!entry) return;
+    const snapshot = entry.words.map(w=>({...w}));
+    if(mode==='ko'){ KO_WORDS=snapshot; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
+    else { EN_WORDS=snapshot; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
+    wordIndex=0;
+    drawer.style.right='-360px';
+    setDrawerView('words');
+    loadWord();
+  }
+
   function deleteWordAt(index){
     if(mode==='ko'){ KO_WORDS.splice(index,1); localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
     else { EN_WORDS.splice(index,1); localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
@@ -549,8 +642,11 @@
   $('skipBtn').addEventListener('click', ()=>nextWord(false));
   $('prevBtn').addEventListener('click', prevWord);
 
-  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; renderDrawer(); });
+  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words'); });
+  $('openHistoryBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('history'); });
   $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-360px'; });
+  drawerTabWords.addEventListener('click', ()=>setDrawerView('words'));
+  drawerTabHistory.addEventListener('click', ()=>setDrawerView('history'));
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
 
@@ -606,9 +702,15 @@
       if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition,favorite:false});
       else tempEn.push({word,meaning:definition,favorite:false});
     });
-    if(tempKo.length>0){ KO_WORDS=tempKo; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
-    if(tempEn.length>0){ EN_WORDS=tempEn; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
-    alert(`가져오기 완료! (한국어: ${tempKo.length}개, 영어: ${tempEn.length}개)`);
+    if(tempKo.length>0){
+      addHistoryBatch('ko', tempKo);
+      KO_WORDS=tempKo; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS));
+    }
+    if(tempEn.length>0){
+      addHistoryBatch('en', tempEn);
+      EN_WORDS=tempEn; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS));
+    }
+    alert(`가져오기 완료! (한국어: ${tempKo.length}개, 영어: ${tempEn.length}개)\n오늘 날짜(${todayStr()})로 학습 기록에 저장되었습니다.`);
     modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
     wordIndex=0; loadWord();
   });
