@@ -441,6 +441,14 @@ function isWordComplete(){
 
 function nextWord(){
   if(!isWordComplete()) return;
+  // Never clear the input's value while the browser still has an active
+  // Hangul composition session open — doing so desyncs the IME's internal
+  // composition anchor from the (now-cleared) DOM value, and the next
+  // keystroke gets inserted at the wrong position (the "second syllable
+  // jumps in front of the first" symptom). If we're mid-composition, do
+  // nothing here; compositionend below will call nextWord() again once
+  // it's actually safe to clear.
+  if(isComposingNow) return;
   idx++;
   typer.value = '';
   if(idx >= list.length){
@@ -468,6 +476,16 @@ function restart(){
 }
 
 /* ---------- Input handling ---------- */
+// The one piece of composition-awareness that's actually necessary (see
+// nextWord() above): track whether the browser has an IME composition
+// session open, so we know it's unsafe to clear typer.value right now.
+let isComposingNow = false;
+typer.addEventListener('compositionstart', () => { isComposingNow = true; });
+typer.addEventListener('compositionend', () => {
+  isComposingNow = false;
+  if(isWordComplete()) nextWord();
+});
+
 typer.addEventListener('input', () => {
   if(!startTime) startTime = Date.now();
   totalKeys++;
