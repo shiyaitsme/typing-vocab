@@ -320,7 +320,13 @@
           if(s.cho===null&&s.jung===null) s.jung=jamo;
           else if(s.jung===null) s.jung=jamo;
           else if(s.jong===null){ const c=JUNG_COMBINE[s.jung+jamo]; if(c) s.jung=c; }
-          else { const moving=s.jong; s.jong=null; advance(moving); current().jung=jamo; }
+          else {
+            const jong=s.jong;
+            const split=JONG_SPLIT[jong];
+            if(split){ s.jong=split[0]; advance(split[1]); }
+            else { s.jong=null; advance(jong); }
+            current().jung=jamo;
+          }
         } else {
           if(s.cho===null) s.cho=jamo;
           else if(s.jung===null) advance(jamo);
@@ -369,17 +375,17 @@
     });
   }
 
-  function renderSyllable(i,engine){
+  function renderSyllable(i,engine,dictation){
     const target=engine.targets[i];
     const descs=getSlotDescriptors(target);
-    if(i>engine.activeIndex) return {mode:'light',text:target?target.char:'',slotStates:descs.map(()=>null)};
+    if(i>engine.activeIndex) return {mode:'light',text:dictation?'':(target?target.char:''),slotStates:descs.map(()=>null)};
     const s=engine.typed[i];
-    if(s.cho===null&&s.jung===null&&s.jong===null) return {mode:'dark',text:target?target.char:'',slotStates:descs.map(()=>null)};
+    if(s.cho===null&&s.jung===null&&s.jong===null) return {mode:'dark',text:dictation?'':(target?target.char:''),slotStates:descs.map(()=>null)};
     const states=evaluateSlotStates(target,s,descs);
     const hasError=states.includes('bad');
     const isComplete=!!target&&s.cho===target.cho&&s.jung===target.jung&&(s.jong||null)===(target.jong||null);
     let mode='dark'; if(hasError) mode='red'; else if(isComplete) mode='blue';
-    return {mode,text:composeDisplay(s),hint:(hasError&&target)?target.char:null,slotStates:states};
+    return {mode,text:composeDisplay(s),hint:(hasError&&target&&!dictation)?target.char:null,slotStates:states};
   }
 
   function makeEnglishEngine(wordObj){
@@ -837,6 +843,7 @@
 
   function computeNextKeyCode(){
     if(currentWordCount()===0) return null;
+    if(dictation) return null;
     if(mode==='ko'){
       const target=koEngine.targets[koEngine.activeIndex];
       const s=koEngine.typed[koEngine.activeIndex];
@@ -908,7 +915,7 @@
       let allComplete=koEngine.activeIndex===koEngine.targets.length-1;
       let allCorrect=true;
       for(let i=0;i<koEngine.targets.length;i++){
-        const r=renderSyllable(i,koEngine);
+        const r=renderSyllable(i,koEngine,dictation);
         if(r.mode!=='blue') allCorrect=false;
         if(r.mode==='red') currentAttemptHadError=true;
         if(i>koEngine.activeIndex) allComplete=false;
@@ -943,7 +950,7 @@
       statusBanner.style.color = wordDone&&allCorrect ? COL.green : 'inherit';
     } else {
       koRow.style.display='none'; enRow.style.display='flex';
-      romanizationEl.textContent = dictation ? '???' : (EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'');
+      romanizationEl.textContent = EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'';
       enRow.innerHTML='';
       const r=renderEnglish(enEngine,dictation);
       if(r.cells.some(c=>c.mode==='red')) currentAttemptHadError=true;
@@ -1111,10 +1118,15 @@
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     const entry = history[index];
     if(!entry) return;
-    const snapshot = entry.words.map(w=>({...w}));
-    if(mode==='ko') KO_WORDS=snapshot; else EN_WORDS=snapshot;
+    const list = currentWordList();
+    let firstIndex = -1;
+    entry.words.forEach(hw=>{
+      let idx = list.findIndex(w=>w.word===hw.word);
+      if(idx===-1){ list.push({...hw}); idx = list.length-1; }
+      if(firstIndex===-1) firstIndex = idx;
+    });
     persistCurrentWordList();
-    wordIndex=0;
+    wordIndex = firstIndex>=0 ? firstIndex : 0;
     drawer.style.right='-520px';
     setNavActive('practice');
     setDrawerView('words');
