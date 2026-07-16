@@ -1404,6 +1404,8 @@
     if(currentWordCount()===0) return;
     if(e.code==='Backspace'){ e.preventDefault(); if(mode==='ko') koEngine.backspace(); else enEngine.backspace(); render(); return; }
     if(e.code==='Enter'){ e.preventDefault(); nextWord(isWordCorrectNow()); return; }
+    if(e.code==='ArrowLeft'){ e.preventDefault(); prevWord(); return; }
+    if(e.code==='ArrowRight'){ e.preventDefault(); nextWord(false); return; }
     if(mode==='ko'){
       const jamo = e.shiftKey ? (KEY_TO_JAMO_SHIFT[e.code]||KEY_TO_JAMO[e.code]) : KEY_TO_JAMO[e.code];
       if(!jamo) return; e.preventDefault(); koEngine.feed(jamo,VOWELS_BASE.has(jamo)); render();
