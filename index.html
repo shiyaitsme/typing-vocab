@@ -960,15 +960,22 @@
     loadWord();
   }
 
-  function statSectionTitle(text){
+  function statCard(){
+    const card=document.createElement('div');
+    card.style.cssText='border:1px solid rgba(242,237,226,.16);border-radius:4px;padding:16px;';
+    return card;
+  }
+
+  function statSectionTitle(text,marginBottom){
     const title=document.createElement('div');
-    title.style.cssText='font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;margin-bottom:10px;';
+    const mb = marginBottom==null ? 12 : marginBottom;
+    title.style.cssText=`font-size:10.5px;letter-spacing:.1em;color:rgba(242,237,226,.45);font-weight:700;text-transform:uppercase;margin-bottom:${mb}px;`;
     title.textContent=text;
     return title;
   }
 
   function buildReviewStatusSection(list){
-    const section=document.createElement('div');
+    const section=statCard();
     section.appendChild(statSectionTitle('복습 현황'));
     const today=todayStr();
     let overdue=0, dueToday=0, upcoming=0, fresh=0;
@@ -981,47 +988,49 @@
     const grid=document.createElement('div');
     grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
     [
-      {label:'밀린 복습', value:overdue, color:COL.red, icon:'🔴'},
-      {label:'오늘 복습', value:dueToday, color:COL.pink, icon:'🟡'},
-      {label:'예정', value:upcoming, color:'rgba(242,237,226,.75)', icon:'⚪'},
-      {label:'미학습', value:fresh, color:'rgba(242,237,226,.4)', icon:'🆕'}
+      {label:'밀린 복습', value:overdue, icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
+      {label:'오늘 복습', value:dueToday, icon:'🟡', bg:'rgba(227,184,214,.09)', border:'1px solid rgba(227,184,214,.4)', dot:'rgba(227,184,214,.18)', num:COL.pink},
+      {label:'예정', value:upcoming, icon:'⚪', bg:'rgba(242,237,226,.04)', border:'1px solid rgba(242,237,226,.14)', dot:'rgba(242,237,226,.06)', num:'rgba(242,237,226,.8)'},
+      {label:'미학습', value:fresh, icon:'🆕', bg:'rgba(242,237,226,.04)', border:'1px dashed rgba(242,237,226,.22)', dot:'rgba(242,237,226,.05)', num:'rgba(242,237,226,.6)'}
     ].forEach(t=>{
       const tile=document.createElement('div');
-      tile.style.cssText='border:1px solid rgba(242,237,226,.14);border-radius:2px;padding:10px 12px;';
+      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${t.bg};border:${t.border};overflow:hidden;`;
+      const blob=document.createElement('div');
+      blob.style.cssText=`position:absolute;top:-12px;right:-12px;width:46px;height:46px;border-radius:50%;background:${t.dot};`;
       const num=document.createElement('div');
-      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:20px;color:${t.color};`;
+      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:23px;color:${t.num};position:relative;`;
       num.textContent=String(t.value);
       const lab=document.createElement('div');
-      lab.style.cssText='font-size:10.5px;color:rgba(242,237,226,.5);margin-top:2px;';
+      lab.style.cssText='font-size:10px;letter-spacing:.02em;color:rgba(242,237,226,.55);margin-top:3px;position:relative;';
       lab.textContent=`${t.icon} ${t.label}`;
-      tile.appendChild(num); tile.appendChild(lab);
+      tile.appendChild(blob); tile.appendChild(num); tile.appendChild(lab);
       grid.appendChild(tile);
     });
     section.appendChild(grid);
     return section;
   }
 
-  function buildBarRow(label,count,max,barColor,labelWidth){
+  function buildBarRow(label,count,max,barColor,labelWidth,numColor,numWeight){
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:8px;';
     const lab=document.createElement('div');
-    lab.style.cssText=`font-size:11px;color:rgba(242,237,226,.6);width:${labelWidth}px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
+    lab.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(242,237,226,.4);width:${labelWidth}px;flex:none;`;
     lab.textContent=label;
     const track=document.createElement('div');
-    track.style.cssText='flex:1;height:10px;background:rgba(242,237,226,.08);border-radius:2px;overflow:hidden;';
+    track.style.cssText='flex:1;height:13px;background:rgba(242,237,226,.08);border-radius:2px;overflow:hidden;';
     const fill=document.createElement('div');
     const pct = max>0 ? Math.round(count/max*100) : 0;
     fill.style.cssText=`height:100%;width:${pct}%;background:${barColor};transition:width .3s ease;`;
     track.appendChild(fill);
     const num=document.createElement('div');
-    num.style.cssText="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#f2ede2;width:22px;text-align:right;flex:none;";
+    num.style.cssText=`font-size:11px;color:${numColor||'rgba(242,237,226,.5)'};width:20px;text-align:right;flex:none;${numWeight?`font-weight:${numWeight};`:''}`;
     num.textContent=String(count);
     row.appendChild(lab); row.appendChild(track); row.appendChild(num);
     return row;
   }
 
   function buildMasterySection(list){
-    const section=document.createElement('div');
+    const section=statCard();
     section.appendChild(statSectionTitle('숙련도 분포'));
     if(list.length===0){
       const empty=document.createElement('div');
@@ -1030,14 +1039,15 @@
       section.appendChild(empty);
       return section;
     }
+    const RAMP=['#5c4256','#6f4d67','#8a5a7d','#a4699a','#c26fae','#e3b8d6'];
     const counts=[0,0,0,0,0,0];
     list.forEach(w=>{ counts[Math.min(w.box||0,5)]++; });
     const max=Math.max(...counts,1);
     const rows=document.createElement('div');
-    rows.style.cssText='display:flex;flex-direction:column;gap:6px;';
+    rows.style.cssText='display:flex;flex-direction:column;gap:7px;';
     counts.forEach((c,box)=>{
-      const alpha=(0.18+(box/5)*0.82).toFixed(2);
-      rows.appendChild(buildBarRow(`LV.${box}`, c, max, `rgba(227,184,214,${alpha})`, 34));
+      const isTop = box===5;
+      rows.appendChild(buildBarRow(`LV.${box}`, c, max, RAMP[box], 30, isTop?COL.pink:null, isTop?700:null));
     });
     section.appendChild(rows);
     return section;
@@ -1046,22 +1056,51 @@
   function buildWeakWordsSection(list){
     const weak = list.filter(w=>(w.wrongCount||0)>0).sort((a,b)=>(b.wrongCount||0)-(a.wrongCount||0)).slice(0,5);
     if(weak.length===0) return null;
-    const section=document.createElement('div');
-    section.appendChild(statSectionTitle('취약 단어 TOP 5'));
+    const section=statCard();
+    const header=document.createElement('div');
+    header.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+    header.appendChild(statSectionTitle('취약 단어 TOP 5', 0));
+    const tag=document.createElement('div');
+    tag.style.cssText='font-size:9.5px;color:#e0685a;font-weight:700;letter-spacing:.03em;';
+    tag.textContent='❌ 오답순';
+    header.appendChild(tag);
+    section.appendChild(header);
+
+    const badgeAlphas=[.18,.14,.11,.09,.07];
     const max=Math.max(...weak.map(w=>w.wrongCount||0),1);
     const rows=document.createElement('div');
-    rows.style.cssText='display:flex;flex-direction:column;gap:6px;';
-    weak.forEach(w=>{ rows.appendChild(buildBarRow(w.word, w.wrongCount||0, max, COL.red, 88)); });
+    rows.style.cssText='display:flex;flex-direction:column;gap:8px;';
+    weak.forEach((w,i)=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:8px;';
+      const badge=document.createElement('div');
+      badge.style.cssText=`width:16px;height:16px;border-radius:50%;background:rgba(192,57,43,${badgeAlphas[i]??.07});color:#e0685a;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;`;
+      badge.textContent=String(i+1);
+      const lab=document.createElement('div');
+      lab.style.cssText='width:58px;font-size:11px;color:#f2ede2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;';
+      lab.textContent=w.word;
+      const track=document.createElement('div');
+      track.style.cssText='flex:1;height:10px;background:rgba(242,237,226,.08);border-radius:2px;overflow:hidden;';
+      const fill=document.createElement('div');
+      const pct=Math.round((w.wrongCount||0)/max*100);
+      fill.style.cssText=`height:100%;width:${pct}%;background:linear-gradient(90deg,#c0392b,#e0685a);`;
+      track.appendChild(fill);
+      const num=document.createElement('div');
+      num.style.cssText='width:16px;text-align:right;font-size:10.5px;color:#e0685a;font-weight:700;';
+      num.textContent=String(w.wrongCount||0);
+      row.appendChild(badge); row.appendChild(lab); row.appendChild(track); row.appendChild(num);
+      rows.appendChild(row);
+    });
     section.appendChild(rows);
     return section;
   }
 
   function buildActivitySection(history){
-    const section=document.createElement('div');
-    section.appendChild(statSectionTitle('단어 추가 활동'));
+    const section=statCard();
+    section.appendChild(statSectionTitle('단어 추가 활동', 4));
     const caption=document.createElement('div');
-    caption.style.cssText='font-size:10px;color:rgba(242,237,226,.35);margin-bottom:10px;';
-    caption.textContent='일괄 가져오기로 단어를 추가한 날짜 기준';
+    caption.style.cssText='font-size:9.5px;color:rgba(242,237,226,.35);margin-bottom:12px;line-height:1.5;';
+    caption.textContent='일괄 가져오기로 새 단어를 추가한 날짜 기준';
     section.appendChild(caption);
 
     const byDate={};
@@ -1077,17 +1116,37 @@
       cells.push({date:key, count:byDate[key]||0});
     }
     const max=Math.max(...cells.map(c=>c.count),1);
+    const tierColor = c => {
+      if(c<=0) return 'rgba(242,237,226,.06)';
+      const ratio=c/max;
+      if(ratio<=0.25) return 'rgba(227,184,214,.25)';
+      if(ratio<=0.5) return 'rgba(227,184,214,.45)';
+      if(ratio<=0.75) return 'rgba(227,184,214,.7)';
+      return COL.pink;
+    };
 
     const grid=document.createElement('div');
-    grid.style.cssText='display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;gap:3px;overflow-x:auto;padding-bottom:4px;';
+    grid.style.cssText='display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;gap:3px;overflow-x:auto;padding-bottom:2px;';
     cells.forEach(c=>{
       const cell=document.createElement('div');
-      const alpha=(0.15+Math.min(c.count/max,1)*0.85).toFixed(2);
       cell.title=`${c.date}: ${c.count}개`;
-      cell.style.cssText=`width:10px;height:10px;border-radius:2px;background:${c.count>0?`rgba(227,184,214,${alpha})`:'rgba(242,237,226,.06)'};`;
+      cell.style.cssText=`width:11px;height:11px;border-radius:2px;background:${tierColor(c.count)};`;
       grid.appendChild(cell);
     });
     section.appendChild(grid);
+
+    const legend=document.createElement('div');
+    legend.style.cssText='display:flex;align-items:center;gap:4px;margin-top:10px;justify-content:flex-end;';
+    const lessLab=document.createElement('span'); lessLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; lessLab.textContent='적음';
+    legend.appendChild(lessLab);
+    ['rgba(242,237,226,.06)','rgba(227,184,214,.25)','rgba(227,184,214,.45)','rgba(227,184,214,.7)',COL.pink].forEach(color=>{
+      const sw=document.createElement('div');
+      sw.style.cssText=`width:9px;height:9px;border-radius:2px;background:${color};`;
+      legend.appendChild(sw);
+    });
+    const moreLab=document.createElement('span'); moreLab.style.cssText='font-size:9px;color:rgba(242,237,226,.35);'; moreLab.textContent='많음';
+    legend.appendChild(moreLab);
+    section.appendChild(legend);
     return section;
   }
 
@@ -1096,7 +1155,7 @@
     const list = currentWordList();
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     const wrap=document.createElement('div');
-    wrap.style.cssText='display:flex;flex-direction:column;gap:22px;padding:4px 0 16px;';
+    wrap.style.cssText='display:flex;flex-direction:column;gap:14px;padding:8px 0 16px;';
     wrap.appendChild(buildReviewStatusSection(list));
     wrap.appendChild(buildMasterySection(list));
     const weakSection=buildWeakWordsSection(list);
