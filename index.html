@@ -240,10 +240,6 @@
         <div id="notebookPreview" style="width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:36px;flex:none;"></div>
         <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
           <div>
-            <div data-i18n="notebookCoverLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
-            <div id="notebookGradientRow" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
-          </div>
-          <div>
             <div data-i18n="notebookEmojiLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">아이콘</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
               <div id="notebookEmojiRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
@@ -251,6 +247,10 @@
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <div data-i18n="notebookCoverLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
+        <div id="notebookGradientRow" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
       </div>
       <div data-i18n="notebookCoverPhotoComingSoon" style="font-size:9.5px;color:rgba(var(--ink-rgb),.35);line-height:1.5;">📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.</div>
       <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:14px;">
@@ -686,22 +686,25 @@
   let localIdSeq = 0;
   function nextLocalId(){ return --localIdSeq; } // negative ids = never-synced-to-cloud
 
-  const NOTEBOOK_GRADIENTS = {
-    sakura:    'linear-gradient(135deg,#ffc7d6,#fedfe9)',
-    taro:      'linear-gradient(135deg,#facde0,#d9e8ff)',
-    blueberry: 'linear-gradient(135deg,#88abf2,#f2f6ff)',
-    seasalt:   'linear-gradient(135deg,#87bdff,#e6f5ff)',
-    glacier:   'linear-gradient(135deg,#a8d2ff,#e0f0ff)',
-    mint:      'linear-gradient(135deg,#8ed6de,#bcf1e0)',
-    muscat:    'linear-gradient(135deg,#bdf9d8,#edffdb)',
-    pear:      'linear-gradient(135deg,#bac9a7,#f5faed)',
-    matcha:    'linear-gradient(135deg,#60787a,#bce8d5)',
-  };
+  // Flat swatches, grouped by hue family (warm pink → dreamy purple/misty blue →
+  // sea-salt blue → icy mint/teal → warm yellow-green/morandi green), light to dark
+  // within each group. Stored directly as the notebook's coverGradient value (a
+  // "#rrggbb" string) — no name→color lookup needed.
+  const NOTEBOOK_COLOR_SWATCHES = [
+    '#FFC7D6','#FACDE0','#FEDFE9','#FEECEC','#FEF6F6','#EEF6EE','#E8F2EF','#E1F9FF', // warm/soft pink
+    '#D9E8FF','#F2F6FF','#E2ECFF','#B7CBF4','#88ABF2','#A8D2FF',                     // dreamy purple / misty blue
+    '#E0F3FF','#E6F5FF','#E0F0FF','#D6EEFC','#B0D6FF','#87BDFF',                     // pure sea-salt blue
+    '#DFFAF5','#DBF9F2','#BCF1E0','#8ED6DE','#D7FADF','#EFFFE0','#EDFFDB','#BDF9D8', // icy mint / teal-green
+    '#FDF5DA','#F5FAED','#F4FEF1','#D5EBD5','#BCE8D5','#DEEBB5','#BAC9A7','#60787A', // warm yellow-green / morandi green
+  ];
   const NOTEBOOK_EMOJI_PRESETS = ['📖','✏️','🎯','🔥','🌱','⭐','🗂️','💡','🍀','🎧','🧠','📚'];
 
   function notebookCoverCSS(nb){
     if(nb && nb.coverUrl) return `background-image:url('${nb.coverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
-    return `background:${NOTEBOOK_GRADIENTS[nb && nb.coverGradient] || NOTEBOOK_GRADIENTS.sakura};`;
+    const c = nb && nb.coverGradient;
+    // Old gradient-name values (from before this switched to flat colors) fall back to
+    // the first swatch instead of rendering an invalid CSS background.
+    return `background:${(c && c.charAt(0)==='#') ? c : NOTEBOOK_COLOR_SWATCHES[0]};`;
   }
 
   // Cover/preset emoji render as actual Apple-style emoji images (not the system emoji
@@ -1422,7 +1425,7 @@
   }
 
   let editingNotebookId = null, pendingDeleteNotebookId = null;
-  let pendingGradient = 'sakura', pendingEmoji = '📖';
+  let pendingGradient = NOTEBOOK_COLOR_SWATCHES[0], pendingEmoji = '📖';
   const notebookModalOverlay = $('notebookModalOverlay');
   const notebookNameInput = $('notebookNameInput'), notebookDescInput = $('notebookDescInput');
   const notebookEmojiInput = $('notebookEmojiInput');
@@ -1430,11 +1433,11 @@
   const notebookPreview = $('notebookPreview');
   const deleteNotebookOverlay = $('deleteNotebookOverlay');
 
-  Object.keys(NOTEBOOK_GRADIENTS).forEach(g=>{
+  NOTEBOOK_COLOR_SWATCHES.forEach(color=>{
     const sw=document.createElement('button');
-    sw.type='button'; sw.dataset.gradient=g;
-    sw.style.cssText=`all:unset;cursor:pointer;width:26px;height:26px;border-radius:100px;background:${NOTEBOOK_GRADIENTS[g]};border:2px solid transparent;box-shadow:0 0 0 1px rgba(var(--ink-rgb),.1);`;
-    sw.addEventListener('click', ()=>{ pendingGradient=g; refreshNotebookModalSwatches(); updateNotebookPreview(); });
+    sw.type='button'; sw.dataset.color=color;
+    sw.style.cssText=`all:unset;cursor:pointer;aspect-ratio:1;width:100%;border-radius:6px;background:${color};border:2px solid transparent;box-shadow:0 0 0 1px rgba(var(--ink-rgb),.1);`;
+    sw.addEventListener('click', ()=>{ pendingGradient=color; refreshNotebookModalSwatches(); updateNotebookPreview(); });
     notebookGradientRow.appendChild(sw);
   });
   NOTEBOOK_EMOJI_PRESETS.forEach(em=>{
@@ -1448,14 +1451,14 @@
   notebookEmojiInput.addEventListener('input', ()=>{ if(notebookEmojiInput.value.trim()){ pendingEmoji=notebookEmojiInput.value.trim(); refreshNotebookModalSwatches(); updateNotebookPreview(); } });
 
   function refreshNotebookModalSwatches(){
-    notebookGradientRow.querySelectorAll('button').forEach(b=>{ b.style.borderColor = b.dataset.gradient===pendingGradient ? 'rgb(var(--ink-rgb))' : 'transparent'; });
+    notebookGradientRow.querySelectorAll('button').forEach(b=>{ b.style.borderColor = b.dataset.color===pendingGradient ? 'rgb(var(--ink-rgb))' : 'transparent'; });
     notebookEmojiRow.querySelectorAll('button').forEach(b=>{
       b.style.background = b.dataset.emoji===pendingEmoji ? 'rgba(var(--accent-rgb),.25)' : 'transparent';
       b.style.borderColor = b.dataset.emoji===pendingEmoji ? 'var(--accent)' : 'rgba(var(--ink-rgb),.18)';
     });
   }
   function updateNotebookPreview(){
-    notebookPreview.style.cssText=`width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;background:${NOTEBOOK_GRADIENTS[pendingGradient]};`;
+    notebookPreview.style.cssText=`width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;background:${pendingGradient};`;
     setEmojiInto(notebookPreview, pendingEmoji, 44);
   }
 
@@ -1464,7 +1467,7 @@
     $('notebookModalTitle').textContent = nb ? t('notebookModalTitleEdit') : t('notebookModalTitleNew');
     notebookNameInput.value = nb ? nb.name : '';
     notebookDescInput.value = nb ? nb.description : '';
-    pendingGradient = nb ? nb.coverGradient : 'sakura';
+    pendingGradient = (nb && nb.coverGradient && nb.coverGradient.charAt(0)==='#') ? nb.coverGradient : NOTEBOOK_COLOR_SWATCHES[0];
     pendingEmoji = nb ? nb.coverEmoji : '📖';
     notebookEmojiInput.value='';
     refreshNotebookModalSwatches();
@@ -2000,7 +2003,7 @@
   });
 
   function makeLocalNotebook(m){
-    return { id: nextLocalId(), name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'sakura', coverEmoji:'📖', coverUrl:'' };
+    return { id: nextLocalId(), name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:NOTEBOOK_COLOR_SWATCHES[0], coverEmoji:'📖', coverUrl:'' };
   }
 
   // wordList/nbList null = cloud unreachable, fall back to a local-only default
@@ -2031,7 +2034,7 @@
   // client-only state the way the old design did (defaults were only local until the
   // first edit implicitly pushed the whole list).
   async function seedDefaultNotebook(m, defaults){
-    const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'sakura', coverEmoji:'📖', coverUrl:'' });
+    const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:NOTEBOOK_COLOR_SWATCHES[0], coverEmoji:'📖', coverUrl:'' });
     const words = defaults.length ? await bulkImportRemote(m, nb.id, defaults) : [];
     return { notebooks:[nb], words };
   }

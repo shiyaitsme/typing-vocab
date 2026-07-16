@@ -91,9 +91,11 @@
 - **自定义单词本（단어장）**：不区分"官方教材"和"自建生词本"——所有单词本都是
   统一的自定义容器，可以自由新建/改名/写简介/删除。단어장标签页是 2 列网格卡片
   （封面 + 名称 + 单词数 + 简介），当前正在练习的那本卡片左上角有"연습 중"角标，
-  卡片右上角悬浮一个✎编辑按钮。封面是预设的**渐变色背景 + emoji**（9 种柔和渐变：
-  sakura/taro/blueberry/seasalt/glacier/mint/muscat/pear/matcha，12 个常用 emoji
-  加自定义 emoji 输入框），emoji 统一用 Apple emoji 图片渲染（走
+  卡片右上角悬浮一个✎编辑按钮。封面是预设的**纯色背景 + emoji**（36 个马卡龙色系
+  纯色，按色相分 5 组从浅到深排列：暖粉/柔粉 → 梦幻紫/雾霾蓝 → 纯净海盐蓝 →
+  冰凉薄荷/青绿 → 温暖黄绿/莫兰迪雅绿，6 列网格铺开；颜色值直接存成
+  `coverGradient: "#rrggbb"` 十六进制字符串，不再是渐变名称查表，12 个常用
+  emoji 加自定义 emoji 输入框），emoji 统一用 Apple emoji 图片渲染（走
   `cdn.jsdelivr.net/npm/emoji-datasource-apple`，而不是系统自带的 emoji 字体），
   这样 Windows/Android 上看到的图案跟 Mac/iPhone 一致，不会因为系统 emoji 字体
   不同而变形或显示成方块；图片加载失败会自动重试一次备用编码，还失败就直接不
