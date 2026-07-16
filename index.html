@@ -42,6 +42,7 @@
 
   <!-- PROGRESS -->
   <div id="progress" style="max-width:1100px;width:100%;padding:4px 24px 18px;font-size:11px;letter-spacing:1px;color:#8f8f8f;text-align:center;"></div>
+  <div id="cloudStatus" style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10.5px;letter-spacing:.5px;color:#e0433a;text-align:center;display:none;"></div>
 
   <!-- MAIN CARD -->
   <div style="width:100%;max-width:1000px;padding:0 20px;">
@@ -147,6 +148,21 @@
         <button id="saveNotesBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">저장</button>
       </div>
     </div>
+  </div>
+
+  <!-- WHO ARE YOU MODAL (first visit only) -->
+  <div id="whoAmIOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👋 이름을 알려주세요</div>
+      <div style="font-size:11px;color:#5b5650;line-height:1.5;">이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.</div>
+      <input type="text" id="whoAmIInput" placeholder="예: shiya" autocomplete="off" style="width:100%;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+      <button id="whoAmISubmitBtn" style="all:unset;cursor:pointer;display:block;width:100%;text-align:center;background:#111;color:#e7b8da;padding:11px;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">시작하기</button>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" style="position:fixed;inset:0;background:#0c0c0c;display:flex;align-items:center;justify-content:center;z-index:1500;color:#8f8f8f;font-size:12px;letter-spacing:1px;text-transform:uppercase;">
+    불러오는 중...
   </div>
 
   <div style="max-width:600px;padding:26px 20px 0;font-size:10.5px;line-height:1.6;color:#6b665f;text-align:center;">
@@ -317,16 +333,14 @@
     {word:'sandwich',meaning:'三明治'},{word:'elephant',meaning:'大象'},{word:'umbrella',meaning:'雨伞'},{word:'calendar',meaning:'日历'}
   ];
 
-  let KO_WORDS = JSON.parse(localStorage.getItem('TRAINER_KO_WORDS')) || DEFAULT_KO_WORDS;
-  let EN_WORDS_RAW = JSON.parse(localStorage.getItem('TRAINER_EN_WORDS')) || DEFAULT_EN_WORDS;
-  let EN_WORDS = EN_WORDS_RAW.map(item=> typeof item==='string' ? {word:item,meaning:'暂无释义'} : item);
-
-  let HISTORY_KO = JSON.parse(localStorage.getItem('TRAINER_HISTORY_KO')) || [];
-  let HISTORY_EN = JSON.parse(localStorage.getItem('TRAINER_HISTORY_EN')) || [];
+  let KO_WORDS = [];
+  let EN_WORDS = [];
+  let HISTORY_KO = [];
+  let HISTORY_EN = [];
 
   let mode='ko', wordIndex=0, dictation=false, stats={correct:0,skipped:0};
-  let koEngine = makeKoreanEngine(KO_WORDS[0]?KO_WORDS[0].word:'');
-  let enEngine = makeEnglishEngine(EN_WORDS[0]);
+  let koEngine = makeKoreanEngine('');
+  let enEngine = makeEnglishEngine(null);
 
   const $ = (id)=> document.getElementById(id);
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
@@ -338,6 +352,69 @@
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
   const notesOnlyToggle=$('notesOnlyToggle'), wordSearchInput=$('wordSearchInput');
   const notesBtn=$('notesBtn'), notesModalOverlay=$('notesModalOverlay'), notesModalTitle=$('notesModalTitle'), notesTextarea=$('notesTextarea');
+  const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
+  const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
+
+  /* =========================================================
+   * Cloud storage (Cloudflare Pages Functions + D1)
+   * ======================================================= */
+  const USER_ID_KEY = 'TRAINER_USER_ID';
+  let userId = '';
+  let cloudOk = true;
+
+  function apiWordsUrl(m){ return `/api/words?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiHistoryUrl(m){ return `/api/history?user=${encodeURIComponent(userId)}&mode=${m}`; }
+
+  function showCloudWarning(msg){
+    cloudOk = false;
+    cloudStatusEl.textContent = msg;
+    cloudStatusEl.style.display = 'block';
+  }
+
+  async function fetchWordsFromCloud(m){
+    const res = await fetch(apiWordsUrl(m));
+    if(!res.ok) throw new Error('words fetch failed: '+res.status);
+    return res.json();
+  }
+
+  async function fetchHistoryFromCloud(m){
+    const res = await fetch(apiHistoryUrl(m));
+    if(!res.ok) throw new Error('history fetch failed: '+res.status);
+    return res.json();
+  }
+
+  function pushWordsToCloud(m, words){
+    if(!cloudOk) return;
+    fetch(apiWordsUrl(m), { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(words) })
+      .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
+      .catch(err=>{ console.error('cloud save failed', err); showCloudWarning('클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.'); });
+  }
+
+  function pushHistoryToCloud(m, date, words){
+    if(!cloudOk) return;
+    fetch(apiHistoryUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({date, words}) })
+      .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
+      .catch(err=>{ console.error('cloud history save failed', err); showCloudWarning('클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.'); });
+  }
+
+  function ensureUserId(){
+    return new Promise((resolve)=>{
+      const stored = localStorage.getItem(USER_ID_KEY);
+      if(stored){ userId = stored; resolve(); return; }
+      whoAmIOverlay.style.opacity='1'; whoAmIOverlay.style.pointerEvents='auto';
+      whoAmIInput.focus();
+      function submit(){
+        const name = whoAmIInput.value.trim();
+        if(!name) return;
+        userId = name;
+        localStorage.setItem(USER_ID_KEY, name);
+        whoAmIOverlay.style.opacity='0'; whoAmIOverlay.style.pointerEvents='none';
+        resolve();
+      }
+      whoAmISubmitBtn.addEventListener('click', submit);
+      whoAmIInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+    });
+  }
 
   function currentWordCount(){ return mode==='ko'?KO_WORDS.length:EN_WORDS.length; }
 
@@ -366,7 +443,7 @@
   function currentWordObj(){ return currentWordList()[wordIndex]; }
 
   function persistCurrentWordList(){
-    localStorage.setItem(mode==='ko' ? 'TRAINER_KO_WORDS' : 'TRAINER_EN_WORDS', JSON.stringify(currentWordList()));
+    pushWordsToCloud(mode, currentWordList());
   }
 
   function toggleFavoriteAt(index){
@@ -581,13 +658,12 @@
 
   function addHistoryBatch(listMode, words){
     const history = listMode==='ko' ? HISTORY_KO : HISTORY_EN;
-    const key = listMode==='ko' ? 'TRAINER_HISTORY_KO' : 'TRAINER_HISTORY_EN';
     const date = todayStr();
     const snapshot = words.map(w=>({...w}));
     const existing = history.find(e=>e.date===date);
     if(existing) existing.words = snapshot;
     else history.push({date, words: snapshot});
-    localStorage.setItem(key, JSON.stringify(history));
+    pushHistoryToCloud(listMode, date, snapshot);
   }
 
   function renderHistory(){
@@ -635,8 +711,8 @@
     const entry = history[index];
     if(!entry) return;
     const snapshot = entry.words.map(w=>({...w}));
-    if(mode==='ko'){ KO_WORDS=snapshot; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
-    else { EN_WORDS=snapshot; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
+    if(mode==='ko') KO_WORDS=snapshot; else EN_WORDS=snapshot;
+    persistCurrentWordList();
     wordIndex=0;
     drawer.style.right='-360px';
     setDrawerView('words');
@@ -644,8 +720,8 @@
   }
 
   function deleteWordAt(index){
-    if(mode==='ko'){ KO_WORDS.splice(index,1); localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
-    else { EN_WORDS.splice(index,1); localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
+    currentWordList().splice(index,1);
+    persistCurrentWordList();
     if(wordIndex>=currentWordCount()) wordIndex=Math.max(0,currentWordCount()-1);
     loadWord();
   }
@@ -737,11 +813,11 @@
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
     if(isKorean){
       KO_WORDS.push({word,roman:meaning||'Custom',favorite:false,notes:''});
-      localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS));
+      pushWordsToCloud('ko', KO_WORDS);
       if(mode!=='ko'){ mode='ko'; setActiveTab('ko'); }
     } else {
       EN_WORDS.push({word,meaning:meaning||'Custom',favorite:false,notes:''});
-      localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS));
+      pushWordsToCloud('en', EN_WORDS);
       if(mode!=='en'){ mode='en'; setActiveTab('en'); }
     }
     wordInput.value=''; meaningInput.value='';
@@ -751,8 +827,9 @@
 
   $('clearWordsBtn').addEventListener('click', ()=>{
     if(confirm('모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?')){
-      localStorage.removeItem('TRAINER_KO_WORDS'); localStorage.removeItem('TRAINER_EN_WORDS');
       KO_WORDS=[...DEFAULT_KO_WORDS]; EN_WORDS=[...DEFAULT_EN_WORDS];
+      pushWordsToCloud('ko', KO_WORDS);
+      pushWordsToCloud('en', EN_WORDS);
       wordIndex=0; loadWord();
     }
   });
@@ -778,19 +855,44 @@
     });
     if(tempKo.length>0){
       addHistoryBatch('ko', tempKo);
-      KO_WORDS=tempKo; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS));
+      KO_WORDS=tempKo; pushWordsToCloud('ko', KO_WORDS);
     }
     if(tempEn.length>0){
       addHistoryBatch('en', tempEn);
-      EN_WORDS=tempEn; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS));
+      EN_WORDS=tempEn; pushWordsToCloud('en', EN_WORDS);
     }
     alert(`가져오기 완료! (한국어: ${tempKo.length}개, 영어: ${tempEn.length}개)\n오늘 날짜(${todayStr()})로 학습 기록에 저장되었습니다.`);
     modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
     wordIndex=0; loadWord();
   });
 
-  setActiveTab('ko');
-  loadWord();
+  async function init(){
+    await ensureUserId();
+    try{
+      const [ko, en, hko, hen] = await Promise.all([
+        fetchWordsFromCloud('ko'),
+        fetchWordsFromCloud('en'),
+        fetchHistoryFromCloud('ko'),
+        fetchHistoryFromCloud('en'),
+      ]);
+      KO_WORDS = ko.length ? ko : [...DEFAULT_KO_WORDS];
+      EN_WORDS = en.length ? en : [...DEFAULT_EN_WORDS];
+      HISTORY_KO = hko;
+      HISTORY_EN = hen;
+    } catch(err){
+      console.error('cloud load failed', err);
+      KO_WORDS = [...DEFAULT_KO_WORDS];
+      EN_WORDS = [...DEFAULT_EN_WORDS];
+      HISTORY_KO = [];
+      HISTORY_EN = [];
+      showCloudWarning('클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.');
+    }
+    loadingOverlay.style.display='none';
+    setActiveTab('ko');
+    loadWord();
+  }
+
+  init();
 })();
 </script>
 </body>

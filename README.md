@@ -58,3 +58,47 @@
 - 目前只支持标准두벌식键盘映射，没有支持其他韩语输入方案（如세벌식）。
 - 没有间隔重复（spaced repetition）逻辑，线性走完词表。
 - 没有中文释义展示（见上）。
+
+## 云端存储部署（Cloudflare Pages + D1）
+
+单词、收藏、笔记、每日学习历史现在存在 Cloudflare D1 数据库里，不再依赖浏览器
+本地存储——换设备、换浏览器、清缓存都不会丢。不设密码，靠首次访问时填的名字
+区分各自的数据（同名 = 同一份数据，可用来在多设备/多人间共享同一账号）。
+
+代码（`functions/api/words.js`、`functions/api/history.js`、`schema.sql`、
+`wrangler.toml`）已经写好并提交在仓库里，但**实际创建数据库 + 部署这一步需要
+你自己的 Cloudflare 账号**，下面是完整步骤：
+
+```bash
+# 1. 登录 Cloudflare（会打开浏览器授权）
+npx wrangler login
+
+# 2. 创建 D1 数据库
+npx wrangler d1 create typing-vocab-db
+# 输出里会有一行 database_id = "xxxxxxxx-xxxx-...", 复制它
+
+# 3. 把 database_id 填进 wrangler.toml
+#    打开 wrangler.toml，把 REPLACE_WITH_YOUR_D1_DATABASE_ID 换成上一步拿到的 id
+
+# 4. 把表结构建到远程数据库
+npx wrangler d1 execute typing-vocab-db --remote --file=./schema.sql
+
+# 5. 部署（第一次会让你确认创建 Pages 项目）
+npx wrangler pages deploy .
+```
+
+部署完成后 wrangler 会给一个 `*.pages.dev` 的网址，直接打开就能用。以后每次
+改完 `index.html` 或 `functions/` 下的代码，重新跑一次 `npx wrangler pages deploy .`
+（或接入 Git 自动部署）即可更新线上版本。
+
+**本地开发调试**（不需要真的部署，用本地模拟的数据库测试后端逻辑）：
+
+```bash
+npx wrangler d1 execute typing-vocab-db --local --file=./schema.sql
+npx wrangler pages dev .
+```
+
+如果 `/api/words`、`/api/history` 接口访问不到（比如还没部署好、或本地直接用
+`python -m http.server` 这种纯静态服务器打开），页面会自动降级：用内置的默认
+词表跑起来，并在进度条下方显示一行提示，说明这次的改动不会被保存——不会白屏
+或报错卡住。
