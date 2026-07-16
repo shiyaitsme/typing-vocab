@@ -74,6 +74,7 @@
   <!-- CONTROLS -->
   <div style="width:100%;max-width:1000px;padding:20px 20px 0;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
     <button id="restartBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">&#8635; 다시 시작</button>
+    <button id="favoriteBtn" style="all:unset;cursor:pointer;border:1px solid rgba(255,255,255,.3);padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#f1ede6;">☆ 즐겨찾기</button>
     <button id="openDrawerBtn" style="all:unset;cursor:pointer;background:#e7b8da;color:#0c0c0c;padding:9px 16px;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;">단어 목록</button>
     <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
       <input type="checkbox" id="dictationToggle" style="accent-color:#e7b8da;">딕테이션 모드
@@ -85,6 +86,11 @@
     <div style="padding:18px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;justify-content:space-between;align-items:center;">
       <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">단어 목록</div>
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:22px;color:#8f8f8f;padding:2px 8px;">&times;</button>
+    </div>
+    <div style="padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.15);">
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
+        <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:#e7b8da;">★ 즐겨찾기만 보기
+      </label>
     </div>
     <div id="drawerContent" style="flex:1;overflow-y:auto;padding:10px;"></div>
   </div>
@@ -299,6 +305,7 @@
   const progressEl=$('progress'), pageCounter=$('pageCounter');
   const drawer=$('drawer'), drawerContent=$('drawerContent');
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
+  const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
 
   function currentWordCount(){ return mode==='ko'?KO_WORDS.length:EN_WORDS.length; }
 
@@ -320,7 +327,28 @@
       mobileInput.placeholder='English input here';
       mobileTip.textContent='※ 영어 모드일 때는 영문 키보드로 입력해 주세요.';
     }
-    render(); renderDrawer();
+    render(); renderDrawer(); updateFavoriteBtn();
+  }
+
+  function currentWordList(){ return mode==='ko' ? KO_WORDS : EN_WORDS; }
+  function currentWordObj(){ return currentWordList()[wordIndex]; }
+
+  function toggleFavoriteAt(index){
+    const list = currentWordList();
+    const item = list[index];
+    if(!item) return;
+    item.favorite = !item.favorite;
+    localStorage.setItem(mode==='ko' ? 'TRAINER_KO_WORDS' : 'TRAINER_EN_WORDS', JSON.stringify(list));
+    renderDrawer();
+    if(index===wordIndex) updateFavoriteBtn();
+  }
+
+  function updateFavoriteBtn(){
+    const w = currentWordObj();
+    const fav = !!(w && w.favorite);
+    favoriteBtn.textContent = fav ? '★ 즐겨찾기' : '☆ 즐겨찾기';
+    favoriteBtn.style.color = fav ? COL.pink : '#f1ede6';
+    favoriteBtn.style.borderColor = fav ? COL.pink : 'rgba(255,255,255,.3)';
   }
 
   function render(){
@@ -416,29 +444,44 @@
     const total=currentWordCount();
     if(total===0){ drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">단어가 없습니다.</div>'; return; }
     const list = mode==='ko' ? KO_WORDS : EN_WORDS;
+    const favoritesOnly = favoritesOnlyToggle.checked;
+    let shown=0;
     list.forEach((item,index)=>{
+      if(favoritesOnly && !item.favorite) return;
+      shown++;
       const sub = mode==='ko' ? item.roman : item.meaning;
-      drawerContent.appendChild(createWordItemDOM(index,item.word,sub));
+      drawerContent.appendChild(createWordItemDOM(index,item.word,sub,!!item.favorite,shown));
     });
+    if(favoritesOnly && shown===0){
+      drawerContent.innerHTML='<div style="color:#8f8f8f;text-align:center;padding:20px;">즐겨찾기한 단어가 없습니다.</div>';
+    }
   }
 
-  function createWordItemDOM(index,mainText,subText){
+  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex){
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(231,184,218,.12)':'transparent'};color:${active?COL.pink:'#f1ede6'};`;
-    container.addEventListener('click',(e)=>{ if(e.target.dataset.role==='del') return; wordIndex=index; loadWord(); drawer.style.right='-360px'; });
+    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-360px'; });
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
     const mainSpan=document.createElement('span');
-    mainSpan.textContent = `${index+1}. ${mainText}`;
+    mainSpan.textContent = `${displayIndex}. ${mainText}`;
     info.appendChild(mainSpan);
     if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:#8f8f8f;'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    const actions=document.createElement('div');
+    actions.style.cssText='display:flex;align-items:center;gap:2px;';
+    const favBtn=document.createElement('button');
+    favBtn.dataset.role='fav';
+    favBtn.textContent = isFavorite ? '★' : '☆';
+    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?COL.pink:'#8f8f8f'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
+    favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
     const delBtn=document.createElement('button');
     delBtn.dataset.role='del';
     delBtn.textContent='✕';
     delBtn.style.cssText='border:none;background:none;color:#e0433a;font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
     delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(`'${mainText}' 단어를 삭제할까요?`)) deleteWordAt(index); });
-    container.appendChild(info); container.appendChild(delBtn);
+    actions.appendChild(favBtn); actions.appendChild(delBtn);
+    container.appendChild(info); container.appendChild(actions);
     return container;
   }
 
@@ -511,17 +554,23 @@
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
 
+  favoriteBtn.addEventListener('click', ()=>{
+    if(currentWordCount()===0) return;
+    toggleFavoriteAt(wordIndex);
+  });
+  favoritesOnlyToggle.addEventListener('change', renderDrawer);
+
   $('addWordBtn').addEventListener('click', ()=>{
     const wordInput=$('newWord'), meaningInput=$('newMeaning');
     const word=wordInput.value.trim(), meaning=meaningInput.value.trim();
     if(!word){ alert('추가할 단어를 입력해 주세요!'); return; }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
     if(isKorean){
-      KO_WORDS.push({word,roman:meaning||'Custom'});
+      KO_WORDS.push({word,roman:meaning||'Custom',favorite:false});
       localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS));
       if(mode!=='ko'){ mode='ko'; setActiveTab('ko'); }
     } else {
-      EN_WORDS.push({word,meaning:meaning||'Custom'});
+      EN_WORDS.push({word,meaning:meaning||'Custom',favorite:false});
       localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS));
       if(mode!=='en'){ mode='en'; setActiveTab('en'); }
     }
@@ -554,8 +603,8 @@
       const word=parts[0]?parts[0].trim():'';
       const definition=parts[1]?parts[1].trim():'Custom';
       if(!word) return;
-      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition});
-      else tempEn.push({word,meaning:definition});
+      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition,favorite:false});
+      else tempEn.push({word,meaning:definition,favorite:false});
     });
     if(tempKo.length>0){ KO_WORDS=tempKo; localStorage.setItem('TRAINER_KO_WORDS',JSON.stringify(KO_WORDS)); }
     if(tempEn.length>0){ EN_WORDS=tempEn; localStorage.setItem('TRAINER_EN_WORDS',JSON.stringify(EN_WORDS)); }
