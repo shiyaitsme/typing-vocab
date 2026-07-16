@@ -85,6 +85,9 @@
     <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
       <input type="checkbox" id="dictationToggle" style="accent-color:#e7b8da;">딕테이션 모드
     </label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
+      <input type="checkbox" id="reviewModeToggle" style="accent-color:#e7b8da;">🔁 복습 모드
+    </label>
   </div>
 
   <!-- DRAWER -->
@@ -105,6 +108,9 @@
         </label>
         <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
           <input type="checkbox" id="notesOnlyToggle" style="accent-color:#e7b8da;">📝 노트만
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.5px;color:#8f8f8f;text-transform:uppercase;cursor:pointer;">
+          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:#e7b8da;">❌ 오답만
         </label>
       </div>
     </div>
@@ -388,6 +394,52 @@
   let koEngine = makeKoreanEngine('');
   let enEngine = makeEnglishEngine(null);
 
+  /* SRS (spaced repetition) + accuracy/speed tracking */
+  const SRS_INTERVALS = [0,1,3,7,14,30]; // days, indexed by box level 0-5
+  let reviewMode=false, currentAttemptHadError=false;
+  let sessionStats={startAt:Date.now(), keysTyped:0, wordsCompleted:0, wordsCleanCompleted:0};
+
+  function addDays(dateStr, days){
+    const d = dateStr ? new Date(dateStr+'T00:00:00') : new Date();
+    d.setDate(d.getDate()+days);
+    const pad=n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  function isDue(w){ return !w.dueAt || w.dueAt<=todayStr(); }
+  function findDueIndex(fromIndex,dir,includeSelf){
+    const list=currentWordList(); const n=list.length;
+    if(n===0) return -1;
+    if(includeSelf && isDue(list[fromIndex])) return fromIndex;
+    for(let step=1; step<=n; step++){
+      const idx=((fromIndex+dir*step)%n+n)%n;
+      if(isDue(list[idx])) return idx;
+    }
+    return -1;
+  }
+  function reviewAdvance(dir){
+    const due=findDueIndex(wordIndex,dir,false);
+    if(due===-1){
+      if(dir>0){
+        alert('오늘 복습할 단어를 모두 마쳤습니다! 🎉');
+        reviewMode=false;
+        const toggle=$('reviewModeToggle'); if(toggle) toggle.checked=false;
+      }
+      return wordIndex;
+    }
+    return due;
+  }
+  function applySrsResult(word, hadError){
+    if(!word) return;
+    const box = word.box||0;
+    if(hadError){
+      word.wrongCount = (word.wrongCount||0)+1;
+      word.box = Math.max(box-1,0);
+    } else {
+      word.box = Math.min(box+1,5);
+    }
+    word.dueAt = addDays(todayStr(), SRS_INTERVALS[word.box]);
+  }
+
   const $ = (id)=> document.getElementById(id);
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const progressEl=$('progress'), pageCounter=$('pageCounter');
@@ -396,7 +448,7 @@
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
-  const notesOnlyToggle=$('notesOnlyToggle'), wordSearchInput=$('wordSearchInput');
+  const notesOnlyToggle=$('notesOnlyToggle'), wordSearchInput=$('wordSearchInput'), wrongOnlyToggle=$('wrongOnlyToggle');
   const notesBtn=$('notesBtn'), notesModalOverlay=$('notesModalOverlay'), notesModalTitle=$('notesModalTitle'), notesTextarea=$('notesTextarea');
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
@@ -469,6 +521,7 @@
   function loadWord(){
     const listCount=currentWordCount();
     mobileInput.value='';
+    currentAttemptHadError=false;
     if(listCount===0){
       if(mode==='ko') koEngine=makeKoreanEngine(''); else enEngine=makeEnglishEngine(null);
       render(); renderActiveDrawerView(); return;
@@ -492,6 +545,12 @@
 
   function persistCurrentWordList(){
     pushWordsToCloud(mode, currentWordList());
+  }
+
+  let persistDebounceTimer=null;
+  function persistCurrentWordListDebounced(){
+    clearTimeout(persistDebounceTimer);
+    persistDebounceTimer=setTimeout(persistCurrentWordList, 700);
   }
 
   function toggleFavoriteAt(index){
@@ -544,7 +603,10 @@
 
   function render(){
     const total=currentWordCount();
-    progressEl.textContent = `정답 ${stats.correct} · 건너뜀 ${stats.skipped}`;
+    const accuracy = sessionStats.wordsCompleted>0 ? Math.round(sessionStats.wordsCleanCompleted/sessionStats.wordsCompleted*100) : 100;
+    const elapsedMin = Math.max((Date.now()-sessionStats.startAt)/60000, 1/60);
+    const cpm = sessionStats.keysTyped>0 ? Math.round(sessionStats.keysTyped/elapsedMin) : 0;
+    progressEl.textContent = `정답 ${stats.correct} · 건너뜀 ${stats.skipped} · 정확도 ${accuracy}% · CPM ${cpm}`;
     pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
 
     if(total===0){
@@ -562,6 +624,7 @@
       for(let i=0;i<koEngine.targets.length;i++){
         const r=renderSyllable(i,koEngine);
         if(r.mode!=='blue') allCorrect=false;
+        if(r.mode==='red') currentAttemptHadError=true;
         if(i>koEngine.activeIndex) allComplete=false;
         const block=document.createElement('div');
         block.style.cssText='display:flex;flex-direction:column;align-items:center;position:relative;min-width:40px;';
@@ -597,6 +660,7 @@
       romanizationEl.textContent = dictation ? '???' : (EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'');
       enRow.innerHTML='';
       const r=renderEnglish(enEngine,dictation);
+      if(r.cells.some(c=>c.mode==='red')) currentAttemptHadError=true;
       if(!r.started){
         const word=enEngine.word||'';
         for(const ch of word){
@@ -637,27 +701,29 @@
     const list = mode==='ko' ? KO_WORDS : EN_WORDS;
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
+    const wrongOnly = wrongOnlyToggle.checked;
     const query = wordSearchInput.value.trim().toLowerCase();
     let shown=0;
     list.forEach((item,index)=>{
       if(favoritesOnly && !item.favorite) return;
       const hasNotes = !!(item.notes && item.notes.trim());
       if(notesOnly && !hasNotes) return;
+      if(wrongOnly && !(item.wrongCount>0)) return;
       const sub = mode==='ko' ? item.roman : item.meaning;
       if(query){
         const haystack = `${item.word} ${sub||''} ${item.notes||''}`.toLowerCase();
         if(!haystack.includes(query)) return;
       }
       shown++;
-      drawerContent.appendChild(createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes));
+      drawerContent.appendChild(createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0));
     });
     if(shown===0){
-      const msg = query ? '검색 결과가 없습니다.' : (notesOnly ? '노트를 남긴 단어가 없습니다.' : '즐겨찾기한 단어가 없습니다.');
+      const msg = query ? '검색 결과가 없습니다.' : (notesOnly ? '노트를 남긴 단어가 없습니다.' : (wrongOnly ? '오답 단어가 없습니다.' : '즐겨찾기한 단어가 없습니다.'));
       drawerContent.innerHTML=`<div style="color:#8f8f8f;text-align:center;padding:20px;">${msg}</div>`;
     }
   }
 
-  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes){
+  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount){
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border:1px solid ${active?COL.pink:'transparent'};background:${active?'rgba(231,184,218,.12)':'transparent'};color:${active?COL.pink:'#f1ede6'};`;
@@ -665,7 +731,7 @@
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;';
     const mainSpan=document.createElement('span');
-    mainSpan.textContent = `${hasNotes?'📝 ':''}${displayIndex}. ${mainText}`;
+    mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongCount>0?'❌'+wrongCount+' ':''}${displayIndex}. ${mainText}`;
     info.appendChild(mainSpan);
     if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:#8f8f8f;'; subSpan.textContent=subText; info.appendChild(subSpan); }
     const actions=document.createElement('div');
@@ -786,13 +852,27 @@
 
   function nextWord(markCorrect){
     if(currentWordCount()===0) return;
-    if(markCorrect) stats.correct++; else stats.skipped++;
-    wordIndex=(wordIndex+1)%currentWordCount();
+    const word = currentWordObj();
+    if(markCorrect){
+      stats.correct++;
+      applySrsResult(word, currentAttemptHadError);
+      const keyCount = mode==='ko'
+        ? koEngine.targets.reduce((sum,t)=>sum+getSlotDescriptors(t).length,0)
+        : (enEngine.word||'').length;
+      sessionStats.keysTyped += keyCount;
+      sessionStats.wordsCompleted++;
+      if(!currentAttemptHadError) sessionStats.wordsCleanCompleted++;
+    } else {
+      stats.skipped++;
+      if(currentAttemptHadError && word) word.wrongCount=(word.wrongCount||0)+1;
+    }
+    if(markCorrect || currentAttemptHadError) persistCurrentWordListDebounced();
+    wordIndex = reviewMode ? reviewAdvance(1) : (wordIndex+1)%currentWordCount();
     loadWord();
   }
   function prevWord(){
     if(currentWordCount()===0) return;
-    wordIndex=(wordIndex-1+currentWordCount())%currentWordCount();
+    wordIndex = reviewMode ? reviewAdvance(-1) : (wordIndex-1+currentWordCount())%currentWordCount();
     loadWord();
   }
 
@@ -824,7 +904,17 @@
     document.querySelectorAll('.tab-glyph').forEach(g=>{ g.textContent = g.dataset.mode===m ? '■' : '□'; g.style.color = g.dataset.mode===m ? COL.pink : '#8f8f8f'; });
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{ mode=btn.dataset.mode; wordIndex=0; setActiveTab(mode); loadWord(); });
+    btn.addEventListener('click',()=>{
+      mode=btn.dataset.mode; wordIndex=0; setActiveTab(mode);
+      if(reviewMode){
+        const due=findDueIndex(0,1,true);
+        if(due===-1){
+          alert('이 모드에는 오늘 복습할 단어가 없습니다! 🎉');
+          reviewMode=false; reviewModeToggle.checked=false;
+        } else wordIndex=due;
+      }
+      loadWord();
+    });
   });
 
   $('restartBtn').addEventListener('click', loadWord);
@@ -839,12 +929,29 @@
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
 
+  const reviewModeToggle=$('reviewModeToggle');
+  reviewModeToggle.addEventListener('change',(e)=>{
+    if(e.target.checked){
+      if(currentWordCount()===0){ e.target.checked=false; return; }
+      const due=findDueIndex(wordIndex,1,true);
+      if(due===-1){
+        alert('오늘 복습할 단어가 없습니다! 🎉 모든 단어가 아직 복습 예정일이 되지 않았어요.');
+        e.target.checked=false;
+        return;
+      }
+      reviewMode=true; wordIndex=due; loadWord();
+    } else {
+      reviewMode=false; loadWord();
+    }
+  });
+
   favoriteBtn.addEventListener('click', ()=>{
     if(currentWordCount()===0) return;
     toggleFavoriteAt(wordIndex);
   });
   favoritesOnlyToggle.addEventListener('change', renderDrawer);
   notesOnlyToggle.addEventListener('change', renderDrawer);
+  wrongOnlyToggle.addEventListener('change', renderDrawer);
   wordSearchInput.addEventListener('input', renderDrawer);
 
   notesBtn.addEventListener('click', ()=>{
