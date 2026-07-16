@@ -705,6 +705,18 @@
 
   function currentWordCount(){ return mode==='ko'?KO_WORDS.length:EN_WORDS.length; }
 
+  function lastIndexKey(m){ return `TRAINER_LAST_INDEX_${userId}_${m}`; }
+  function loadLastIndex(m){
+    const raw = localStorage.getItem(lastIndexKey(m));
+    const n = raw!==null ? parseInt(raw,10) : 0;
+    return Number.isFinite(n) && n>=0 ? n : 0;
+  }
+  function saveLastIndex(){
+    localStorage.setItem(lastIndexKey(mode), String(wordIndex));
+  }
+  function lastModeKey(){ return `TRAINER_LAST_MODE_${userId}`; }
+  function saveLastMode(){ localStorage.setItem(lastModeKey(), mode); }
+
   function loadWord(){
     const listCount=currentWordCount();
     mobileInput.value='';
@@ -715,6 +727,8 @@
     }
     if(wordIndex>=listCount) wordIndex=0;
     if(wordIndex<0) wordIndex=listCount-1;
+    saveLastIndex();
+    saveLastMode();
     if(mode==='ko'){
       koEngine=makeKoreanEngine(KO_WORDS[wordIndex].word);
     } else {
@@ -1385,7 +1399,7 @@
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      mode=btn.dataset.mode; wordIndex=0; setActiveTab(mode);
+      mode=btn.dataset.mode; wordIndex=loadLastIndex(mode); setActiveTab(mode);
       if(reviewMode){
         const due=findDueIndex(0,1,true);
         if(due===-1){
@@ -1589,7 +1603,7 @@
     cloudStatusEl.style.display = 'none';
     await loadCloudData();
     loadingOverlay.style.display='none';
-    mode='ko'; wordIndex=0;
+    mode='ko'; wordIndex=loadLastIndex('ko');
     setActiveTab('ko');
     loadWord();
   }
@@ -1673,7 +1687,9 @@
     currentUserLabel.textContent = userId;
     await loadCloudData();
     loadingOverlay.style.display='none';
-    setActiveTab('ko');
+    mode = localStorage.getItem(lastModeKey()) || 'ko';
+    wordIndex = loadLastIndex(mode);
+    setActiveTab(mode);
     loadWord();
   }
 
