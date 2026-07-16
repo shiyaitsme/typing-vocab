@@ -12,7 +12,7 @@
     --gray-light:#c7cbd1;
     --gray-mid:#52565c;
     --gray-dark:#8a8f98;
-    --green:#2fa84f;
+    --done-blue:#1a56c4;
     --red:#e0453c;
     --ink:#22262c;
   }
@@ -48,12 +48,13 @@
     font-size:64px; font-weight:700;
     min-width:1em; text-align:center; line-height:1;
   }
-  .syl-char.preview{color:var(--gray-light);}
-  .syl-char.correct{color:var(--gray-mid);}
+  .syl-char.future{color:var(--gray-light);}
+  .syl-char.active{color:var(--gray-mid);}
+  .syl-char.done{color:var(--done-blue);}
   .syl-char.wrong{color:var(--red);}
   .bars{display:flex; gap:5px;}
   .bar{width:26px; height:5px; border-radius:3px; background:var(--gray-light);}
-  .bar.correct{background:var(--green);}
+  .bar.correct{background:var(--done-blue);}
   .bar.wrong{background:var(--red);}
   .meaning{font-size:16px; color:#555; text-align:center;}
   .meaning b{color:var(--ink);}
@@ -348,6 +349,20 @@ function render(){
   const typed = typer.value;
   syllablesEl.innerHTML = '';
 
+  // A not-yet-typed position only becomes "up next" (dark gray) once the position
+  // right before it is structurally *settled* — every one of its slots resolved,
+  // whether correct or wrong — not merely because the raw string happens to have
+  // grown to that length. A single Hangul syllable can sit at one string length
+  // for several keystrokes while still mid-composition (e.g. "ㅇ" -> "여" -> "연"
+  // are all length 1), so length alone can't tell us the previous syllable is done.
+  let nextActiveIdx = 0; // with nothing typed yet, position 0 is "up next"
+  if(typed.length > 0){
+    const lastIdx = typed.length - 1;
+    const lastStates = evaluateSlots(target[lastIdx], typed[lastIdx], true);
+    const lastSettled = !lastStates.includes('pending');
+    nextActiveIdx = lastSettled ? typed.length : -1;
+  }
+
   for(let i=0;i<target.length;i++){
     const tChar = target[i];
     const typedChar = typed[i];
@@ -355,24 +370,30 @@ function render(){
     const started = typedChar !== undefined;
     const states = evaluateSlots(tChar, typedChar, isComposingHere);
     const hasWrong = states.includes('wrong');
+    const isFullyDone = started && !hasWrong && states.every(s => s === 'correct');
 
     const group = document.createElement('div');
     group.className = 'syl-group';
 
-    // small correct-answer hint, only while this exact syllable is actively being typed
+    // small correct-answer hint: only ever shown for a syllable that currently has
+    // an error, as a corrective reminder — not during normal correct typing. It
+    // persists even after the cursor moves on to later syllables, until the error
+    // is actually fixed (e.g. via backspace).
     const hintEl = document.createElement('div');
     hintEl.className = 'syl-hint';
-    hintEl.textContent = (started && isComposingHere) ? tChar : '';
+    hintEl.textContent = hasWrong ? tChar : '';
 
-    // big display: hide the answer once typing starts here — show what was actually
-    // typed instead (colored by correctness), not the target itself
+    // big display: once typing starts here, show what was actually typed instead of
+    // the target — colored dark-gray while in progress, blue once fully correct, red
+    // if it has any wrong part. Not-yet-reached characters stay a dim preview, except
+    // the very next one to type, which is dark-gray ("up next") even before any input.
     const charEl = document.createElement('div');
     if(started){
       charEl.textContent = typedChar;
-      charEl.className = 'syl-char ' + (hasWrong ? 'wrong' : 'correct');
+      charEl.className = 'syl-char ' + (hasWrong ? 'wrong' : (isFullyDone ? 'done' : 'active'));
     } else {
       charEl.textContent = tChar;
-      charEl.className = 'syl-char preview';
+      charEl.className = 'syl-char ' + (i === nextActiveIdx ? 'active' : 'future');
     }
 
     const barsEl = document.createElement('div');
