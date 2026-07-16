@@ -1,5 +1,16 @@
 -- Cloudflare D1 schema for typing-vocab cloud storage.
 -- Apply with: wrangler d1 execute typing-vocab-db --remote --file=./schema.sql
+--
+-- This file defines the full CURRENT schema for a brand-new database — every column
+-- and table a fresh install needs is inlined directly (CREATE TABLE IF NOT EXISTS is
+-- safe to run any number of times). It does NOT retrofit an older, already-deployed
+-- database whose tables were created before a column existed — for that, run the
+-- one-time scripts under migrations/ instead (each documents which DBs need it and
+-- is written to be safe to run standalone, without depending on anything in this file
+-- already having failed/succeeded). wrangler d1 execute runs an entire --file as one
+-- transaction: if any single statement errors (e.g. "duplicate column name" from a
+-- migration that was already applied), the WHOLE file rolls back — so never rely on
+-- "later statements ran anyway" when a file mixes already-applied and new migrations.
 
 CREATE TABLE IF NOT EXISTS words (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,18 +23,32 @@ CREATE TABLE IF NOT EXISTS words (
   sort_order INTEGER NOT NULL DEFAULT 0,
   box INTEGER NOT NULL DEFAULT 0,
   due_at TEXT NOT NULL DEFAULT '',
-  wrong_count INTEGER NOT NULL DEFAULT 0
+  wrong_count INTEGER NOT NULL DEFAULT 0,
+  notebook_id INTEGER NOT NULL DEFAULT 0,
+  created_date TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_words_user_mode ON words(user_id, mode, sort_order);
+CREATE INDEX IF NOT EXISTS idx_words_notebook_date ON words(notebook_id, created_date);
 
--- One-time migration for a database created before box/due_at/wrong_count existed.
--- SQLite's ALTER TABLE ADD COLUMN has no "IF NOT EXISTS" form, so only run these
--- three lines once — re-running them after the columns already exist will error
--- with "duplicate column name" (harmless, just means it's already migrated).
-ALTER TABLE words ADD COLUMN box INTEGER NOT NULL DEFAULT 0;
-ALTER TABLE words ADD COLUMN due_at TEXT NOT NULL DEFAULT '';
-ALTER TABLE words ADD COLUMN wrong_count INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE IF NOT EXISTS notebooks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL,
+  mode TEXT NOT NULL CHECK(mode IN ('ko','en')),
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  cover_gradient TEXT NOT NULL DEFAULT 'purple',
+  cover_emoji TEXT NOT NULL DEFAULT '📖',
+  cover_url TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_notebooks_user_mode ON notebooks(user_id, mode, sort_order);
 
+-- history_batches is deprecated as of the notebook/date-filter redesign (see
+-- notebooks table above) — the app no longer reads or writes it. Left in place
+-- rather than dropped so no data is destroyed; safe to ignore. Kept here (instead of
+-- only in migrations/) so a brand-new database still has the table, in case any old
+-- client/script still expects it to exist.
 CREATE TABLE IF NOT EXISTS history_batches (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id TEXT NOT NULL,

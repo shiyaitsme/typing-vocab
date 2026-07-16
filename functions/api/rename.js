@@ -15,6 +15,7 @@ export async function onRequestPost({ request, env }) {
 
   await env.DB.batch([
     env.DB.prepare('UPDATE words SET user_id=? WHERE user_id=?').bind(newUser, oldUser),
+    env.DB.prepare('UPDATE notebooks SET user_id=? WHERE user_id=?').bind(newUser, oldUser),
     env.DB.prepare('UPDATE history_batches SET user_id=? WHERE user_id=?').bind(newUser, oldUser),
   ]);
   return Response.json({ ok: true });

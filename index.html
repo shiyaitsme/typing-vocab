@@ -41,7 +41,7 @@
     <nav style="display:flex;gap:18px;font-size:11px;letter-spacing:.05em;font-weight:600;">
       <button id="navPracticeBtn" data-i18n="navPractice" style="all:unset;cursor:pointer;color:rgb(var(--ink-rgb));">연습</button>
       <button id="openDrawerBtn" data-i18n="navWords" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">단어 목록</button>
-      <button id="openHistoryBtn" data-i18n="navHistory" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">학습 기록</button>
+      <button id="openNotebooksBtn" data-i18n="navNotebooks" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">단어장</button>
       <button id="openStatsBtn" data-i18n="navStats" style="all:unset;cursor:pointer;color:rgba(var(--ink-rgb),.45);">통계</button>
     </nav>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -148,15 +148,27 @@
   <!-- DRAWER -->
   <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
     <div style="padding:22px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;justify-content:space-between;align-items:center;">
-      <div id="drawerHeaderTitle" data-i18n="drawerHeaderTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어 & 기록</div>
+      <div id="drawerHeaderTitle" data-i18n="drawerHeaderTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어장</div>
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:rgb(var(--ink-rgb));padding:2px 8px;">&times;</button>
     </div>
     <div style="display:flex;border-bottom:1px solid rgba(var(--ink-rgb),.14);">
       <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
-      <button id="drawerTabHistory" data-i18n="drawerTabHistory" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">학습 기록</button>
+      <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어장</button>
       <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
     </div>
     <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;flex-direction:column;gap:12px;">
+      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(var(--ink-rgb),.16);border-radius:4px;">
+        <div id="currentNotebookCover" style="width:34px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;"></div>
+        <div style="flex:1;min-width:0;">
+          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="currentNotebookMeta" style="font-size:10px;color:rgba(var(--ink-rgb),.45);"></div>
+        </div>
+        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;font-size:10px;font-weight:700;color:var(--accent);white-space:nowrap;padding:4px 2px;">전환</button>
+      </div>
+      <div>
+        <div data-i18n="dateFilterTitle" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);font-weight:700;text-transform:uppercase;margin-bottom:6px;">날짜별 필터</div>
+        <div id="dateFilterRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
           <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
@@ -205,6 +217,34 @@
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
         <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">가져오기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTEBOOK EDIT MODAL -->
+  <div id="notebookModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:420px;border-radius:4px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
+      <div id="notebookModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
+      <input type="text" id="notebookNameInput" data-i18n-placeholder="notebookNamePlaceholder" placeholder="단어장 이름" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px;font-size:13px;border-radius:2px;font-family:inherit;">
+      <textarea id="notebookDescInput" data-i18n-placeholder="notebookDescPlaceholder" placeholder="간단한 설명(선택)" style="width:100%;height:60px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
+      <div>
+        <div data-i18n="notebookCoverLabel" style="font-size:10px;letter-spacing:.05em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
+        <div id="notebookGradientRow" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div>
+        <div data-i18n="notebookEmojiLabel" style="font-size:10px;letter-spacing:.05em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">아이콘</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div id="notebookEmojiRow" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
+          <input type="text" id="notebookEmojiInput" maxlength="4" autocomplete="off" style="width:44px;text-align:center;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 4px;font-size:16px;border-radius:2px;font-family:inherit;flex:none;">
+        </div>
+      </div>
+      <div id="notebookPreview" style="width:100%;height:64px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:26px;"></div>
+      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;">
+        <button id="deleteNotebookBtn" data-i18n="deleteNotebookBtn" style="all:unset;cursor:pointer;padding:9px 12px;font-size:11px;letter-spacing:.03em;color:var(--warn);font-weight:700;display:none;">삭제</button>
+        <div style="display:flex;gap:8px;margin-left:auto;">
+          <button id="closeNotebookModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
+          <button id="saveNotebookBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
+        </div>
       </div>
     </div>
   </div>
@@ -447,7 +487,7 @@
   const I18N = {
     ko: {
       tagline: '+ 한글 &amp; 영어 타자 연습기',
-      navPractice: '연습', navWords: '단어 목록', navHistory: '학습 기록', navStats: '통계',
+      navPractice: '연습', navWords: '단어 목록', navNotebooks: '단어장', navStats: '통계',
       renameTitle: '이름 변경',
       heroTitle: '타자로 배우는<br>한글 &amp; 영어',
       heroDesc: '매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.',
@@ -463,28 +503,34 @@
       streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
       masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
       correctNext: '정답! Enter로 다음',
-      drawerHeaderTitle: '단어 & 기록', drawerTabWords: '단어 목록', drawerTabHistory: '학습 기록', drawerTabStats: '통계',
+      drawerHeaderTitle: '단어장', drawerTabWords: '단어 목록', drawerTabNotebooks: '단어장', drawerTabStats: '통계',
       favOnlyLabel: '★ 즐겨찾기만', notesOnlyLabel: '📝 노트만', wrongOnlyLabel: '❌ 오답만',
       wordSearchPlaceholder: '🔍 단어, 뜻, 노트 검색...', newWordPlaceholder: '단어 (한국어/english)', newMeaningPlaceholder: '뜻/로마자',
       openBulkBtn: '가져오기/내보내기', openAiPromptBtn: '🤖 AI 프롬프트', clearWordsBtn: '초기화',
       noWords: '단어가 없습니다.', noSearchResults: '검색 결과가 없습니다.', noNotesWords: '노트를 남긴 단어가 없습니다.',
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
-      noHistory: '학습 기록이 없습니다.<br>일괄 가져오기로 단어를 추가하면 오늘 날짜로 기록됩니다.',
-      historyCount: '{{count}}개', studyThisDate: '▶ 이 날짜로 연습하기',
+      switchNotebookBtn: '전환', dateFilterTitle: '날짜별 필터', allDatesLabel: '전체',
+      notebookWordCount: '단어 {{count}}개', noNotebooks: '단어장이 없습니다.<br>새 단어장을 만들어 보세요.',
+      newNotebookBtn: '+ 새 단어장', notebookModalTitleNew: '📖 새 단어장', notebookModalTitleEdit: '✎ 단어장 편집',
+      notebookNamePlaceholder: '단어장 이름', notebookDescPlaceholder: '간단한 설명(선택)',
+      notebookCoverLabel: '배경색', notebookEmojiLabel: '아이콘', deleteNotebookBtn: '삭제',
+      notebookNameAlertEmpty: '단어장 이름을 입력해 주세요!',
+      deleteNotebookConfirm: "'{{name}}' 단어장과 안의 단어를 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
+      cantDeleteLastNotebook: '마지막 남은 단어장은 삭제할 수 없습니다. 먼저 새 단어장을 만들어 주세요.',
       reviewStatusTitle: '복습 현황', overdueLabel: '밀린 복습', dueTodayLabel: '오늘 복습', upcomingLabel: '예정', freshLabel: '미학습',
       masteryDistTitle: '숙련도 분포', weakWordsTitle: '취약 단어 TOP 5', wrongOrderTag: '❌ 오답순',
-      activityTitle: '단어 추가 활동', activityCaption: '일괄 가져오기로 새 단어를 추가한 날짜 기준',
+      activityTitle: '단어 추가 활동', activityCaption: '이 단어장에 단어를 추가한 날짜 기준',
       legendLess: '적음', legendMore: '많음', activityTooltip: '{{date}}: {{count}}개',
       addWordAlertEmpty: '추가할 단어를 입력해 주세요!',
-      clearConfirm: '모든 사용자 단어를 초기화하고 기본 단어로 복구하시겠습니까?',
+      clearConfirm: '이 단어장의 모든 단어를 삭제하시겠습니까? 단어장 자체는 남습니다.',
       aiPromptTitle: '🤖 AI 프롬프트',
       aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
       cancel: '취소', copyBtn: '복사하기', copiedBtn: '✓ 복사됨',
       bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.',
       bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기',
       importAlertEmpty: '가져올 내용을 입력해 주세요!',
-      importSuccess: '가져오기 완료! (한국어: {{koCount}}개, 영어: {{enCount}}개)\n오늘 날짜({{date}})로 학습 기록에 저장되었습니다.',
+      importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
       notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장',
       whoAmITitle: '👋 이름을 알려주세요',
       whoAmIDesc: '이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.',
@@ -508,7 +554,7 @@
     },
     en: {
       tagline: '+ Korean &amp; English Typing Trainer',
-      navPractice: 'Practice', navWords: 'Words', navHistory: 'History', navStats: 'Stats',
+      navPractice: 'Practice', navWords: 'Words', navNotebooks: 'Notebooks', navStats: 'Stats',
       renameTitle: 'Rename',
       heroTitle: 'Learn Korean<br>&amp; English by Typing',
       heroDesc: "A little every day — memorize Korean and English words with your fingertips. Only words you truly learn stick.",
@@ -524,28 +570,34 @@
       streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
       masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
       correctNext: 'Correct! Press Enter for next',
-      drawerHeaderTitle: 'Words & History', drawerTabWords: 'Words', drawerTabHistory: 'History', drawerTabStats: 'Stats',
+      drawerHeaderTitle: 'Notebooks', drawerTabWords: 'Words', drawerTabNotebooks: 'Notebooks', drawerTabStats: 'Stats',
       favOnlyLabel: '★ Favorites only', notesOnlyLabel: '📝 Notes only', wrongOnlyLabel: '❌ Wrong only',
       wordSearchPlaceholder: '🔍 Search word, meaning, notes...', newWordPlaceholder: 'Word (한국어/english)', newMeaningPlaceholder: 'Meaning / romanization',
       openBulkBtn: 'Import/Export', openAiPromptBtn: '🤖 AI Prompt', clearWordsBtn: 'Reset',
       noWords: 'No words yet.', noSearchResults: 'No search results.', noNotesWords: 'No words with notes.',
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
-      noHistory: 'No history yet.<br>Bulk-import words to save today\'s date as a record.',
-      historyCount: '{{count}}', studyThisDate: '▶ Practice this date',
+      switchNotebookBtn: 'Switch', dateFilterTitle: 'Filter by date', allDatesLabel: 'All',
+      notebookWordCount: '{{count}} words', noNotebooks: 'No notebooks yet.<br>Create one to get started.',
+      newNotebookBtn: '+ New notebook', notebookModalTitleNew: '📖 New notebook', notebookModalTitleEdit: '✎ Edit notebook',
+      notebookNamePlaceholder: 'Notebook name', notebookDescPlaceholder: 'Short description (optional)',
+      notebookCoverLabel: 'Cover color', notebookEmojiLabel: 'Icon', deleteNotebookBtn: 'Delete',
+      notebookNameAlertEmpty: 'Please enter a notebook name!',
+      deleteNotebookConfirm: "Delete notebook '{{name}}' and all its words? This can't be undone.",
+      cantDeleteLastNotebook: "Can't delete your last notebook. Create another one first.",
       reviewStatusTitle: 'Review Status', overdueLabel: 'Overdue', dueTodayLabel: 'Due Today', upcomingLabel: 'Upcoming', freshLabel: 'Not Studied',
       masteryDistTitle: 'Mastery Distribution', weakWordsTitle: 'Top 5 Weak Words', wrongOrderTag: '❌ By mistakes',
-      activityTitle: 'Word Addition Activity', activityCaption: 'Based on dates new words were bulk-imported',
+      activityTitle: 'Word Addition Activity', activityCaption: 'Based on dates words were added to this notebook',
       legendLess: 'Less', legendMore: 'More', activityTooltip: '{{date}}: {{count}}',
       addWordAlertEmpty: 'Please enter a word to add!',
-      clearConfirm: 'Reset all your words back to the defaults?',
+      clearConfirm: 'Delete all words in this notebook? The notebook itself will stay.',
       aiPromptTitle: '🤖 AI Prompt',
       aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
       cancel: 'Cancel', copyBtn: 'Copy', copiedBtn: '✓ Copied',
       bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format.',
       bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import',
       importAlertEmpty: 'Please enter content to import!',
-      importSuccess: 'Import complete! (Korean: {{koCount}}, English: {{enCount}})\nSaved to history under today\'s date ({{date}}).',
+      importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
       notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save',
       whoAmITitle: "👋 What's your name?",
       whoAmIDesc: "Your word list will be saved to the cloud under this name. It'll be remembered automatically next time on this device.",
@@ -575,10 +627,46 @@
     return str;
   }
 
-  let KO_WORDS = [];
-  let EN_WORDS = [];
-  let HISTORY_KO = [];
-  let HISTORY_EN = [];
+  /* =========================================================
+   * Notebook data model
+   * - wordsById: single source of truth, id -> word object. Every view (practice
+   *   queue, drawer list, stats) reads/mutates the SAME object via this map, so a
+   *   favorite/notes edit is visible everywhere instantly and can never be lost by
+   *   switching notebooks or toggling the date filter.
+   * - notebookWords: notebookId -> ordered array of word objects (same references
+   *   as in wordsById) belonging to that notebook.
+   * - notebooks: mode -> ordered array of notebook objects {id,name,description,
+   *   coverGradient,coverEmoji,coverUrl}.
+   * ======================================================= */
+  let wordsById = new Map();
+  let notebookWords = { ko: new Map(), en: new Map() };
+  let notebooks = { ko: [], en: [] };
+  let currentNotebookIdByMode = { ko: null, en: null };
+  let selectedDatesByMode = { ko: null, en: null }; // null = "All"; else Set of 'YYYY-MM-DD'
+  let localIdSeq = 0;
+  function nextLocalId(){ return --localIdSeq; } // negative ids = never-synced-to-cloud
+
+  const COVER_GRADIENTS = {
+    purple: 'linear-gradient(135deg,#8b5cf6,#c4b5fd)',
+    pink:   'linear-gradient(135deg,#ec4899,#f9a8d4)',
+    blue:   'linear-gradient(135deg,#3b82f6,#93c5fd)',
+    green:  'linear-gradient(135deg,#10b981,#6ee7b7)',
+    orange: 'linear-gradient(135deg,#f97316,#fdba74)',
+    gray:   'linear-gradient(135deg,#57534e,#a8a29e)',
+  };
+  const NOTEBOOK_EMOJI_PRESETS = ['📖','✏️','🎯','🔥','🌱','⭐','🗂️','💡'];
+
+  function notebookCoverCSS(nb){
+    if(nb && nb.coverUrl) return `background-image:url('${nb.coverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
+    return `background:${COVER_GRADIENTS[nb && nb.coverGradient] || COVER_GRADIENTS.purple};`;
+  }
+
+  function mode2(){ return mode; }
+  function currentNotebookId(){ return currentNotebookIdByMode[mode]; }
+  function currentNotebooks(){ return notebooks[mode]; }
+  function currentNotebook(){ return currentNotebooks().find(n=>n.id===currentNotebookId()); }
+  function currentNotebookAllWords(){ return notebookWords[mode].get(currentNotebookId()) || []; }
+  function currentSelectedDates(){ return selectedDatesByMode[mode]; }
 
   let mode='ko', wordIndex=0, dictation=false, stats={correct:0,skipped:0};
   let koEngine = makeKoreanEngine('');
@@ -635,7 +723,7 @@
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const progressEl=$('progress'), pageCounter=$('pageCounter');
   const drawer=$('drawer'), drawerContent=$('drawerContent');
-  const drawerTabWords=$('drawerTabWords'), drawerTabHistory=$('drawerTabHistory'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow');
+  const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
@@ -649,13 +737,19 @@
 
   /* =========================================================
    * Cloud storage (Cloudflare Pages Functions + D1)
+   * All word mutations are scoped to a single row by its stable id (POST/PATCH/DELETE
+   * on /api/words/:id) instead of overwriting the whole list — this is what makes
+   * favorite/notes immune to being lost by notebook/date-filter switches.
    * ======================================================= */
   const USER_ID_KEY = 'TRAINER_USER_ID';
   let userId = '';
   let cloudOk = true;
 
   function apiWordsUrl(m){ return `/api/words?user=${encodeURIComponent(userId)}&mode=${m}`; }
-  function apiHistoryUrl(m){ return `/api/history?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiWordUrl(id, m){ return `/api/words/${id}?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiWordsBulkUrl(m){ return `/api/words/bulk?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiNotebooksUrl(m){ return `/api/notebooks?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiNotebookUrl(id){ return `/api/notebooks/${id}?user=${encodeURIComponent(userId)}`; }
 
   let cloudWarningKey = null;
   function showCloudWarning(key){
@@ -671,24 +765,78 @@
     return res.json();
   }
 
-  async function fetchHistoryFromCloud(m){
-    const res = await fetch(apiHistoryUrl(m));
-    if(!res.ok) throw new Error('history fetch failed: '+res.status);
+  async function fetchNotebooksFromCloud(m){
+    const res = await fetch(apiNotebooksUrl(m));
+    if(!res.ok) throw new Error('notebooks fetch failed: '+res.status);
     return res.json();
   }
 
-  function pushWordsToCloud(m, words){
-    if(!cloudOk) return;
-    fetch(apiWordsUrl(m), { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(words) })
-      .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
-      .catch(err=>{ console.error('cloud save failed', err); showCloudWarning('cloudSaveFailed'); });
+  async function createNotebookRemote(m, fields){
+    const res = await fetch(apiNotebooksUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(fields) });
+    if(!res.ok) throw new Error('create notebook failed: '+res.status);
+    return res.json();
+  }
+  function patchNotebookRemote(id, fields){
+    if(!cloudOk || id<0) return Promise.resolve();
+    return fetch(apiNotebookUrl(id), { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(fields) })
+      .then(res=>{ if(!res.ok) throw new Error('patch notebook failed: '+res.status); })
+      .catch(err=>{ console.error('cloud patch notebook failed', err); showCloudWarning('cloudSaveFailed'); });
+  }
+  function deleteNotebookRemote(id){
+    if(!cloudOk || id<0) return Promise.resolve();
+    return fetch(apiNotebookUrl(id), { method:'DELETE' })
+      .catch(err=>{ console.error('cloud delete notebook failed', err); showCloudWarning('cloudSaveFailed'); });
   }
 
-  function pushHistoryToCloud(m, date, words){
-    if(!cloudOk) return;
-    fetch(apiHistoryUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({date, words}) })
-      .then(res=>{ if(!res.ok) throw new Error('save failed: '+res.status); })
-      .catch(err=>{ console.error('cloud history save failed', err); showCloudWarning('cloudSaveFailed'); });
+  async function createWordRemote(m, notebookId, fields){
+    const res = await fetch(apiWordsUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, ...fields }) });
+    if(!res.ok) throw new Error('create word failed: '+res.status);
+    return res.json();
+  }
+  function patchWordRemote(id, m, fields){
+    if(!cloudOk || id<0) return;
+    fetch(apiWordUrl(id, m), { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(fields) })
+      .then(res=>{ if(!res.ok) throw new Error('patch word failed: '+res.status); })
+      .catch(err=>{ console.error('cloud patch failed', err); showCloudWarning('cloudSaveFailed'); });
+  }
+  const patchDebounceTimers = new Map();
+  function patchWordRemoteDebounced(id, m, fieldNames){
+    clearTimeout(patchDebounceTimers.get(id));
+    patchDebounceTimers.set(id, setTimeout(()=>{
+      patchDebounceTimers.delete(id);
+      const w = wordsById.get(id);
+      if(!w) return;
+      const fields={}; fieldNames.forEach(f=>fields[f]=w[f]);
+      patchWordRemote(id, m, fields);
+    }, 700));
+  }
+  function deleteWordRemote(id, m){
+    if(!cloudOk || id<0) return;
+    fetch(apiWordUrl(id, m), { method:'DELETE' })
+      .catch(err=>{ console.error('cloud delete failed', err); showCloudWarning('cloudSaveFailed'); });
+  }
+  async function bulkImportRemote(m, notebookId, items){
+    const res = await fetch(apiWordsBulkUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, items }) });
+    if(!res.ok) throw new Error('bulk import failed: '+res.status);
+    return res.json();
+  }
+  function clearNotebookRemote(m, notebookId){
+    if(!cloudOk || notebookId<0) return Promise.resolve();
+    return fetch(`/api/words?user=${encodeURIComponent(userId)}&mode=${m}&notebook=${notebookId}`, { method:'DELETE' })
+      .catch(err=>{ console.error('cloud clear failed', err); showCloudWarning('cloudSaveFailed'); });
+  }
+
+  function addWordToStore(m, word){
+    if(!notebookWords[m].has(word.notebookId)) notebookWords[m].set(word.notebookId, []);
+    notebookWords[m].get(word.notebookId).push(word);
+    wordsById.set(word.id, word);
+  }
+  function removeWordFromStore(m, id){
+    const w = wordsById.get(id);
+    if(!w) return;
+    const arr = notebookWords[m].get(w.notebookId);
+    if(arr){ const i=arr.indexOf(w); if(i>=0) arr.splice(i,1); }
+    wordsById.delete(id);
   }
 
   function ensureUserId(){
@@ -709,8 +857,6 @@
       whoAmIInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
     });
   }
-
-  function currentWordCount(){ return mode==='ko'?KO_WORDS.length:EN_WORDS.length; }
 
   function lastIndexKey(m){ return `TRAINER_LAST_INDEX_${userId}_${m}`; }
   function loadLastIndex(m){
@@ -736,10 +882,11 @@
     if(wordIndex<0) wordIndex=listCount-1;
     saveLastIndex();
     saveLastMode();
+    const list = currentWordList();
     if(mode==='ko'){
-      koEngine=makeKoreanEngine(KO_WORDS[wordIndex].word);
+      koEngine=makeKoreanEngine(list[wordIndex].word);
     } else {
-      enEngine=makeEnglishEngine(EN_WORDS[wordIndex]);
+      enEngine=makeEnglishEngine(list[wordIndex]);
     }
     updateMobileHints();
     render(); renderActiveDrawerView(); updateFavoriteBtn(); updateNotesBtn();
@@ -755,25 +902,25 @@
     }
   }
 
-  function currentWordList(){ return mode==='ko' ? KO_WORDS : EN_WORDS; }
+  // currentWordList() is the practice queue AND the base list the drawer sub-filters
+  // (favorites/notes/wrong/search) — scoped to the current notebook, narrowed further
+  // by the date-filter selection. Every item is the exact same object reference stored
+  // in wordsById, so mutating item.favorite/item.notes here is visible everywhere.
+  function currentWordList(){
+    const all = currentNotebookAllWords();
+    const sel = currentSelectedDates();
+    if(!sel) return all;
+    return all.filter(w=>sel.has(w.createdDate));
+  }
+  function currentWordCount(){ return currentWordList().length; }
   function currentWordObj(){ return currentWordList()[wordIndex]; }
-
-  function persistCurrentWordList(){
-    pushWordsToCloud(mode, currentWordList());
-  }
-
-  let persistDebounceTimer=null;
-  function persistCurrentWordListDebounced(){
-    clearTimeout(persistDebounceTimer);
-    persistDebounceTimer=setTimeout(persistCurrentWordList, 700);
-  }
 
   function toggleFavoriteAt(index){
     const list = currentWordList();
     const item = list[index];
     if(!item) return;
     item.favorite = !item.favorite;
-    persistCurrentWordList();
+    patchWordRemote(item.id, mode, {favorite:item.favorite});
     renderDrawer();
     favCountLabel.textContent = String(list.filter(x=>x.favorite).length);
     if(index===wordIndex) updateFavoriteBtn();
@@ -811,7 +958,7 @@
     const w = currentWordObj();
     if(!w) return;
     w.notes = notesTextarea.value.trim();
-    persistCurrentWordList();
+    patchWordRemote(w.id, mode, {notes:w.notes});
     updateNotesBtn();
     renderActiveDrawerView();
     closeNotesModal();
@@ -911,7 +1058,7 @@
 
     if(mode==='ko'){
       koRow.style.display='flex'; enRow.style.display='none';
-      romanizationEl.textContent = KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'';
+      romanizationEl.textContent = currentWordObj()?currentWordObj().roman:'';
       koRow.innerHTML='';
       let allComplete=koEngine.activeIndex===koEngine.targets.length-1;
       let allCorrect=true;
@@ -951,7 +1098,7 @@
       statusBanner.style.color = wordDone&&allCorrect ? COL.green : 'inherit';
     } else {
       koRow.style.display='none'; enRow.style.display='flex';
-      romanizationEl.textContent = EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'';
+      romanizationEl.textContent = currentWordObj()?currentWordObj().meaning:'';
       enRow.innerHTML='';
       const r=renderEnglish(enEngine,dictation);
       if(r.cells.some(c=>c.mode==='red')) currentAttemptHadError=true;
@@ -992,7 +1139,7 @@
     drawerContent.innerHTML='';
     const total=currentWordCount();
     if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
-    const list = mode==='ko' ? KO_WORDS : EN_WORDS;
+    const list = currentWordList();
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
     const wrongOnly = wrongOnlyToggle.checked;
@@ -1057,7 +1204,7 @@
   }
 
   function renderActiveDrawerView(scrollToActive){
-    if(drawerView==='history') renderHistory(); else if(drawerView==='stats') renderStats(); else renderDrawer(scrollToActive);
+    if(drawerView==='notebooks') renderNotebooks(); else if(drawerView==='stats') renderStats(); else renderDrawer(scrollToActive);
   }
 
   function setDrawerView(view, scrollToActive){
@@ -1065,9 +1212,10 @@
     const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`};
     const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent'};
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
-    Object.assign(drawerTabHistory.style, view==='history'?activeStyle:inactiveStyle);
+    Object.assign(drawerTabNotebooks.style, view==='notebooks'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
     wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
+    if(view==='words'){ updateCurrentNotebookBar(); renderDateFilterRow(); }
     renderActiveDrawerView(scrollToActive);
   }
 
@@ -1076,74 +1224,211 @@
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   }
 
-  function addHistoryBatch(listMode, words){
-    const history = listMode==='ko' ? HISTORY_KO : HISTORY_EN;
-    const date = todayStr();
-    const snapshot = words.map(w=>({...w}));
-    const existing = history.find(e=>e.date===date);
-    if(existing) existing.words = snapshot;
-    else history.push({date, words: snapshot});
-    pushHistoryToCloud(listMode, date, snapshot);
+  /* =========================================================
+   * Notebooks: switching, date filter, create/edit/delete
+   * ======================================================= */
+  function currentNotebookKey(m){ return `TRAINER_CURRENT_NOTEBOOK_${userId}_${m}`; }
+
+  function selectNotebook(m, id){
+    currentNotebookIdByMode[m] = id;
+    localStorage.setItem(currentNotebookKey(m), String(id));
+    selectedDatesByMode[m] = null;
+    if(m===mode){ wordIndex=0; updateCurrentNotebookBar(); renderDateFilterRow(); loadWord(); }
   }
 
-  function renderHistory(){
-    drawerContent.innerHTML='';
-    const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
-    if(history.length===0){
-      drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noHistory')}</div>`;
+  function updateCurrentNotebookBar(){
+    const nb = currentNotebook();
+    const coverEl = $('currentNotebookCover');
+    if(!nb){
+      coverEl.style.cssText='width:34px;height:34px;border-radius:4px;flex:none;background:rgba(var(--ink-rgb),.08);';
+      coverEl.textContent='';
+      $('currentNotebookName').textContent=''; $('currentNotebookMeta').textContent='';
       return;
     }
-    for(let i=history.length-1;i>=0;i--){
-      drawerContent.appendChild(createHistoryItemDOM(history[i], i));
-    }
+    coverEl.style.cssText=`width:34px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;${notebookCoverCSS(nb)}`;
+    coverEl.textContent = nb.coverUrl ? '' : nb.coverEmoji;
+    $('currentNotebookName').textContent = nb.name;
+    $('currentNotebookMeta').textContent = t('notebookWordCount', {count: currentNotebookAllWords().length});
   }
 
-  function createHistoryItemDOM(entry, index){
-    const container=document.createElement('div');
-    container.style.cssText='padding:12px;margin-bottom:6px;border:1px solid rgba(var(--ink-rgb),.14);border-radius:2px;';
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;justify-content:space-between;align-items:center;';
-    const dateSpan=document.createElement('span');
-    dateSpan.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5px;color:rgb(var(--ink-rgb));";
-    dateSpan.textContent=entry.date;
-    const countSpan=document.createElement('span');
-    countSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.45);';
-    countSpan.textContent=t('historyCount',{count:entry.words.length});
-    row.appendChild(dateSpan); row.appendChild(countSpan);
-    container.appendChild(row);
-
-    const preview=document.createElement('div');
-    preview.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-    preview.textContent=entry.words.map(w=>w.word).join(', ');
-    container.appendChild(preview);
-
-    const studyBtn=document.createElement('button');
-    studyBtn.textContent=t('studyThisDate');
-    studyBtn.style.cssText='all:unset;cursor:pointer;display:block;width:100%;text-align:center;margin-top:8px;background:var(--accent);color:var(--accent-ink);padding:8px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;border-radius:2px;';
-    studyBtn.addEventListener('click', ()=>studyHistoryEntry(index));
-    container.appendChild(studyBtn);
-
-    return container;
-  }
-
-  function studyHistoryEntry(index){
-    const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
-    const entry = history[index];
-    if(!entry) return;
-    const list = currentWordList();
-    let firstIndex = -1;
-    entry.words.forEach(hw=>{
-      let idx = list.findIndex(w=>w.word===hw.word);
-      if(idx===-1){ list.push({...hw}); idx = list.length-1; }
-      if(firstIndex===-1) firstIndex = idx;
+  function renderDateFilterRow(){
+    const row = $('dateFilterRow');
+    row.innerHTML='';
+    const dates = Array.from(new Set(currentNotebookAllWords().map(w=>w.createdDate).filter(Boolean))).sort().reverse();
+    const sel = currentSelectedDates();
+    const makePill=(label, active, onClick)=>{
+      const btn=document.createElement('button');
+      btn.type='button'; btn.textContent=label;
+      btn.style.cssText=`all:unset;cursor:pointer;padding:6px 11px;font-size:10.5px;font-weight:700;border-radius:100px;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.25)'};background:${active?'var(--accent)':'transparent'};color:${active?'var(--accent-ink)':'rgb(var(--ink-rgb))'};`;
+      btn.addEventListener('click', onClick);
+      return btn;
+    };
+    row.appendChild(makePill(t('allDatesLabel'), !sel, ()=>{
+      selectedDatesByMode[mode]=null;
+      renderDateFilterRow(); wordIndex=0; loadWord();
+    }));
+    dates.forEach(d=>{
+      const active = !!sel && sel.has(d);
+      row.appendChild(makePill(d, active, ()=>{
+        let s = selectedDatesByMode[mode];
+        if(!s){ s=new Set(); selectedDatesByMode[mode]=s; }
+        if(s.has(d)) s.delete(d); else s.add(d);
+        if(s.size===0) selectedDatesByMode[mode]=null;
+        renderDateFilterRow(); wordIndex=0; loadWord();
+      }));
     });
-    persistCurrentWordList();
-    wordIndex = firstIndex>=0 ? firstIndex : 0;
-    drawer.style.right='-520px';
-    setNavActive('practice');
-    setDrawerView('words');
-    loadWord();
   }
+
+  function renderNotebooks(){
+    drawerContent.innerHTML='';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;gap:10px;padding:8px 0 16px;';
+    const addBtn=document.createElement('button');
+    addBtn.type='button'; addBtn.textContent=t('newNotebookBtn');
+    addBtn.style.cssText='all:unset;cursor:pointer;text-align:center;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgb(var(--ink-rgb));padding:14px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.03em;';
+    addBtn.addEventListener('click', ()=>openNotebookModal(null));
+    wrap.appendChild(addBtn);
+    const list = currentNotebooks();
+    if(list.length===0){
+      const empty=document.createElement('div');
+      empty.style.cssText='color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;';
+      empty.innerHTML=t('noNotebooks');
+      wrap.appendChild(empty);
+    } else {
+      list.forEach(nb=>wrap.appendChild(createNotebookCardDOM(nb)));
+    }
+    drawerContent.appendChild(wrap);
+  }
+
+  function createNotebookCardDOM(nb){
+    const active = nb.id===currentNotebookId();
+    const card=document.createElement('div');
+    card.style.cssText=`display:flex;gap:12px;align-items:center;padding:10px;border-radius:4px;cursor:pointer;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.16)'};background:${active?'rgba(var(--accent-rgb),.1)':'transparent'};`;
+    card.addEventListener('click', ()=>{
+      selectNotebook(mode, nb.id);
+      setDrawerView('words', true);
+      setNavActive('words');
+    });
+    const cover=document.createElement('div');
+    cover.style.cssText=`width:44px;height:44px;border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;${notebookCoverCSS(nb)}`;
+    cover.textContent = nb.coverUrl ? '' : nb.coverEmoji;
+    card.appendChild(cover);
+    const info=document.createElement('div');
+    info.style.cssText='flex:1;min-width:0;';
+    const nameEl=document.createElement('div');
+    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+    nameEl.textContent=nb.name;
+    info.appendChild(nameEl);
+    const metaEl=document.createElement('div');
+    metaEl.style.cssText='font-size:10.5px;color:rgba(var(--ink-rgb),.45);margin-top:2px;';
+    metaEl.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
+    info.appendChild(metaEl);
+    if(nb.description){
+      const descEl=document.createElement('div');
+      descEl.style.cssText='font-size:10.5px;color:rgba(var(--ink-rgb),.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      descEl.textContent=nb.description;
+      info.appendChild(descEl);
+    }
+    card.appendChild(info);
+    const editBtn=document.createElement('button');
+    editBtn.type='button'; editBtn.textContent='✎';
+    editBtn.style.cssText='all:unset;cursor:pointer;padding:8px;font-size:14px;color:rgba(var(--ink-rgb),.4);flex:none;';
+    editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
+    card.appendChild(editBtn);
+    return card;
+  }
+
+  let editingNotebookId = null;
+  let pendingGradient = 'purple', pendingEmoji = '📖';
+  const notebookModalOverlay = $('notebookModalOverlay');
+  const notebookNameInput = $('notebookNameInput'), notebookDescInput = $('notebookDescInput');
+  const notebookEmojiInput = $('notebookEmojiInput');
+  const notebookGradientRow = $('notebookGradientRow'), notebookEmojiRow = $('notebookEmojiRow');
+  const notebookPreview = $('notebookPreview');
+
+  Object.keys(COVER_GRADIENTS).forEach(g=>{
+    const sw=document.createElement('button');
+    sw.type='button'; sw.dataset.gradient=g;
+    sw.style.cssText=`all:unset;cursor:pointer;width:30px;height:30px;border-radius:100px;background:${COVER_GRADIENTS[g]};border:2px solid transparent;`;
+    sw.addEventListener('click', ()=>{ pendingGradient=g; refreshNotebookModalSwatches(); updateNotebookPreview(); });
+    notebookGradientRow.appendChild(sw);
+  });
+  NOTEBOOK_EMOJI_PRESETS.forEach(em=>{
+    const b=document.createElement('button');
+    b.type='button'; b.textContent=em;
+    b.style.cssText='all:unset;cursor:pointer;width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid rgba(var(--ink-rgb),.2);';
+    b.addEventListener('click', ()=>{ pendingEmoji=em; notebookEmojiInput.value=''; updateNotebookPreview(); });
+    notebookEmojiRow.appendChild(b);
+  });
+  notebookEmojiInput.addEventListener('input', ()=>{ if(notebookEmojiInput.value.trim()) pendingEmoji=notebookEmojiInput.value.trim(); updateNotebookPreview(); });
+
+  function refreshNotebookModalSwatches(){
+    notebookGradientRow.querySelectorAll('button').forEach(b=>{ b.style.borderColor = b.dataset.gradient===pendingGradient ? 'rgb(var(--ink-rgb))' : 'transparent'; });
+  }
+  function updateNotebookPreview(){
+    notebookPreview.style.cssText=`width:100%;height:64px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:26px;background:${COVER_GRADIENTS[pendingGradient]};`;
+    notebookPreview.textContent=pendingEmoji;
+  }
+
+  function openNotebookModal(nb){
+    editingNotebookId = nb ? nb.id : null;
+    $('notebookModalTitle').textContent = nb ? t('notebookModalTitleEdit') : t('notebookModalTitleNew');
+    notebookNameInput.value = nb ? nb.name : '';
+    notebookDescInput.value = nb ? nb.description : '';
+    pendingGradient = nb ? nb.coverGradient : 'purple';
+    pendingEmoji = nb ? nb.coverEmoji : '📖';
+    notebookEmojiInput.value='';
+    refreshNotebookModalSwatches();
+    updateNotebookPreview();
+    $('deleteNotebookBtn').style.display = nb ? 'block' : 'none';
+    notebookModalOverlay.style.opacity='1'; notebookModalOverlay.style.pointerEvents='auto';
+    notebookNameInput.focus();
+  }
+  function closeNotebookModal(){
+    notebookModalOverlay.style.opacity='0'; notebookModalOverlay.style.pointerEvents='none';
+  }
+  async function saveNotebookModal(){
+    const name = notebookNameInput.value.trim();
+    if(!name){ alert(t('notebookNameAlertEmpty')); return; }
+    const fields = { name, description: notebookDescInput.value.trim(), coverGradient: pendingGradient, coverEmoji: pendingEmoji, coverUrl: '' };
+    if(editingNotebookId!=null){
+      const nb = currentNotebooks().find(n=>n.id===editingNotebookId);
+      if(nb){
+        Object.assign(nb, fields);
+        patchNotebookRemote(nb.id, fields);
+        if(nb.id===currentNotebookId()) updateCurrentNotebookBar();
+      }
+    } else {
+      let nb;
+      if(cloudOk){
+        try{ nb = await createNotebookRemote(mode, fields); }
+        catch(err){ console.error('create notebook failed', err); showCloudWarning('cloudSaveFailed'); nb = { id: nextLocalId(), ...fields }; }
+      } else {
+        nb = { id: nextLocalId(), ...fields };
+      }
+      notebooks[mode].push(nb);
+      notebookWords[mode].set(nb.id, []);
+    }
+    closeNotebookModal();
+    renderNotebooks();
+  }
+  $('closeNotebookModalBtn').addEventListener('click', closeNotebookModal);
+  $('saveNotebookBtn').addEventListener('click', saveNotebookModal);
+  $('deleteNotebookBtn').addEventListener('click', ()=>{
+    const nb = currentNotebooks().find(n=>n.id===editingNotebookId);
+    if(!nb) return;
+    if(currentNotebooks().length<=1){ alert(t('cantDeleteLastNotebook')); return; }
+    if(!confirm(t('deleteNotebookConfirm',{name:nb.name}))) return;
+    deleteNotebookRemote(nb.id);
+    notebooks[mode] = notebooks[mode].filter(n=>n.id!==nb.id);
+    (notebookWords[mode].get(nb.id)||[]).forEach(w=>wordsById.delete(w.id));
+    notebookWords[mode].delete(nb.id);
+    if(currentNotebookId()===nb.id) selectNotebook(mode, notebooks[mode][0].id);
+    closeNotebookModal();
+    renderNotebooks();
+  });
+  $('switchNotebookBtn').addEventListener('click', ()=>{ setDrawerView('notebooks'); setNavActive('notebooks'); });
+  drawerTabNotebooks.addEventListener('click', ()=>setDrawerView('notebooks'));
 
   function statCard(){
     const card=document.createElement('div');
@@ -1280,7 +1565,7 @@
     return section;
   }
 
-  function buildActivitySection(history){
+  function buildActivitySection(){
     const section=statCard();
     section.appendChild(statSectionTitle(t('activityTitle'), 4));
     const caption=document.createElement('div');
@@ -1289,7 +1574,7 @@
     section.appendChild(caption);
 
     const byDate={};
-    history.forEach(h=>{ byDate[h.date]=(byDate[h.date]||0)+h.words.length; });
+    currentNotebookAllWords().forEach(w=>{ if(w.createdDate) byDate[w.createdDate]=(byDate[w.createdDate]||0)+1; });
 
     const days=84;
     const today=new Date(); today.setHours(0,0,0,0);
@@ -1338,20 +1623,21 @@
   function renderStats(){
     drawerContent.innerHTML='';
     const list = currentWordList();
-    const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     const wrap=document.createElement('div');
     wrap.style.cssText='display:flex;flex-direction:column;gap:14px;padding:8px 0 16px;';
     wrap.appendChild(buildReviewStatusSection(list));
     wrap.appendChild(buildMasterySection(list));
     const weakSection=buildWeakWordsSection(list);
     if(weakSection) wrap.appendChild(weakSection);
-    wrap.appendChild(buildActivitySection(history));
+    wrap.appendChild(buildActivitySection());
     drawerContent.appendChild(wrap);
   }
 
   function deleteWordAt(index){
-    currentWordList().splice(index,1);
-    persistCurrentWordList();
+    const item = currentWordList()[index];
+    if(!item) return;
+    deleteWordRemote(item.id, mode);
+    removeWordFromStore(mode, item.id);
     if(wordIndex>=currentWordCount()) wordIndex=Math.max(0,currentWordCount()-1);
     loadWord();
   }
@@ -1384,7 +1670,7 @@
       if(currentAttemptHadError && word) word.wrongCount=(word.wrongCount||0)+1;
       sessionStreak=0;
     }
-    if(markCorrect || currentAttemptHadError) persistCurrentWordListDebounced();
+    if((markCorrect || currentAttemptHadError) && word) patchWordRemoteDebounced(word.id, mode, ['box','dueAt','wrongCount']);
     wordIndex = reviewMode ? reviewAdvance(1) : (wordIndex+1)%currentWordCount();
     loadWord();
   }
@@ -1426,6 +1712,7 @@
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       mode=btn.dataset.mode; wordIndex=loadLastIndex(mode); setActiveTab(mode);
+      updateCurrentNotebookBar(); renderDateFilterRow();
       if(reviewMode){
         const due=findDueIndex(0,1,true);
         if(due===-1){
@@ -1442,16 +1729,15 @@
   $('prevBtn').addEventListener('click', prevWord);
 
   function setNavActive(which){
-    const map = {practice:'navPracticeBtn', words:'openDrawerBtn', history:'openHistoryBtn', stats:'openStatsBtn'};
+    const map = {practice:'navPracticeBtn', words:'openDrawerBtn', notebooks:'openNotebooksBtn', stats:'openStatsBtn'};
     Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
   }
   $('navPracticeBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
   $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words', true); setNavActive('words'); });
-  $('openHistoryBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('history'); setNavActive('history'); });
+  $('openNotebooksBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('notebooks'); setNavActive('notebooks'); });
   $('openStatsBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('stats'); setNavActive('stats'); });
   $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
   drawerTabWords.addEventListener('click', ()=>setDrawerView('words', true));
-  drawerTabHistory.addEventListener('click', ()=>setDrawerView('history'));
   drawerTabStats.addEventListener('click', ()=>setDrawerView('stats'));
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
@@ -1488,32 +1774,44 @@
   $('closeNotesModalBtn').addEventListener('click', closeNotesModal);
   $('saveNotesBtn').addEventListener('click', saveCurrentNotes);
 
-  $('addWordBtn').addEventListener('click', ()=>{
+  function localWordFallback(notebookId, fields){
+    return { id: nextLocalId(), notebookId, favorite:false, notes:'', box:0, dueAt:'', wrongCount:0, createdDate: todayStr(), ...fields };
+  }
+
+  $('addWordBtn').addEventListener('click', async ()=>{
     const wordInput=$('newWord'), meaningInput=$('newMeaning');
     const word=wordInput.value.trim(), meaning=meaningInput.value.trim();
     if(!word){ alert(t('addWordAlertEmpty')); return; }
-    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word);
-    if(isKorean){
-      KO_WORDS.push({word,roman:meaning||'Custom',favorite:false,notes:''});
-      pushWordsToCloud('ko', KO_WORDS);
-      if(mode!=='ko'){ mode='ko'; setActiveTab('ko'); }
+    const m = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word) ? 'ko' : 'en';
+    const notebookId = currentNotebookIdByMode[m];
+    if(notebookId==null) return;
+    const fields = m==='ko' ? {word, roman: meaning||'Custom'} : {word, meaning: meaning||'Custom'};
+    let wordObj;
+    if(cloudOk){
+      try{ wordObj = await createWordRemote(m, notebookId, fields); }
+      catch(err){ console.error('create word failed', err); showCloudWarning('cloudSaveFailed'); wordObj = localWordFallback(notebookId, fields); }
     } else {
-      EN_WORDS.push({word,meaning:meaning||'Custom',favorite:false,notes:''});
-      pushWordsToCloud('en', EN_WORDS);
-      if(mode!=='en'){ mode='en'; setActiveTab('en'); }
+      wordObj = localWordFallback(notebookId, fields);
     }
+    addWordToStore(m, wordObj);
     wordInput.value=''; meaningInput.value='';
+    if(mode!==m){ mode=m; setActiveTab(m); }
+    selectedDatesByMode[m]=null;
+    updateCurrentNotebookBar(); renderDateFilterRow();
     wordIndex=currentWordCount()-1;
     loadWord();
   });
 
   $('clearWordsBtn').addEventListener('click', ()=>{
-    if(confirm(t('clearConfirm'))){
-      KO_WORDS=[...DEFAULT_KO_WORDS]; EN_WORDS=[...DEFAULT_EN_WORDS];
-      pushWordsToCloud('ko', KO_WORDS);
-      pushWordsToCloud('en', EN_WORDS);
-      wordIndex=0; loadWord();
-    }
+    if(!confirm(t('clearConfirm'))) return;
+    const notebookId = currentNotebookId();
+    if(notebookId==null) return;
+    clearNotebookRemote(mode, notebookId);
+    (notebookWords[mode].get(notebookId)||[]).forEach(w=>wordsById.delete(w.id));
+    notebookWords[mode].set(notebookId, []);
+    selectedDatesByMode[mode]=null;
+    updateCurrentNotebookBar(); renderDateFilterRow();
+    wordIndex=0; loadWord();
   });
 
   const aiPromptModalOverlay=$('aiPromptModalOverlay'), aiPromptTextarea=$('aiPromptTextarea');
@@ -1540,10 +1838,32 @@
   const modalOverlay=$('modalOverlay'), bulkTextarea=$('bulkTextarea');
   $('openBulkBtn').addEventListener('click', ()=>{
     modalOverlay.style.opacity='1'; modalOverlay.style.pointerEvents='auto';
-    bulkTextarea.value = mode==='ko' ? KO_WORDS.map(i=>`${i.word},${i.roman}`).join('\n') : EN_WORDS.map(i=>`${i.word},${i.meaning}`).join('\n');
+    const list = currentNotebookAllWords();
+    bulkTextarea.value = mode==='ko' ? list.map(i=>`${i.word},${i.roman}`).join('\n') : list.map(i=>`${i.word},${i.meaning}`).join('\n');
   });
   $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
-  $('importBtn').addEventListener('click', ()=>{
+
+  // Import only ever INSERTs new words (server-side dedup by word text within the
+  // target notebook, see functions/api/words/bulk.js) — it never rewrites an existing
+  // row, so re-importing can't step on that word's favorite/notes/SRS state.
+  async function importInto(m, items){
+    if(items.length===0) return 0;
+    const notebookId = currentNotebookIdByMode[m];
+    if(notebookId==null) return 0;
+    let created=null;
+    if(cloudOk){
+      try{ created = await bulkImportRemote(m, notebookId, items); }
+      catch(err){ console.error('bulk import failed', err); showCloudWarning('cloudSaveFailed'); }
+    }
+    if(!created){
+      const existingWords = new Set((notebookWords[m].get(notebookId)||[]).map(w=>w.word));
+      created = items.filter(it=>!existingWords.has(it.word)).map(it=>localWordFallback(notebookId, it));
+    }
+    created.forEach(w=>addWordToStore(m, w));
+    return created.length;
+  }
+
+  $('importBtn').addEventListener('click', async ()=>{
     const rawText=bulkTextarea.value.trim();
     if(!rawText){ alert(t('importAlertEmpty')); return; }
     const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
@@ -1557,44 +1877,77 @@
       if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)){
         if(seenKo.has(word)) return;
         seenKo.add(word);
-        tempKo.push({word,roman:definition,favorite:false,notes:''});
+        tempKo.push({word,roman:definition});
       } else {
         if(seenEn.has(word)) return;
         seenEn.add(word);
-        tempEn.push({word,meaning:definition,favorite:false,notes:''});
+        tempEn.push({word,meaning:definition});
       }
     });
-    if(tempKo.length>0){
-      addHistoryBatch('ko', tempKo);
-      KO_WORDS=tempKo; pushWordsToCloud('ko', KO_WORDS);
-    }
-    if(tempEn.length>0){
-      addHistoryBatch('en', tempEn);
-      EN_WORDS=tempEn; pushWordsToCloud('en', EN_WORDS);
-    }
-    alert(t('importSuccess',{koCount:tempKo.length,enCount:tempEn.length,date:todayStr()}));
+    const addedKo = await importInto('ko', tempKo);
+    const addedEn = await importInto('en', tempEn);
+    alert(t('importSuccess',{count:addedKo+addedEn, date:todayStr()}));
     modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
+    selectedDatesByMode[mode]=null;
+    updateCurrentNotebookBar(); renderDateFilterRow();
     wordIndex=0; loadWord();
   });
 
+  function makeLocalNotebook(m){
+    return { id: nextLocalId(), name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'purple', coverEmoji:'📖', coverUrl:'' };
+  }
+
+  // wordList/nbList null = cloud unreachable, fall back to a local-only default
+  // notebook + built-in words (never synced, same graceful-degradation as before).
+  function setupModeData(m, nbList, wordList){
+    const nbs = (nbList && nbList.length) ? nbList : [makeLocalNotebook(m)];
+    notebooks[m] = nbs;
+    nbs.forEach(nb=>{ if(!notebookWords[m].has(nb.id)) notebookWords[m].set(nb.id, []); });
+    const words = wordList!=null ? wordList : (m==='ko'?DEFAULT_KO_WORDS:DEFAULT_EN_WORDS).map(w=>({...w}));
+    const fallbackNotebookId = nbs[0].id;
+    words.forEach(w=>{
+      let nbId = w.notebookId;
+      if(nbId==null || !notebookWords[m].has(nbId)) nbId = fallbackNotebookId;
+      w.notebookId = nbId;
+      if(w.id==null) w.id = nextLocalId();
+      if(!w.createdDate) w.createdDate = todayStr();
+      if(w.favorite==null) w.favorite=false;
+      if(w.notes==null) w.notes='';
+      addWordToStore(m, w);
+    });
+    const saved = parseInt(localStorage.getItem(currentNotebookKey(m)), 10);
+    currentNotebookIdByMode[m] = notebooks[m].some(n=>n.id===saved) ? saved : notebooks[m][0].id;
+    selectedDatesByMode[m] = null;
+  }
+
+  // Brand-new account (cloud reachable, zero notebooks yet): seed one real notebook +
+  // the built-in default words as actual synced rows, instead of leaving them as
+  // client-only state the way the old design did (defaults were only local until the
+  // first edit implicitly pushed the whole list).
+  async function seedDefaultNotebook(m, defaults){
+    const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:'purple', coverEmoji:'📖', coverUrl:'' });
+    const words = defaults.length ? await bulkImportRemote(m, nb.id, defaults) : [];
+    return { notebooks:[nb], words };
+  }
+
   async function loadCloudData(){
+    wordsById = new Map();
+    notebookWords = { ko: new Map(), en: new Map() };
     try{
-      const [ko, en, hko, hen] = await Promise.all([
+      let [nbKo, nbEn, wKo, wEn] = await Promise.all([
+        fetchNotebooksFromCloud('ko'),
+        fetchNotebooksFromCloud('en'),
         fetchWordsFromCloud('ko'),
         fetchWordsFromCloud('en'),
-        fetchHistoryFromCloud('ko'),
-        fetchHistoryFromCloud('en'),
       ]);
-      KO_WORDS = ko.length ? ko : [...DEFAULT_KO_WORDS];
-      EN_WORDS = en.length ? en : [...DEFAULT_EN_WORDS];
-      HISTORY_KO = hko;
-      HISTORY_EN = hen;
+      if(nbKo.length===0 && wKo.length===0) ({notebooks: nbKo, words: wKo} = await seedDefaultNotebook('ko', DEFAULT_KO_WORDS));
+      if(nbEn.length===0 && wEn.length===0) ({notebooks: nbEn, words: wEn} = await seedDefaultNotebook('en', DEFAULT_EN_WORDS));
+      setupModeData('ko', nbKo, wKo);
+      setupModeData('en', nbEn, wEn);
     } catch(err){
       console.error('cloud load failed', err);
-      KO_WORDS = [...DEFAULT_KO_WORDS];
-      EN_WORDS = [...DEFAULT_EN_WORDS];
-      HISTORY_KO = [];
-      HISTORY_EN = [];
+      setupModeData('ko', null, null);
+      setupModeData('en', null, null);
       showCloudWarning('cloudUnavailable');
     }
   }
@@ -1639,6 +1992,7 @@
     loadingOverlay.style.display='none';
     mode='ko'; wordIndex=loadLastIndex('ko');
     setActiveTab('ko');
+    updateCurrentNotebookBar(); renderDateFilterRow();
     loadWord();
   }
 
@@ -1729,6 +2083,8 @@
     refreshSwitchUserModalTexts();
     if(!cloudOk && cloudWarningKey) cloudStatusEl.textContent = t(cloudWarningKey);
     render();
+    updateCurrentNotebookBar();
+    renderDateFilterRow();
     renderActiveDrawerView();
     updateFavoriteBtn();
     updateNotesBtn();
@@ -1752,6 +2108,7 @@
     mode = localStorage.getItem(lastModeKey()) || 'ko';
     wordIndex = loadLastIndex(mode);
     setActiveTab(mode);
+    updateCurrentNotebookBar(); renderDateFilterRow();
     loadWord();
   }
 

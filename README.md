@@ -32,8 +32,8 @@
 分五块：
 
 - **顶部导航栏**（sticky）：左边 logo，中间한국어/english切换 tab（切换**练习
-  内容**是韩语还是英语词表），中间偏右"연습 / 단어 목록 / 학습 기록 / 통계"
-  四个导航按钮（对应关闭抽屉 / 打开单词列表 / 打开历史 / 打开统计面板），
+  内容**是韩语还是英语词表），中间偏右"연습 / 단어 목록 / 단어장 / 통계"
+  四个导航按钮（对应关闭抽屉 / 打开单词列表 / 打开单词本管理 / 打开统计面板），
   最右边先是一个**🌙/☀️ 主题开关**（暗色/亮色切换），再是**KO/EN 界面语言
   开关**（只翻译界面文案本身，跟练习内容切换是两回事，互不影响），两个的
   选择都记在 localStorage，最后是账号胶囊按钮（点开切换账号，旁边✎图标是
@@ -44,10 +44,12 @@
   输入框），底部是上一个/下一个按钮。
 - **右侧统计栏**：本次会话统计（정답/건너뜀/정확도/CPM）、즐겨찾기计数、
   딕테이션모드和복습모드两个开关。
-- **单词抽屉**（从右侧滑出）：顶部是"단어 목록/학습 기록"两个 tab，下面是
-  즐겨찾기만/노트만/오답만三个筛选药丸、搜索框、加词小表单（한글+meaning+"+"）、
-  가져오기/AI프롬프트/초기화三个按钮，最下面才是实际的单词列表。原来单独一块
-  的"+ 단어 추가하기"卡片已经合并进这里，主页面下面不再有它。
+- **单词抽屉**（从右侧滑出）：顶部是"단어 목록/단어장/통계"三个 tab。
+  단어 목록标签页顶部是当前单词本的封面/名称/简介条（点"전환"跳去단어장标签
+  切换单词本），下面是按创建日期筛选的药丸行（전체/各个日期，见下面"自定义
+  单词本"一节），再往下是즐겨찾기만/노트만/오답만三个筛选药丸、搜索框、加词
+  小表单（한글+meaning+"+"）、가져오기/AI프롬프트/초기화三个按钮，最下面才
+  是实际的单词列表。단어장标签页是单词本网格，可以新建/编辑/删除单词本。
 
 这些都是纯视觉结构，逐部件高亮、SRS、云端存储等判定逻辑不受影响。
 
@@ -79,16 +81,25 @@
 - **收藏（즐겨찾기）**：当前词一键收藏，单词列表可只看收藏。
 - **笔记（노트）**：给单个词写例句/相关知识，单词列表里有笔记的词会标 📝，并在
   下面附一行笔记内容预览（取前 36 个字符，多行合并成一行，超出用…省略）。
+  收藏和笔记都按单词的数据库主键 `id` 单行读写（`PATCH /api/words/:id`），
+  不管切换到哪个单词本、日期筛选怎么勾选，只要这个词的 `id` 没变，它的收藏/
+  笔记状态在界面上永远实时同步、不会被别的操作覆盖或重置（这是这版重构专门
+  修的一个 bug，见下面"词表数据结构"一节）。
 - **搜索**：单词列表顶部搜索框，实时匹配单词、翻译、笔记内容。
 - **单词列表定位同步**：点击"단어 목록"（或从학습 기록/통계标签切回来）时，列表
   会自动滚动到当前正在背的那个词，不用手动往下翻找。
-- **学习历史（학습 기록）**：批量导入会按日期自动存一条历史记录（同一天多次导入
-  合并更新，不覆盖丢失），可以在"학습 기록"标签里翻看任意一天导入过的内容，
-  一键重新加载回来练习。"이 날짜로 연습하기"按**单词文本**跟当前词表合并——
-  已经在词表里的词保持原样（收藏/笔记/숙련도都不动），只把那天批次里后来被
-  删掉的词重新加回来，不会用历史快照整表覆盖、抹掉这之后积累的收藏和笔记。
-  批量导入解析每一行时会按单词文本自动去重，同一批次里重复粘贴的词只保留
-  第一次出现的那条。
+- **自定义单词本（단어장）**：不区分"官方教材"和"自建生词本"——所有单词本都是
+  统一的自定义容器，可以自由新建/改名/写简介/删除（단어장标签页里"+ 새 단어장"）。
+  封面目前是预设的**渐变色背景 + emoji**（8 种渐变、8 个常用 emoji 加自定义
+  emoji 输入框），后端已经预留 `coverUrl` 字段，以后支持上传自己的图片时直接
+  往这个字段存链接就行，不用再改数据库结构。单词本按한국어/english模式各自
+  独立（一个单词本只属于一种练习语言）。
+- **按创建日期筛选（날짜별 필터）**：进入单词本后，筛选行会列出这个本子里所有
+  出现过的创建日期（例如 2026-07-16、2026-07-15），点日期药丸多选/取消，练习
+  区和单词列表就只在选中的那几天导入/添加的词里循环；默认勾选"전체"背整个
+  本子。加词、批量导入的词都会记下当天日期，不需要手动标记。
+  批量导入只会**新增**本子里还没有的词（按单词文本判重，重复的直接跳过，绝不
+  覆盖已存在的那条），所以重复粘贴同一批内容不会把已有词的收藏/笔记冲掉。
 - **主题切换（🌙/☀️）**：头部账号胶囊左边的独立开关，暗色/亮色两套配色用
   CSS 自定义属性（`--bg`/`--ink-rgb`/`--accent`等）实现，点一下整体切换，
   选择记在 localStorage。**练习卡片和笔记弹窗故意保持奶油色不跟随主题**——
@@ -130,20 +141,36 @@
 
 ## 词表数据结构
 
-单词对象结构：韩语 `{word, roman, favorite, notes}`，英语 `{word, meaning,
-favorite, notes}`。默认词表见 `index.html` 里的 `DEFAULT_KO_WORDS` /
-`DEFAULT_EN_WORDS`——只有在某个账号云端还没有任何数据时才会用到，作为新账号
-的初始展示内容。
+这版重构之前，`words` 表虽然有数据库 `id`，但前端从来拿不到它——保存永远是
+"整表删掉再按数组顺序重新插入"，历史记录回放只能靠**单词文本**做匹配去重。
+这就是"点历史记录/切单词本导致收藏和笔记丢失"这个 bug 的根因：数据没有稳定
+身份，容易在整表覆盖时被文本重名或顺序错位坑到。
+
+现在前端拿到的每个单词对象都带着数据库主键 `id`，所有写操作（收藏/笔记/SRS/
+删除/移动单词本）都是按这个 `id` 的单行 `PATCH`/`DELETE`，不会再有整表覆盖
+这种操作，收藏笔记丢失在架构上已经不可能发生。
+
+单词对象结构：韩语 `{id, notebookId, createdDate, word, roman, favorite,
+notes, box, dueAt, wrongCount}`，英语把 `roman` 换成 `meaning`，其余字段一样。
+单词本对象结构：`{id, name, description, coverGradient, coverEmoji,
+coverUrl}`（`coverUrl` 非空时优先用图片，否则用渐变+emoji）。默认词表见
+`index.html` 里的 `DEFAULT_KO_WORDS` / `DEFAULT_EN_WORDS`——新账号首次访问时
+会真的建一个默认单词本、把这些词批量导入进去存进 D1（不再是像以前那样只停留
+在前端内存里，等第一次编辑才顺带存上）。
 
 ## 项目结构
 
 ```
-index.html              前端全部代码（HTML/CSS/JS 都在一个文件里）
-functions/api/words.js  读取/整体覆盖某账号某语言模式的单词表
-functions/api/history.js 读取/新增某账号某语言模式的学习历史批次
-functions/api/rename.js 把某账号的数据整体迁移到一个新名字
-schema.sql               D1 数据库表结构（words、history_batches）
-wrangler.toml             Cloudflare Pages 项目配置（含 D1 数据库绑定）
+index.html                      前端全部代码（HTML/CSS/JS 都在一个文件里）
+functions/api/notebooks.js      读取某账号某语言模式的单词本列表 / 新建单词本
+functions/api/notebooks/[id].js 改名/改简介/改封面（PATCH），删除单词本（DELETE，级联删除本子里的词）
+functions/api/words.js          读取某账号某语言模式下所有单词 / 加一个新词（POST）/ 清空某个单词本（DELETE）
+functions/api/words/[id].js     按 id 改收藏/笔记/SRS等字段（PATCH）/ 删单个词（DELETE）
+functions/api/words/bulk.js     批量导入到某个单词本（只新增，已存在的单词文本会被跳过，不会覆盖）
+functions/api/rename.js         把某账号的数据（单词、单词本）整体迁移到一个新名字
+schema.sql                      D1 数据库表结构：一份完整的最新 schema，只给全新数据库用
+migrations/                     针对"已经部署过的旧数据库"的一次性升级脚本，见下面部署一节
+wrangler.toml                   Cloudflare Pages 项目配置（含 D1 数据库绑定）
 ```
 
 ## 已知局限
@@ -182,12 +209,23 @@ npx wrangler pages deploy .
 #    （连接 Git 之后的自动构建不一定会保留手动部署时的绑定，要检查一下）
 ```
 
-**如果之前已经建过库**（`words` 表里还没有 `box`/`due_at`/`wrong_count` 这几列，
-即间隔重复/错词本相关字段），重新跑一遍下面这条把新字段加上去即可，不会丢数据：
+**如果之前已经建过库**：`schema.sql` 现在是"全新数据库该长什么样"的完整定义，
+`CREATE TABLE IF NOT EXISTS`/`CREATE INDEX IF NOT EXISTS` 在已存在的库上重跑是
+安全的空操作，但**不会**给已经建好、缺列的旧表补列——补列走 `migrations/` 目录
+下的一次性脚本，按需要跑哪个跑哪个（不会丢数据，也不依赖跑没跑过另一个）：
 
 ```bash
-npx wrangler d1 execute typing-vocab-db --remote --file=./schema.sql
+# words 表里还没有 box/due_at/wrong_count（间隔重复/错词本相关字段）：
+npx wrangler d1 execute typing-vocab-db --remote --file=./migrations/001_add_srs_columns.sql
+
+# 还没有 notebooks 表 / words.notebook_id / words.created_date（这版单词本重构加的）：
+npx wrangler d1 execute typing-vocab-db --remote --file=./migrations/002_add_notebooks.sql
 ```
+
+`migrations/002_add_notebooks.sql` 会自动给每个已有 (账号, 语言模式) 建一个
+默认单词本，把这个模式下所有词都归进去；每个词的创建日期尽量从旧的
+`history_batches` 历史记录里按单词文本匹配回填，匹配不上的记成迁移当天——
+过程中只新增/移动，不会删除或覆盖任何词的收藏、笔记、SRS 状态。
 
 **本地开发调试**（不需要真的部署，用本地模拟的数据库测试后端逻辑）：
 
@@ -196,7 +234,7 @@ npx wrangler d1 execute typing-vocab-db --local --file=./schema.sql
 npx wrangler pages dev .
 ```
 
-如果 `/api/words`、`/api/history` 等接口访问不到（比如还没部署好、或本地直接用
+如果 `/api/words`、`/api/notebooks` 等接口访问不到（比如还没部署好、或本地直接用
 `python -m http.server` 这种纯静态服务器打开），页面会自动降级：用内置的默认
 词表跑起来，并在进度条下方显示一行提示，说明这次的改动不会被保存——不会白屏
 或报错卡住。
@@ -217,23 +255,31 @@ npx wrangler pages dev .
    exception"通用错误页，看不出具体原因——去 Cloudflare 后台 Workers & Pages →
    项目 → **Logs**（实时日志）里翻真正的报错。
 
-**已知会导致 500 的两个原因（都遇到过）：**
+**已知会导致 500 的原因（都遇到过）：**
 
 - **绑定没跟着部署生效**：在 Cloudflare 后台 Settings → Bindings 里加/改 D1
   绑定，只对**之后**的新部署生效，不会补给已经部署好的旧版本。改完绑定要
   触发一次新部署（随便 push 一个空提交，或去 Deployments 里点 Retry deployment）。
-- **schema.sql 迁移语句写错、静默失败**：`ALTER TABLE ... ADD COLUMN` 在
-  SQLite/D1 里**不支持** `IF NOT EXISTS` 修饰符（这个只有 `CREATE TABLE`/
-  `CREATE INDEX` 才有）。早期版本的 `schema.sql` 就是这么写的三条加字段语句，
-  `wrangler d1 execute --file=./schema.sql` 跑完没有报出显眼的错误，但那三条
-  `ALTER TABLE` 其实一条都没成功执行——`words` 表里始终没有 `box`/`due_at`/
-  `wrong_count` 这几列，而代码已经在按这几列查询了，于是每次请求都 500。
-  **怎么判断迁移是不是真的生效**：看 `wrangler` 跑完打印的统计表，
-  `Total queries executed` 要等于 `schema.sql` 里的语句条数（当前是 7 条），
-  涉及改动已有数据的语句 `Rows written` 不应该是 0——数字对不上就说明有语句
-  被静默跳过了，得去检查 SQL 语法。
+- **迁移语句写错、静默失败**：`ALTER TABLE ... ADD COLUMN` 在 SQLite/D1 里
+  **不支持** `IF NOT EXISTS` 修饰符（这个只有 `CREATE TABLE`/`CREATE INDEX`
+  才有）。早期版本的 `schema.sql` 把这种 `ALTER TABLE` 语句和 `CREATE TABLE`
+  写在同一个文件里，`wrangler d1 execute --file=...` 跑完没有报出显眼的错误，
+  但 `ALTER TABLE` 其实一条都没成功执行，代码已经在按新列查询了，于是每次
+  请求都 500。**怎么判断迁移是不是真的生效**：看 `wrangler` 跑完打印的统计
+  表，`Total queries executed` 要等于文件里的语句条数，涉及改动已有数据的
+  语句 `Rows written` 不应该是 0——数字对不上就说明有语句被静默跳过了。
+- **`wrangler d1 execute --file` 是把整个文件当一个事务跑的**：只要文件里
+  任何一条语句报错（哪怕是"这列已经加过了"这种预期内、本该忽略的报错），
+  **整个文件都会回滚**，包括这条报错语句后面那些原本会成功、这次真正需要
+  跑的新语句——不是"跳过这一条继续跑下一条"。这也是为什么 `schema.sql` 和
+  `migrations/` 要分开：`schema.sql` 只给全新数据库用（每条语句在新库上都
+  能成功，不会遇到"已经加过"的情况），针对已部署旧库的 `ALTER TABLE` 全部
+  挪到独立的 `migrations/00N_xxx.sql` 里，一个迁移一个文件，不会被另一个
+  迁移"这列已经加过"的报错连累回滚。以后新增字段/表时，新的一次性迁移也应
+  该继续新开一个 `migrations/00N_xxx.sql`，而不是塞进 `schema.sql` 或者塞进
+  前一个迁移文件末尾。
 
-**以后改 `schema.sql` 时怎么避免类似问题：**
+**改完 `schema.sql` 或新加一个 `migrations/*.sql` 时怎么验证：**
 
 1. 先在本地库上跑一遍确认语法没问题，再跑 `--remote`：
    ```bash
@@ -245,6 +291,7 @@ npx wrangler pages dev .
    ```
    确认新加的列真的出现在结果里。
 3. `ALTER TABLE ADD COLUMN` 没有 `IF NOT EXISTS` 这种写法，老老实实写
-   `ALTER TABLE words ADD COLUMN xxx ...` 就行；第二次在已经有这列的库上
-   重复跑会报 "duplicate column name"，这是正常现象（说明已经加过了），
-   忽略即可——不像 `CREATE TABLE IF NOT EXISTS` 那样能反复安全重跑。
+   `ALTER TABLE words ADD COLUMN xxx ...` 就行；在已经有这列的库上重复跑同一个
+   迁移文件会报 "duplicate column name"，这是正常现象（说明已经加过了），但
+   因为上面那条"整文件事务"的坑，**不要**把这种"预期会重复报错"的迁移语句和
+   还没跑过的新语句写进同一个文件——分开成独立文件才能保证互不连累。
