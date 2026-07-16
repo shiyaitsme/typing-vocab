@@ -904,7 +904,7 @@
 
     if(mode==='ko'){
       koRow.style.display='flex'; enRow.style.display='none';
-      romanizationEl.textContent = dictation ? '???' : (KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'');
+      romanizationEl.textContent = KO_WORDS[wordIndex]?KO_WORDS[wordIndex].roman:'';
       koRow.innerHTML='';
       let allComplete=koEngine.activeIndex===koEngine.targets.length-1;
       let allCorrect=true;
@@ -944,7 +944,7 @@
       statusBanner.style.color = wordDone&&allCorrect ? COL.green : 'inherit';
     } else {
       koRow.style.display='none'; enRow.style.display='flex';
-      romanizationEl.textContent = dictation ? '???' : (EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'');
+      romanizationEl.textContent = EN_WORDS[wordIndex]?EN_WORDS[wordIndex].meaning:'';
       enRow.innerHTML='';
       const r=renderEnglish(enEngine,dictation);
       if(r.cells.some(c=>c.mode==='red')) currentAttemptHadError=true;
