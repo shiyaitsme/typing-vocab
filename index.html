@@ -43,6 +43,9 @@
   <!-- PROGRESS -->
   <div id="progress" style="max-width:1100px;width:100%;padding:4px 24px 18px;font-size:11px;letter-spacing:1px;color:#8f8f8f;text-align:center;"></div>
   <div id="cloudStatus" style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10.5px;letter-spacing:.5px;color:#e0433a;text-align:center;display:none;"></div>
+  <div style="max-width:1100px;width:100%;padding:0 24px 8px;font-size:10px;letter-spacing:.5px;color:#8f8f8f;text-align:center;">
+    👤 <span id="currentUserLabel"></span> · <button id="switchUserBtn" style="all:unset;cursor:pointer;text-decoration:underline;color:#8f8f8f;">계정 전환</button>
+  </div>
 
   <!-- MAIN CARD -->
   <div style="width:100%;max-width:1000px;padding:0 20px;">
@@ -177,6 +180,19 @@
   <!-- LOADING OVERLAY -->
   <div id="loadingOverlay" style="position:fixed;inset:0;background:#0c0c0c;display:flex;align-items:center;justify-content:center;z-index:1500;color:#8f8f8f;font-size:12px;letter-spacing:1px;text-transform:uppercase;">
     불러오는 중...
+  </div>
+
+  <!-- SWITCH USER MODAL -->
+  <div id="switchUserModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+    <div style="background:#f1ede6;color:#111;padding:22px;width:95%;max-width:400px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;">👤 계정 전환</div>
+      <div style="font-size:11px;color:#5b5650;line-height:1.5;">다른 기기에서 쓴 이름과 대소문자·띄어쓰기까지 정확히 똑같이 입력해야 같은 데이터를 볼 수 있습니다.</div>
+      <input type="text" id="switchUserInput" placeholder="예: shiya" autocomplete="off" style="width:100%;padding:10px;border:1px solid #111;font-size:13px;font-family:'JetBrains Mono',monospace;">
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="closeSwitchUserModalBtn" style="all:unset;cursor:pointer;padding:9px 14px;border:1px solid #111;font-size:11px;letter-spacing:.5px;text-transform:uppercase;">취소</button>
+        <button id="submitSwitchUserBtn" style="all:unset;cursor:pointer;padding:9px 14px;background:#111;color:#e7b8da;font-size:11px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;">전환하기</button>
+      </div>
+    </div>
   </div>
 
   <div style="max-width:600px;padding:26px 20px 0;font-size:10.5px;line-height:1.6;color:#6b665f;text-align:center;">
@@ -384,6 +400,8 @@
   const notesBtn=$('notesBtn'), notesModalOverlay=$('notesModalOverlay'), notesModalTitle=$('notesModalTitle'), notesTextarea=$('notesTextarea');
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
+  const currentUserLabel=$('currentUserLabel');
+  const switchUserModalOverlay=$('switchUserModalOverlay'), switchUserInput=$('switchUserInput');
 
   /* =========================================================
    * Cloud storage (Cloudflare Pages Functions + D1)
@@ -917,8 +935,7 @@
     wordIndex=0; loadWord();
   });
 
-  async function init(){
-    await ensureUserId();
+  async function loadCloudData(){
     try{
       const [ko, en, hko, hen] = await Promise.all([
         fetchWordsFromCloud('ko'),
@@ -938,6 +955,42 @@
       HISTORY_EN = [];
       showCloudWarning('클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.');
     }
+  }
+
+  function openSwitchUserModal(){
+    switchUserInput.value = userId;
+    switchUserModalOverlay.style.opacity='1'; switchUserModalOverlay.style.pointerEvents='auto';
+    switchUserInput.focus(); switchUserInput.select();
+  }
+  function closeSwitchUserModal(){
+    switchUserModalOverlay.style.opacity='0'; switchUserModalOverlay.style.pointerEvents='none';
+  }
+  async function switchToUser(newName){
+    const name = newName.trim();
+    if(!name){ return; }
+    if(name===userId){ closeSwitchUserModal(); return; }
+    userId = name;
+    localStorage.setItem(USER_ID_KEY, userId);
+    currentUserLabel.textContent = userId;
+    closeSwitchUserModal();
+    loadingOverlay.style.display='flex';
+    cloudOk = true;
+    cloudStatusEl.style.display = 'none';
+    await loadCloudData();
+    loadingOverlay.style.display='none';
+    mode='ko'; wordIndex=0;
+    setActiveTab('ko');
+    loadWord();
+  }
+  $('switchUserBtn').addEventListener('click', openSwitchUserModal);
+  $('closeSwitchUserModalBtn').addEventListener('click', closeSwitchUserModal);
+  $('submitSwitchUserBtn').addEventListener('click', ()=> switchToUser(switchUserInput.value));
+  switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); switchToUser(switchUserInput.value); } });
+
+  async function init(){
+    await ensureUserId();
+    currentUserLabel.textContent = userId;
+    await loadCloudData();
     loadingOverlay.style.display='none';
     setActiveTab('ko');
     loadWord();
