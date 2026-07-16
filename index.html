@@ -988,7 +988,7 @@
     }
   }
 
-  function renderDrawer(){
+  function renderDrawer(scrollToActive){
     drawerContent.innerHTML='';
     const total=currentWordCount();
     if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
@@ -998,6 +998,7 @@
     const wrongOnly = wrongOnlyToggle.checked;
     const query = wordSearchInput.value.trim().toLowerCase();
     let shown=0;
+    let activeEl=null;
     list.forEach((item,index)=>{
       if(favoritesOnly && !item.favorite) return;
       const hasNotes = !!(item.notes && item.notes.trim());
@@ -1009,12 +1010,15 @@
         if(!haystack.includes(query)) return;
       }
       shown++;
-      drawerContent.appendChild(createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0));
+      const el = createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0);
+      if(index===wordIndex) activeEl=el;
+      drawerContent.appendChild(el);
     });
     if(shown===0){
       const msg = query ? t('noSearchResults') : (notesOnly ? t('noNotesWords') : (wrongOnly ? t('noWrongWords') : t('noFavWords')));
       drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${msg}</div>`;
     }
+    if(scrollToActive && activeEl) activeEl.scrollIntoView({block:'start'});
   }
 
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount){
@@ -1045,11 +1049,11 @@
     return container;
   }
 
-  function renderActiveDrawerView(){
-    if(drawerView==='history') renderHistory(); else if(drawerView==='stats') renderStats(); else renderDrawer();
+  function renderActiveDrawerView(scrollToActive){
+    if(drawerView==='history') renderHistory(); else if(drawerView==='stats') renderStats(); else renderDrawer(scrollToActive);
   }
 
-  function setDrawerView(view){
+  function setDrawerView(view, scrollToActive){
     drawerView=view;
     const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`};
     const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent'};
@@ -1057,7 +1061,7 @@
     Object.assign(drawerTabHistory.style, view==='history'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
     wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
-    renderActiveDrawerView();
+    renderActiveDrawerView(scrollToActive);
   }
 
   function todayStr(){
@@ -1433,11 +1437,11 @@
     Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
   }
   $('navPracticeBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
-  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words'); setNavActive('words'); });
+  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words', true); setNavActive('words'); });
   $('openHistoryBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('history'); setNavActive('history'); });
   $('openStatsBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('stats'); setNavActive('stats'); });
   $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
-  drawerTabWords.addEventListener('click', ()=>setDrawerView('words'));
+  drawerTabWords.addEventListener('click', ()=>setDrawerView('words', true));
   drawerTabHistory.addEventListener('click', ()=>setDrawerView('history'));
   drawerTabStats.addEventListener('click', ()=>setDrawerView('stats'));
 
@@ -1535,13 +1539,21 @@
     if(!rawText){ alert(t('importAlertEmpty')); return; }
     const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
     const tempKo=[], tempEn=[];
+    const seenKo=new Set(), seenEn=new Set();
     lines.forEach(line=>{
       const parts=line.split(',');
       const word=parts[0]?parts[0].trim():'';
       const definition=parts[1]?parts[1].trim():'Custom';
       if(!word) return;
-      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition,favorite:false,notes:''});
-      else tempEn.push({word,meaning:definition,favorite:false,notes:''});
+      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)){
+        if(seenKo.has(word)) return;
+        seenKo.add(word);
+        tempKo.push({word,roman:definition,favorite:false,notes:''});
+      } else {
+        if(seenEn.has(word)) return;
+        seenEn.add(word);
+        tempEn.push({word,meaning:definition,favorite:false,notes:''});
+      }
     });
     if(tempKo.length>0){
       addHistoryBatch('ko', tempKo);
