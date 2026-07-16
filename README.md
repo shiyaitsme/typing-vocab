@@ -167,3 +167,51 @@ npx wrangler pages dev .
 `python -m http.server` 这种纯静态服务器打开），页面会自动降级：用内置的默认
 词表跑起来，并在进度条下方显示一行提示，说明这次的改动不会被保存——不会白屏
 或报错卡住。
+
+## 故障排查：进度条下面出现红字警告
+
+"클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다." 这行红字
+代表这次打开页面时 `/api/words`（或 `/api/history`）请求失败了，页面自动降级用
+内置默认词表跑。**这不代表数据被删了**——只要这个警告出现，`cloudOk` 就会变
+`false`，之后所有保存操作（`pushWordsToCloud`）都会被跳过，不会拿默认词表把
+云端的真实数据覆盖掉。原来的数据大概率还老老实实存在 D1 里，只是这次连不上。
+
+排查顺序：
+
+1. 浏览器开发者工具（`Cmd+Option+I`）→ **Network** 标签，刷新页面，找
+   `words?user=...` 这条请求，看**状态码**。
+2. 如果是 **500**，Response 里通常是 Cloudflare 自己生成的"Worker threw
+   exception"通用错误页，看不出具体原因——去 Cloudflare 后台 Workers & Pages →
+   项目 → **Logs**（实时日志）里翻真正的报错。
+
+**已知会导致 500 的两个原因（都遇到过）：**
+
+- **绑定没跟着部署生效**：在 Cloudflare 后台 Settings → Bindings 里加/改 D1
+  绑定，只对**之后**的新部署生效，不会补给已经部署好的旧版本。改完绑定要
+  触发一次新部署（随便 push 一个空提交，或去 Deployments 里点 Retry deployment）。
+- **schema.sql 迁移语句写错、静默失败**：`ALTER TABLE ... ADD COLUMN` 在
+  SQLite/D1 里**不支持** `IF NOT EXISTS` 修饰符（这个只有 `CREATE TABLE`/
+  `CREATE INDEX` 才有）。早期版本的 `schema.sql` 就是这么写的三条加字段语句，
+  `wrangler d1 execute --file=./schema.sql` 跑完没有报出显眼的错误，但那三条
+  `ALTER TABLE` 其实一条都没成功执行——`words` 表里始终没有 `box`/`due_at`/
+  `wrong_count` 这几列，而代码已经在按这几列查询了，于是每次请求都 500。
+  **怎么判断迁移是不是真的生效**：看 `wrangler` 跑完打印的统计表，
+  `Total queries executed` 要等于 `schema.sql` 里的语句条数（当前是 7 条），
+  涉及改动已有数据的语句 `Rows written` 不应该是 0——数字对不上就说明有语句
+  被静默跳过了，得去检查 SQL 语法。
+
+**以后改 `schema.sql` 时怎么避免类似问题：**
+
+1. 先在本地库上跑一遍确认语法没问题，再跑 `--remote`：
+   ```bash
+   npx wrangler d1 execute typing-vocab-db --local --file=./schema.sql
+   ```
+2. 跑完 `--remote` 之后，实际查一下表结构，别只看有没有报错：
+   ```bash
+   npx wrangler d1 execute typing-vocab-db --remote --command "PRAGMA table_info(words);"
+   ```
+   确认新加的列真的出现在结果里。
+3. `ALTER TABLE ADD COLUMN` 没有 `IF NOT EXISTS` 这种写法，老老实实写
+   `ALTER TABLE words ADD COLUMN xxx ...` 就行；第二次在已经有这列的库上
+   重复跑会报 "duplicate column name"，这是正常现象（说明已经加过了），
+   忽略即可——不像 `CREATE TABLE IF NOT EXISTS` 那样能反复安全重跑。
