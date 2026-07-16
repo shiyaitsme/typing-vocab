@@ -1112,10 +1112,15 @@
     const history = mode==='ko' ? HISTORY_KO : HISTORY_EN;
     const entry = history[index];
     if(!entry) return;
-    const snapshot = entry.words.map(w=>({...w}));
-    if(mode==='ko') KO_WORDS=snapshot; else EN_WORDS=snapshot;
+    const list = currentWordList();
+    let firstIndex = -1;
+    entry.words.forEach(hw=>{
+      let idx = list.findIndex(w=>w.word===hw.word);
+      if(idx===-1){ list.push({...hw}); idx = list.length-1; }
+      if(firstIndex===-1) firstIndex = idx;
+    });
     persistCurrentWordList();
-    wordIndex=0;
+    wordIndex = firstIndex>=0 ? firstIndex : 0;
     drawer.style.right='-520px';
     setNavActive('practice');
     setDrawerView('words');
