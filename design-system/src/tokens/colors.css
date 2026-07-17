@@ -1,0 +1,37 @@
+/* TYPE/TRAINER design tokens — color.
+   Dark is the default theme (matches the shipped app's default). Apply
+   `.tt-theme-light` to any ancestor element to switch a subtree to light. */
+
+:root {
+  --tt-bg: #0a0a0a;
+  --tt-bg-rgb: 10, 10, 10;
+  --tt-ink-rgb: 242, 237, 226;
+  --tt-input-bg: #141414;
+  --tt-accent: #e3b8d6;
+  --tt-accent-rgb: 227, 184, 214;
+  --tt-accent-ink: #0a0a0a;
+  --tt-warn: #e07a5f;
+  --tt-warn-rgb: 224, 122, 95;
+
+  /* The practice surface ("paper") is a fixed cream card that does not
+     swap with the dark/light theme toggle — it matches the shipped app. */
+  --tt-paper-bg: #f2ede2;
+  --tt-paper-ink: #0a0a0a;
+  --tt-paper-ink-rgb: 10, 10, 10;
+  --tt-paper-accent: #f7cdce;
+  --tt-paper-gray: #c9c2b3;
+  --tt-paper-red: #c0392b;
+  --tt-paper-green: #0a7a3d;
+}
+
+.tt-theme-light {
+  --tt-bg: #f1efe9;
+  --tt-bg-rgb: 241, 239, 233;
+  --tt-ink-rgb: 26, 23, 20;
+  --tt-input-bg: #ffffff;
+  --tt-accent: #f7cdce;
+  --tt-accent-rgb: 247, 205, 206;
+  --tt-accent-ink: #1a1714;
+  --tt-warn: #b8451f;
+  --tt-warn-rgb: 184, 69, 31;
+}

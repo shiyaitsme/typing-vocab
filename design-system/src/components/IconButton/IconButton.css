@@ -1,0 +1,40 @@
+.tt-icon-button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--tt-font-body);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.tt-icon-button--md {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+.tt-icon-button--sm {
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+}
+
+.tt-icon-button--square {
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  background: transparent;
+  color: rgb(var(--tt-ink-rgb));
+}
+.tt-icon-button--square:hover {
+  background: rgba(var(--tt-ink-rgb), 0.08);
+}
+
+.tt-icon-button--soft-circle {
+  border-radius: 100px;
+  background: rgba(var(--tt-ink-rgb), 0.08);
+  color: rgba(var(--tt-ink-rgb), 0.75);
+}
+.tt-icon-button--soft-circle:hover {
+  background: rgba(var(--tt-ink-rgb), 0.16);
+}

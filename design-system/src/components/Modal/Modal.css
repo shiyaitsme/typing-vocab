@@ -1,0 +1,59 @@
+.tt-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.tt-modal__panel {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 4px;
+  padding: 26px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--tt-font-body);
+}
+
+.tt-modal__panel--default {
+  background: var(--tt-bg);
+  color: rgb(var(--tt-ink-rgb));
+  border: 1px solid rgba(var(--tt-ink-rgb), 0.2);
+}
+
+.tt-modal__panel--paper {
+  background: var(--tt-paper-bg);
+  color: var(--tt-paper-ink);
+}
+
+.tt-modal__panel--danger {
+  background: var(--tt-bg);
+  color: rgb(var(--tt-ink-rgb));
+  border: 1px solid rgba(var(--tt-warn-rgb), 0.4);
+}
+
+.tt-modal__title {
+  font-family: var(--tt-font-display);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.tt-modal__description {
+  font-size: 11px;
+  line-height: 1.6;
+  opacity: 0.6;
+}
+
+.tt-modal__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}

@@ -1,0 +1,17 @@
+.tt-card {
+  box-sizing: border-box;
+  border: 1px solid rgba(var(--tt-ink-rgb), 0.16);
+  border-radius: 4px;
+  padding: 18px;
+  font-family: var(--tt-font-body);
+  color: rgb(var(--tt-ink-rgb));
+}
+
+.tt-card__title {
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: rgba(var(--tt-ink-rgb), 0.45);
+  margin-bottom: 8px;
+}

@@ -1,0 +1,129 @@
+.tt-practice-card {
+  box-sizing: border-box;
+  background: var(--tt-paper-bg);
+  color: var(--tt-paper-ink);
+  border-radius: 4px;
+  padding: 30px;
+  font-family: var(--tt-font-body);
+  max-width: 620px;
+}
+
+.tt-practice-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.tt-practice-card__counter-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.tt-practice-card__counter {
+  font-family: var(--tt-font-display);
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+}
+
+.tt-practice-card__mastery-dots {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+.tt-practice-card__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(var(--tt-paper-ink-rgb), 0.15);
+}
+.tt-practice-card__dot[data-filled] {
+  background: var(--tt-paper-accent);
+}
+
+.tt-practice-card__actions {
+  display: flex;
+  gap: 8px;
+}
+/* The action icon buttons always sit on the fixed cream paper surface, so
+   they use the paper ink tone regardless of the app's dark/light theme. */
+.tt-practice-card__actions .tt-icon-button--square {
+  color: var(--tt-paper-ink);
+}
+.tt-practice-card__actions .tt-icon-button--square:hover {
+  background: rgba(var(--tt-paper-ink-rgb), 0.08);
+}
+.tt-practice-card__actions .tt-icon-button[data-active] {
+  color: var(--tt-paper-accent);
+  border-color: var(--tt-paper-accent);
+}
+
+.tt-practice-card__stage {
+  border-top: 1.5px solid var(--tt-paper-ink);
+  border-bottom: 1.5px solid var(--tt-paper-ink);
+  padding: 30px 0;
+  text-align: center;
+}
+
+.tt-practice-card__romanization {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--tt-paper-ink-rgb), 0.5);
+  margin-bottom: 16px;
+  min-height: 14px;
+}
+
+.tt-practice-card__row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.tt-practice-card__status {
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  height: 18px;
+  margin-top: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--tt-paper-green);
+}
+
+.tt-practice-card__input.tt-text-input {
+  margin: 18px auto 0;
+  max-width: 320px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 11px 14px;
+}
+
+.tt-practice-card__tip {
+  font-size: 10.5px;
+  color: rgba(var(--tt-paper-ink-rgb), 0.45);
+  text-align: center;
+  letter-spacing: 0.3px;
+  margin-top: 6px;
+}
+
+.tt-practice-card__nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 22px;
+}
+.tt-practice-card__nav .tt-button--dashed {
+  color: var(--tt-paper-ink);
+  border-color: var(--tt-paper-ink);
+}
+.tt-practice-card__nav .tt-button--dashed:hover {
+  background: var(--tt-paper-ink);
+  color: var(--tt-paper-bg);
+}

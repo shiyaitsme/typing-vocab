@@ -1,0 +1,60 @@
+.tt-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 32px;
+  border-bottom: 1px solid rgba(var(--tt-ink-rgb), 0.14);
+  background: rgba(var(--tt-bg-rgb), 0.88);
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+  font-family: var(--tt-font-body);
+  color: rgb(var(--tt-ink-rgb));
+  box-sizing: border-box;
+}
+
+.tt-app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tt-app-header__logo {
+  font-family: var(--tt-font-display);
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+.tt-app-header__logo-accent {
+  color: var(--tt-accent);
+}
+
+.tt-app-header__tagline {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: rgba(var(--tt-ink-rgb), 0.5);
+  font-weight: 500;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.tt-app-header__center {
+  display: flex;
+}
+
+.tt-app-header__nav {
+  display: flex;
+  gap: 18px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.tt-app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

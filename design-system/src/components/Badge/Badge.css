@@ -1,0 +1,21 @@
+.tt-badge {
+  display: inline-block;
+  font-family: var(--tt-font-mono);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.tt-badge--default {
+  color: rgba(var(--tt-paper-ink-rgb), 0.45);
+  border: 1px solid rgba(var(--tt-paper-ink-rgb), 0.2);
+}
+
+.tt-badge--accent {
+  color: var(--tt-accent-ink);
+  background: var(--tt-accent);
+  border: 1px solid transparent;
+}

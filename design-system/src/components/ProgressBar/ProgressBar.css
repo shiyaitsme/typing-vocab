@@ -1,0 +1,23 @@
+.tt-progress-bar {
+  font-family: var(--tt-font-body);
+}
+
+.tt-progress-bar__track {
+  height: 5px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(var(--tt-ink-rgb), 0.12);
+}
+
+.tt-progress-bar__fill {
+  height: 100%;
+  background: var(--tt-accent);
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tt-progress-bar__label {
+  margin-top: 8px;
+  font-size: 10.5px;
+  color: rgba(var(--tt-ink-rgb), 0.4);
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,12 @@
+{
+  "projectId": "94ff5e9c-96ff-41a1-b124-9d407c9eea6a",
+  "shape": "package",
+  "pkg": "@typing-vocab/design-system",
+  "globalName": "TypeTrainerDS",
+  "buildCmd": "npm run build",
+  "cssEntry": "dist/index.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "Modal": { "cardMode": "single" }
+  }
+}

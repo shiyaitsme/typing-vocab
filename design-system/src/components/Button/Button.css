@@ -1,0 +1,83 @@
+.tt-button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--tt-font-body);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: 2px;
+  transition: background 0.18s ease, color 0.18s ease, letter-spacing 0.18s ease,
+    border-color 0.18s ease;
+  white-space: nowrap;
+}
+
+.tt-button--md {
+  padding: 9px 16px;
+  font-size: 11px;
+}
+
+.tt-button--sm {
+  padding: 6px 12px;
+  font-size: 10px;
+}
+
+.tt-button--accent {
+  background: var(--tt-accent);
+  color: var(--tt-accent-ink);
+}
+.tt-button--accent:hover {
+  filter: brightness(1.05);
+}
+
+.tt-button--invert {
+  border-radius: 100px;
+  background: rgb(var(--tt-ink-rgb));
+  color: var(--tt-bg);
+  padding-inline: 16px;
+}
+
+.tt-button--outline {
+  border: 1px solid rgba(var(--tt-ink-rgb), 0.25);
+  color: rgb(var(--tt-ink-rgb));
+  background: transparent;
+}
+.tt-button--outline:hover {
+  border-color: rgba(var(--tt-ink-rgb), 0.5);
+}
+
+.tt-button--dashed {
+  border: 1.5px dashed rgb(var(--tt-ink-rgb));
+  color: rgb(var(--tt-ink-rgb));
+  background: transparent;
+}
+.tt-button--dashed:hover {
+  background: var(--tt-bg);
+  letter-spacing: 0.1em;
+}
+
+.tt-button--ghost {
+  color: rgba(var(--tt-ink-rgb), 0.45);
+  background: transparent;
+  padding: 4px 2px;
+}
+.tt-button--ghost:hover {
+  color: rgb(var(--tt-ink-rgb));
+}
+
+.tt-button--danger {
+  border: 1px solid rgba(var(--tt-warn-rgb), 0.4);
+  color: var(--tt-warn);
+  background: transparent;
+}
+.tt-button--danger:hover {
+  border-color: var(--tt-warn);
+}
+
+.tt-button--danger-solid {
+  background: var(--tt-warn);
+  color: #fff;
+}

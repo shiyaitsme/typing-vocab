@@ -1,0 +1,27 @@
+.tt-toggle {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--tt-font-body);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: rgba(var(--tt-ink-rgb), 0.65);
+}
+
+.tt-toggle__input {
+  accent-color: var(--tt-accent);
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.tt-toggle--chip {
+  justify-content: center;
+  border: 1px solid rgba(var(--tt-ink-rgb), 0.25);
+  color: rgb(var(--tt-ink-rgb));
+  padding: 8px;
+  font-weight: 700;
+  border-radius: 2px;
+}

@@ -1,0 +1,35 @@
+.tt-text-input {
+  box-sizing: border-box;
+  width: 100%;
+  font-family: var(--tt-font-body);
+  font-weight: 600;
+  outline: none;
+  border-radius: 2px;
+  padding: 11px 14px;
+  font-size: 13px;
+}
+
+.tt-text-input--centered {
+  text-align: center;
+}
+
+.tt-text-input--dark {
+  background: var(--tt-input-bg);
+  border: 1px solid rgba(var(--tt-ink-rgb), 0.2);
+  color: rgb(var(--tt-ink-rgb));
+}
+.tt-text-input--dark::placeholder {
+  color: rgba(var(--tt-ink-rgb), 0.35);
+}
+.tt-text-input--dark:focus {
+  border-color: var(--tt-accent);
+}
+
+.tt-text-input--paper {
+  background: #fff;
+  border: 1.5px solid var(--tt-paper-ink);
+  color: var(--tt-paper-ink);
+}
+.tt-text-input--paper::placeholder {
+  color: rgba(var(--tt-paper-ink-rgb), 0.4);
+}
