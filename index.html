@@ -528,7 +528,7 @@
       mobileTipEn: '※ 영어 모드일 때는 영문 키보드로 입력해 주세요.',
       sessionStatsTitle: '이번 세션', favSectionTitle: '즐겨찾기', masteryProgressTitle: '숙련도 진행',
       dictationLabel: '딕테이션 모드', reviewLabel: '🔁 복습 모드',
-      progressLine: '정답 {{correct}} · 건너뜀 {{skipped}} · 정확도 {{accuracy}}% · CPM {{cpm}}{{streak}}',
+      progressLine: '정답 {{correct}} · 건너뜀 {{skipped}} · 정확도 {{accuracy}}%{{streak}}',
       streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
       masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
       correctNext: '정답! Enter로 다음',
@@ -600,7 +600,7 @@
       mobileTipEn: '※ In English mode, please use an English keyboard.',
       sessionStatsTitle: 'This Session', favSectionTitle: 'Favorites', masteryProgressTitle: 'Mastery Progress',
       dictationLabel: 'Dictation Mode', reviewLabel: '🔁 Review Mode',
-      progressLine: 'Correct {{correct}} · Skipped {{skipped}} · Accuracy {{accuracy}}% · CPM {{cpm}}{{streak}}',
+      progressLine: 'Correct {{correct}} · Skipped {{skipped}} · Accuracy {{accuracy}}%{{streak}}',
       streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
       masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
       correctNext: 'Correct! Press Enter for next',
@@ -743,7 +743,7 @@
   /* SRS (spaced repetition) + accuracy/speed tracking */
   const SRS_INTERVALS = [0,1,3,7,14,30]; // days, indexed by box level 0-5
   let reviewMode=false, currentAttemptHadError=false;
-  let sessionStats={startAt:Date.now(), keysTyped:0, wordsCompleted:0, wordsCleanCompleted:0};
+  let sessionStats={wordsCompleted:0, wordsCleanCompleted:0};
   let sessionStreak=0, bestStreak=0;
 
   function addDays(dateStr, days){
@@ -1125,10 +1125,8 @@
   function render(){
     const total=currentWordCount();
     const accuracy = sessionStats.wordsCompleted>0 ? Math.round(sessionStats.wordsCleanCompleted/sessionStats.wordsCompleted*100) : 100;
-    const elapsedMin = Math.max((Date.now()-sessionStats.startAt)/60000, 1/60);
-    const cpm = sessionStats.keysTyped>0 ? Math.round(sessionStats.keysTyped/elapsedMin) : 0;
     const streakTag = sessionStreak>=3 ? t('streakTagFire',{n:sessionStreak}) : (sessionStreak>0 ? t('streakTag',{n:sessionStreak}) : '');
-    progressEl.textContent = t('progressLine',{correct:stats.correct,skipped:stats.skipped,accuracy,cpm,streak:streakTag});
+    progressEl.textContent = t('progressLine',{correct:stats.correct,skipped:stats.skipped,accuracy,streak:streakTag});
     pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
     const pageBadge=$('pageBadge'); if(pageBadge) pageBadge.textContent = total>0 ? `NO.${String(wordIndex+1).padStart(3,'0')}` : '';
     renderMasteryDots(currentWordObj());
@@ -1784,10 +1782,6 @@
     if(markCorrect){
       stats.correct++;
       applySrsResult(word, currentAttemptHadError);
-      const keyCount = mode==='ko'
-        ? koEngine.targets.reduce((sum,t)=>sum+getSlotDescriptors(t).length,0)
-        : (enEngine.word||'').length;
-      sessionStats.keysTyped += keyCount;
       sessionStats.wordsCompleted++;
       if(!currentAttemptHadError){ sessionStats.wordsCleanCompleted++; sessionStreak++; bestStreak=Math.max(bestStreak,sessionStreak); }
       else sessionStreak=0;
