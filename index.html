@@ -1926,7 +1926,30 @@
     const m = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word) ? 'ko' : 'en';
     const notebookId = currentNotebookIdByMode[m];
     if(notebookId==null) return;
-    const fields = m==='ko' ? {word, roman: meaning||'Custom'} : {word, meaning: meaning||'Custom'};
+    const finalMeaning = meaning||'Custom';
+
+    // 일괄 가져오기와 같은 규칙: 이 단어장에 이미 있는 단어 텍스트면 새로
+    // 만들지 않고 그 단어의 뜻에 합친다.
+    const field = meaningField(m);
+    const existing = (notebookWords[m].get(notebookId)||[]).find(w=>w.word===word);
+    if(existing){
+      const merged = mergeMeaningLocal(existing[field], finalMeaning);
+      if(merged !== existing[field]){
+        existing[field] = merged;
+        patchWordRemote(existing.id, m, {[field]: merged});
+      }
+      wordInput.value=''; meaningInput.value='';
+      if(mode!==m){ mode=m; setActiveTab(m); }
+      selectedDatesByMode[m]=null;
+      reviewCategoryByMode[m]=null;
+      updateCurrentNotebookBar(); renderDateFilterRow();
+      const idx = currentWordList().indexOf(existing);
+      wordIndex = idx>=0 ? idx : 0;
+      loadWord();
+      return;
+    }
+
+    const fields = m==='ko' ? {word, roman: finalMeaning} : {word, meaning: finalMeaning};
     let wordObj;
     if(cloudOk){
       try{ wordObj = await createWordRemote(m, notebookId, fields); }
@@ -1938,6 +1961,7 @@
     wordInput.value=''; meaningInput.value='';
     if(mode!==m){ mode=m; setActiveTab(m); }
     selectedDatesByMode[m]=null;
+    reviewCategoryByMode[m]=null;
     updateCurrentNotebookBar(); renderDateFilterRow();
     wordIndex=currentWordCount()-1;
     loadWord();
