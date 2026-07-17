@@ -143,9 +143,9 @@
   </section>
 
   <!-- DRAWER -->
+  <div id="drawerBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s ease;"></div>
   <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
-    <div style="padding:22px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;justify-content:space-between;align-items:center;">
-      <div id="drawerHeaderTitle" data-i18n="drawerHeaderTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:18px;">단어장</div>
+    <div style="padding:22px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;justify-content:flex-end;align-items:center;">
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:rgb(var(--ink-rgb));padding:2px 8px;">&times;</button>
     </div>
     <div style="display:flex;border-bottom:1px solid rgba(var(--ink-rgb),.14);">
@@ -542,7 +542,7 @@
       streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
       masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
       correctNext: '정답! Enter로 다음',
-      drawerHeaderTitle: '단어장', drawerTabWords: '단어 목록', drawerTabNotebooks: '단어장', drawerTabStats: '통계',
+      drawerTabWords: '단어 목록', drawerTabNotebooks: '단어장', drawerTabStats: '통계',
       favOnlyLabel: '★ 즐겨찾기만', notesOnlyLabel: '📝 노트만', wrongOnlyLabel: '❌ 오답만',
       wordSearchPlaceholder: '🔍 단어, 뜻, 노트 검색...', newWordPlaceholder: '단어 (한국어/english)', newMeaningPlaceholder: '뜻/로마자',
       openBulkBtn: '가져오기/내보내기', openAiPromptBtn: '🤖 AI 프롬프트', clearWordsBtn: '초기화',
@@ -617,7 +617,7 @@
       streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
       masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
       correctNext: 'Correct! Press Enter for next',
-      drawerHeaderTitle: 'Notebooks', drawerTabWords: 'Words', drawerTabNotebooks: 'Notebooks', drawerTabStats: 'Stats',
+      drawerTabWords: 'Words', drawerTabNotebooks: 'Notebooks', drawerTabStats: 'Stats',
       favOnlyLabel: '★ Favorites only', notesOnlyLabel: '📝 Notes only', wrongOnlyLabel: '❌ Wrong only',
       wordSearchPlaceholder: '🔍 Search word, meaning, notes...', newWordPlaceholder: 'Word (한국어/english)', newMeaningPlaceholder: 'Meaning / romanization',
       openBulkBtn: 'Import/Export', openAiPromptBtn: '🤖 AI Prompt', clearWordsBtn: 'Reset',
@@ -799,7 +799,15 @@
   const $ = (id)=> document.getElementById(id);
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const progressEl=$('progress'), pageCounter=$('pageCounter');
-  const drawer=$('drawer'), drawerContent=$('drawerContent');
+  const drawer=$('drawer'), drawerContent=$('drawerContent'), drawerBackdrop=$('drawerBackdrop');
+  function openDrawer(){
+    drawer.style.right='0';
+    drawerBackdrop.style.opacity='1'; drawerBackdrop.style.pointerEvents='auto';
+  }
+  function closeDrawer(){
+    drawer.style.right='-520px';
+    drawerBackdrop.style.opacity='0'; drawerBackdrop.style.pointerEvents='none';
+  }
   const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow'), notebooksPanel=$('notebooksPanel');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
@@ -1305,7 +1313,7 @@
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
-    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); drawer.style.right='-520px'; setNavActive('practice'); });
+    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice'); });
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;min-width:0;';
     const mainSpan=document.createElement('span');
@@ -1641,7 +1649,7 @@
     wordIndex = 0;
     updateCurrentNotebookBar(); renderDateFilterRow();
     loadWord();
-    drawer.style.right='-520px';
+    closeDrawer();
     setNavActive('practice');
   }
 
@@ -1945,11 +1953,12 @@
     const map = {practice:'navPracticeBtn', words:'openDrawerBtn', notebooks:'openNotebooksBtn', stats:'openStatsBtn'};
     Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
   }
-  $('navPracticeBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
-  $('openDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('words', true); setNavActive('words'); });
-  $('openNotebooksBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('notebooks'); setNavActive('notebooks'); });
-  $('openStatsBtn').addEventListener('click', ()=>{ drawer.style.right='0'; setDrawerView('stats'); setNavActive('stats'); });
-  $('closeDrawerBtn').addEventListener('click', ()=>{ drawer.style.right='-520px'; setNavActive('practice'); });
+  $('navPracticeBtn').addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
+  $('openDrawerBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('words', true); setNavActive('words'); });
+  $('openNotebooksBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('notebooks'); setNavActive('notebooks'); });
+  $('openStatsBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('stats'); setNavActive('stats'); });
+  $('closeDrawerBtn').addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
+  drawerBackdrop.addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
   drawerTabWords.addEventListener('click', ()=>setDrawerView('words', true));
   drawerTabStats.addEventListener('click', ()=>setDrawerView('stats'));
 
