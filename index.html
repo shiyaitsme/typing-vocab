@@ -926,9 +926,26 @@
     });
   }
 
-  function lastIndexKey(m){ return `TRAINER_LAST_INDEX_${userId}_${m}`; }
-  function loadLastIndex(m){
-    const raw = localStorage.getItem(lastIndexKey(m));
+  function sessionStatsKey(){ return `TRAINER_SESSION_STATS_${userId}_${todayStr()}`; }
+  function saveSessionStats(){
+    localStorage.setItem(sessionStatsKey(), JSON.stringify({ stats, sessionStats }));
+  }
+  function restoreSessionStats(){
+    const raw = localStorage.getItem(sessionStatsKey());
+    if(!raw) return;
+    try{
+      const saved = JSON.parse(raw);
+      if(saved && saved.stats) stats = saved.stats;
+      if(saved && saved.sessionStats) sessionStats = saved.sessionStats;
+    }catch(err){ console.error('restore session stats failed', err); }
+  }
+
+  function lastIndexKey(m, notebookId){
+    const nb = notebookId!=null ? notebookId : currentNotebookIdByMode[m];
+    return `TRAINER_LAST_INDEX_${userId}_${m}_${nb}`;
+  }
+  function loadLastIndex(m, notebookId){
+    const raw = localStorage.getItem(lastIndexKey(m, notebookId));
     const n = raw!==null ? parseInt(raw,10) : 0;
     return Number.isFinite(n) && n>=0 ? n : 0;
   }
@@ -1303,7 +1320,7 @@
     currentNotebookIdByMode[m] = id;
     localStorage.setItem(currentNotebookKey(m), String(id));
     selectedDatesByMode[m] = null;
-    if(m===mode){ wordIndex=0; updateCurrentNotebookBar(); renderDateFilterRow(); loadWord(); }
+    if(m===mode){ wordIndex=loadLastIndex(m, id); updateCurrentNotebookBar(); renderDateFilterRow(); loadWord(); }
   }
 
   function updateCurrentNotebookBar(){
@@ -1780,6 +1797,7 @@
       sessionStreak=0;
     }
     if((markCorrect || currentAttemptHadError) && word) patchWordRemoteDebounced(word.id, mode, ['box','dueAt','wrongCount']);
+    saveSessionStats();
     wordIndex = reviewMode ? reviewAdvance(1) : (wordIndex+1)%currentWordCount();
     loadWord();
   }
@@ -2100,6 +2118,7 @@
     await loadCloudData();
     loadingOverlay.style.display='none';
     mode='ko'; wordIndex=loadLastIndex('ko');
+    restoreSessionStats();
     setActiveTab('ko');
     updateCurrentNotebookBar(); renderDateFilterRow();
     loadWord();
@@ -2216,6 +2235,7 @@
     loadingOverlay.style.display='none';
     mode = localStorage.getItem(lastModeKey()) || 'ko';
     wordIndex = loadLastIndex(mode);
+    restoreSessionStats();
     setActiveTab(mode);
     updateCurrentNotebookBar(); renderDateFilterRow();
     loadWord();
