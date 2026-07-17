@@ -562,6 +562,7 @@
       bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기',
       importAlertEmpty: '가져올 내용을 입력해 주세요!',
       importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
+      importSuccessMerged: ' 이미 있던 단어 {{merged}}개는 뜻을 합쳤습니다.',
       notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장',
       whoAmITitle: '👋 이름을 알려주세요',
       whoAmIDesc: '이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.',
@@ -633,6 +634,7 @@
       bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import',
       importAlertEmpty: 'Please enter content to import!',
       importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
+      importSuccessMerged: ' {{merged}} existing word(s) had their meanings merged.',
       notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save',
       whoAmITitle: "👋 What's your name?",
       whoAmIDesc: "Your word list will be saved to the cloud under this name. It'll be remembered automatically next time on this device.",
@@ -1982,24 +1984,49 @@
   });
   $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
 
-  // Import only ever INSERTs new words (server-side dedup by word text within the
-  // target notebook, see functions/api/words/bulk.js) — it never rewrites an existing
-  // row, so re-importing can't step on that word's favorite/notes/SRS state.
+  function meaningField(m){ return m==='ko' ? 'roman' : 'meaning'; }
+  // word,뜻 조각을 세미콜론으로 합친다 — 이미 들어있는 조각이면 다시 안 붙인다
+  // (functions/api/words/bulk.js의 mergeMeaning과 동일한 규칙).
+  function mergeMeaningLocal(existingMeaning, newMeaning){
+    const parts = existingMeaning ? existingMeaning.split(/;\s*/).map(s=>s.trim()).filter(Boolean) : [];
+    if(newMeaning && !parts.includes(newMeaning)) parts.push(newMeaning);
+    return parts.join('; ');
+  }
+
+  // 단어가 이 단어장에 이미 있으면 새 단어를 추가하는 대신 뜻을 기존 단어에
+  // 합친다(favorite/notes/SRS 상태는 그대로 유지) — 없는 단어만 새로 추가.
   async function importInto(m, items){
-    if(items.length===0) return 0;
+    if(items.length===0) return {inserted:0, merged:0};
     const notebookId = currentNotebookIdByMode[m];
-    if(notebookId==null) return 0;
-    let created=null;
+    if(notebookId==null) return {inserted:0, merged:0};
+    const field = meaningField(m);
+    let result=null;
     if(cloudOk){
-      try{ created = await bulkImportRemote(m, notebookId, items); }
+      try{ result = await bulkImportRemote(m, notebookId, items); }
       catch(err){ console.error('bulk import failed', err); showCloudWarning('cloudSaveFailed'); }
     }
-    if(!created){
-      const existingWords = new Set((notebookWords[m].get(notebookId)||[]).map(w=>w.word));
-      created = items.filter(it=>!existingWords.has(it.word)).map(it=>localWordFallback(notebookId, it));
+    if(!result){
+      const existingByWord = new Map((notebookWords[m].get(notebookId)||[]).map(w=>[w.word, w]));
+      const newByWord = new Map();
+      const merged = [];
+      items.forEach(it=>{
+        const existing = existingByWord.get(it.word);
+        if(existing){
+          existing[field] = mergeMeaningLocal(existing[field], it[field]||'');
+          merged.push(existing);
+          return;
+        }
+        const prior = newByWord.get(it.word);
+        if(prior){ prior[field] = mergeMeaningLocal(prior[field], it[field]||''); return; }
+        newByWord.set(it.word, localWordFallback(notebookId, it));
+      });
+      result = { inserted: Array.from(newByWord.values()), merged };
     }
-    created.forEach(w=>addWordToStore(m, w));
-    return created.length;
+    result.inserted.forEach(w=>addWordToStore(m, w));
+    // Merged rows already exist in the store as the same object reference — just
+    // sync in the server's merged meaning in case of any drift (e.g. another device).
+    result.merged.forEach(w=>{ const existing=wordsById.get(w.id); if(existing) existing[field]=w[field]; });
+    return { inserted: result.inserted.length, merged: result.merged.length };
   }
 
   $('importBtn').addEventListener('click', async ()=>{
@@ -2007,25 +2034,22 @@
     if(!rawText){ alert(t('importAlertEmpty')); return; }
     const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
     const tempKo=[], tempEn=[];
-    const seenKo=new Set(), seenEn=new Set();
+    // 같은 단어가 붙여넣은 텍스트 안에 여러 번 나와도(또는 이미 단어장에 있어도)
+    // importInto가 뜻을 합쳐주니 여기서는 미리 걸러내지 않는다.
     lines.forEach(line=>{
       const parts=line.split(',');
       const word=parts[0]?parts[0].trim():'';
       const definition=parts[1]?parts[1].trim():'Custom';
       if(!word) return;
-      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)){
-        if(seenKo.has(word)) return;
-        seenKo.add(word);
-        tempKo.push({word,roman:definition});
-      } else {
-        if(seenEn.has(word)) return;
-        seenEn.add(word);
-        tempEn.push({word,meaning:definition});
-      }
+      if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition});
+      else tempEn.push({word,meaning:definition});
     });
-    const addedKo = await importInto('ko', tempKo);
-    const addedEn = await importInto('en', tempEn);
-    alert(t('importSuccess',{count:addedKo+addedEn, date:todayStr()}));
+    const resultKo = await importInto('ko', tempKo);
+    const resultEn = await importInto('en', tempEn);
+    const inserted = resultKo.inserted+resultEn.inserted;
+    const merged = resultKo.merged+resultEn.merged;
+    const mergedNote = merged>0 ? t('importSuccessMerged',{merged}) : '';
+    alert(t('importSuccess',{count:inserted, date:todayStr()})+mergedNote);
     modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none';
     selectedDatesByMode[mode]=null;
     updateCurrentNotebookBar(); renderDateFilterRow();
@@ -2065,8 +2089,8 @@
   // first edit implicitly pushed the whole list).
   async function seedDefaultNotebook(m, defaults){
     const nb = await createNotebookRemote(m, { name: m==='ko' ? '기본 단어장' : 'My Wordbook', description:'', coverGradient:NOTEBOOK_COLOR_SWATCHES[0], coverEmoji:'📖', coverUrl:'' });
-    const words = defaults.length ? await bulkImportRemote(m, nb.id, defaults) : [];
-    return { notebooks:[nb], words };
+    const result = defaults.length ? await bulkImportRemote(m, nb.id, defaults) : {inserted:[], merged:[]};
+    return { notebooks:[nb], words:result.inserted };
   }
 
   async function loadCloudData(){

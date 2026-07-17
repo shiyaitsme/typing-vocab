@@ -14,9 +14,17 @@ function todayStr() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-// POST /api/words/bulk?user=&mode= — batch import into one notebook. Only ever INSERTs
-// brand-new rows (words whose text doesn't already exist in that notebook); it never
-// UPDATEs an existing row, so a re-import can't step on that word's favorite/notes.
+// word,뜻 조각을 세미콜론으로 합친다 — 이미 들어있는 조각이면 다시 안 붙인다.
+function mergeMeaning(existingMeaning, newMeaning) {
+  const parts = existingMeaning ? existingMeaning.split(/;\s*/).map(s => s.trim()).filter(Boolean) : [];
+  if (newMeaning && !parts.includes(newMeaning)) parts.push(newMeaning);
+  return parts.join('; ');
+}
+
+// POST /api/words/bulk?user=&mode= — batch import into one notebook. A word whose text
+// doesn't exist yet in this notebook gets INSERTed; a word that already exists gets its
+// meaning MERGED into the existing row's meaning (never overwritten) instead of creating
+// a duplicate entry — favorite/notes/box/due_at/wrong_count on that row are untouched.
 export async function onRequestPost({ request, env }) {
   const url = new URL(request.url);
   const user = (url.searchParams.get('user') || '').trim();
@@ -28,30 +36,46 @@ export async function onRequestPost({ request, env }) {
   if (!Number.isFinite(notebookId) || !items) return new Response('Bad Request', { status: 400 });
 
   const { results: existing } = await env.DB.prepare(
-    'SELECT word FROM words WHERE user_id=? AND mode=? AND notebook_id=?'
+    'SELECT id, word, meaning FROM words WHERE user_id=? AND mode=? AND notebook_id=?'
   ).bind(user, mode, notebookId).all();
-  const existingWords = new Set(existing.map(r => r.word));
+  const existingByWord = new Map(existing.map(r => [r.word, { id: r.id, meaning: r.meaning || '' }]));
 
   const date = todayStr();
-  const seen = new Set();
-  const toInsert = [];
+  const newByWord = new Map(); // brand-new word (possibly repeated in this batch) -> merged meaning
+  const toUpdate = new Map(); // existing row id -> merged meaning
   for (const item of items) {
     const word = (item.word || '').trim();
-    if (!word || existingWords.has(word) || seen.has(word)) continue;
-    seen.add(word);
+    if (!word) continue;
     const meaning = mode === 'ko' ? (item.roman || '') : (item.meaning || '');
-    toInsert.push({ word, meaning });
+    const ex = existingByWord.get(word);
+    if (ex) {
+      const current = toUpdate.has(ex.id) ? toUpdate.get(ex.id) : ex.meaning;
+      const merged = mergeMeaning(current, meaning);
+      if (merged !== current) toUpdate.set(ex.id, merged);
+      continue;
+    }
+    newByWord.set(word, mergeMeaning(newByWord.get(word) || '', meaning));
   }
-  if (toInsert.length === 0) return Response.json([]);
 
-  const stmts = toInsert.map(item =>
+  const insertStmts = Array.from(newByWord, ([word, meaning]) =>
     env.DB.prepare(
       `INSERT INTO words (user_id, mode, notebook_id, word, meaning, created_date)
        VALUES (?,?,?,?,?,?)
        RETURNING id, notebook_id, created_date, word, meaning, favorite, notes, box, due_at, wrong_count`
-    ).bind(user, mode, notebookId, item.word, item.meaning, date)
+    ).bind(user, mode, notebookId, word, meaning, date)
   );
-  const batchResults = await env.DB.batch(stmts);
-  const rows = batchResults.map(r => r.results[0]);
-  return Response.json(rows.map(r => normalizeRow(mode, r)));
+  const updateStmts = Array.from(toUpdate, ([id, meaning]) =>
+    env.DB.prepare(
+      `UPDATE words SET meaning=? WHERE id=?
+       RETURNING id, notebook_id, created_date, word, meaning, favorite, notes, box, due_at, wrong_count`
+    ).bind(meaning, id)
+  );
+
+  const [insertResults, updateResults] = await Promise.all([
+    insertStmts.length ? env.DB.batch(insertStmts) : Promise.resolve([]),
+    updateStmts.length ? env.DB.batch(updateStmts) : Promise.resolve([]),
+  ]);
+  const inserted = insertResults.map(r => normalizeRow(mode, r.results[0]));
+  const merged = updateResults.map(r => normalizeRow(mode, r.results[0]));
+  return Response.json({ inserted, merged });
 }
