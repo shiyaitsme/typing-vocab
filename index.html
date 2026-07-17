@@ -288,6 +288,19 @@
     </div>
   </div>
 
+  <!-- EDIT WORD MODAL -->
+  <div id="editWordModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:#f2ede2;color:#0a0a0a;padding:26px;width:100%;max-width:460px;border-radius:4px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+      <div id="editWordModalTitle" data-i18n="editWordModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">✎ 단어 수정</div>
+      <input type="text" id="editWordInput" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="width:100%;box-sizing:border-box;padding:11px;border:1.5px solid #0a0a0a;font-family:'Space Grotesk',sans-serif;font-size:13px;border-radius:2px;">
+      <input type="text" id="editMeaningInput" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="width:100%;box-sizing:border-box;padding:11px;border:1.5px solid #0a0a0a;font-family:'Space Grotesk',sans-serif;font-size:13px;border-radius:2px;">
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="closeEditWordModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1.5px solid #0a0a0a;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">취소</button>
+        <button id="saveEditWordBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:#0a0a0a;color:#f2ede2;font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
+      </div>
+    </div>
+  </div>
+
   <!-- WHO ARE YOU MODAL (first visit only) -->
   <div id="whoAmIOverlay" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="width:100%;max-width:400px;text-align:center;">
@@ -554,6 +567,9 @@
       activityTitle: '단어 추가 활동', activityCaption: '이 단어장에 단어를 추가한 날짜 기준',
       legendLess: '적음', legendMore: '많음', activityTooltip: '{{date}}: {{count}}개',
       addWordAlertEmpty: '추가할 단어를 입력해 주세요!',
+      editWordModalTitle: '✎ 단어 수정',
+      editWordAlertEmpty: '단어를 입력해 주세요!',
+      editWordAlertDuplicate: "'{{word}}'는 이미 이 단어장에 있는 다른 단어입니다. 합치려면 그 단어를 삭제한 뒤 다시 시도해 주세요.",
       clearConfirm: '이 단어장의 모든 단어를 삭제하시겠습니까? 단어장 자체는 남습니다.',
       aiPromptTitle: '🤖 AI 프롬프트',
       aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
@@ -626,6 +642,9 @@
       activityTitle: 'Word Addition Activity', activityCaption: 'Based on dates words were added to this notebook',
       legendLess: 'Less', legendMore: 'More', activityTooltip: '{{date}}: {{count}}',
       addWordAlertEmpty: 'Please enter a word to add!',
+      editWordModalTitle: '✎ Edit Word',
+      editWordAlertEmpty: 'Please enter a word!',
+      editWordAlertDuplicate: "'{{word}}' already exists as a different word in this notebook. Delete that one first if you want to merge them.",
       clearConfirm: 'Delete all words in this notebook? The notebook itself will stay.',
       aiPromptTitle: '🤖 AI Prompt',
       aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
@@ -787,6 +806,7 @@
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
   const notesOnlyToggle=$('notesOnlyToggle'), wordSearchInput=$('wordSearchInput'), wrongOnlyToggle=$('wrongOnlyToggle');
   const notesBtn=$('notesBtn'), notesModalOverlay=$('notesModalOverlay'), notesModalTitle=$('notesModalTitle'), notesTextarea=$('notesTextarea');
+  const editWordModalOverlay=$('editWordModalOverlay'), editWordInput=$('editWordInput'), editMeaningInput=$('editMeaningInput');
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
   const currentUserLabel=$('currentUserLabel');
@@ -1030,6 +1050,37 @@
     notesModalOverlay.style.opacity='0'; notesModalOverlay.style.pointerEvents='none';
   }
 
+  let editingWordId = null;
+  function openEditWordModal(w){
+    editingWordId = w.id;
+    editWordInput.value = w.word;
+    editMeaningInput.value = w[meaningField(mode)] || '';
+    editWordModalOverlay.style.opacity='1'; editWordModalOverlay.style.pointerEvents='auto';
+    editWordInput.focus(); editWordInput.select();
+  }
+
+  function closeEditWordModal(){
+    editWordModalOverlay.style.opacity='0'; editWordModalOverlay.style.pointerEvents='none';
+  }
+
+  function saveEditedWord(){
+    const w = wordsById.get(editingWordId);
+    if(!w) return;
+    const newWord = editWordInput.value.trim();
+    if(!newWord){ alert(t('editWordAlertEmpty')); return; }
+    const newMeaning = editMeaningInput.value.trim();
+    const field = meaningField(mode);
+    if(newWord!==w.word){
+      const clash = (notebookWords[mode].get(w.notebookId)||[]).some(other=>other!==w && other.word===newWord);
+      if(clash){ alert(t('editWordAlertDuplicate',{word:newWord})); return; }
+    }
+    w.word = newWord;
+    w[field] = newMeaning || 'Custom';
+    patchWordRemote(w.id, mode, {word:newWord, [field]:w[field]});
+    loadWord();
+    closeEditWordModal();
+  }
+
   function saveCurrentNotes(){
     const w = currentWordObj();
     if(!w) return;
@@ -1236,7 +1287,7 @@
     if(wrongOnly) entries.sort((a,b)=>(b.item.wrongCount||0)-(a.item.wrongCount||0));
     let activeEl=null;
     entries.forEach((e,i)=>{
-      const el = createWordItemDOM(e.index, e.item.word, e.sub, !!e.item.favorite, wrongOnly?null:(i+1), e.hasNotes, e.item.wrongCount||0, e.item.notes, wrongOnly);
+      const el = createWordItemDOM(e.index, e.item.word, e.sub, !!e.item.favorite, wrongOnly?null:(i+1), e.hasNotes, e.item.wrongCount||0, e.item.notes, wrongOnly, e.item.id);
       if(e.index===wordIndex) activeEl=el;
       drawerContent.appendChild(el);
     });
@@ -1250,7 +1301,7 @@
   // 오답만 볼 때만 ❌횟수 배지를 보여준다 — 평소 목록에 섞여 있으면 번호와
   // 붙어 보여서 숫자가 튄 것처럼 헷갈리기 때문에(예: "❌1 56."), 나머지 필터
   // (전체/즐겨찾기만/노트만/검색)에서는 순번만 보여주고 배지 자체를 안 보여준다.
-  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge){
+  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge,wordId){
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
@@ -1272,6 +1323,11 @@
     }
     const actions=document.createElement('div');
     actions.style.cssText='display:flex;align-items:center;gap:2px;';
+    const editBtn=document.createElement('button');
+    editBtn.dataset.role='edit';
+    editBtn.textContent='✎';
+    editBtn.style.cssText='border:none;background:none;color:rgba(var(--ink-rgb),.4);font-weight:bold;cursor:pointer;padding:6px 6px;font-size:13px;';
+    editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); const w=wordsById.get(wordId); if(w) openEditWordModal(w); });
     const favBtn=document.createElement('button');
     favBtn.dataset.role='fav';
     favBtn.textContent = isFavorite ? '★' : '☆';
@@ -1282,7 +1338,7 @@
     delBtn.textContent='✕';
     delBtn.style.cssText='border:none;background:none;color:rgba(var(--ink-rgb),.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
     delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
-    actions.appendChild(favBtn); actions.appendChild(delBtn);
+    actions.appendChild(editBtn); actions.appendChild(favBtn); actions.appendChild(delBtn);
     container.appendChild(info); container.appendChild(actions);
     return container;
   }
@@ -1914,6 +1970,11 @@
   });
   $('closeNotesModalBtn').addEventListener('click', closeNotesModal);
   $('saveNotesBtn').addEventListener('click', saveCurrentNotes);
+
+  $('closeEditWordModalBtn').addEventListener('click', closeEditWordModal);
+  $('saveEditWordBtn').addEventListener('click', saveEditedWord);
+  editWordInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); saveEditedWord(); } });
+  editMeaningInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); saveEditedWord(); } });
 
   function localWordFallback(notebookId, fields){
     return { id: nextLocalId(), notebookId, favorite:false, notes:'', box:0, dueAt:'', wrongCount:0, createdDate: todayStr(), ...fields };

@@ -22,7 +22,7 @@ export async function onRequestPatch({ request, env, params }) {
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== 'object') return new Response('Bad Request', { status: 400 });
 
-  const fieldMap = { favorite: 'favorite', notes: 'notes', box: 'box', dueAt: 'due_at', wrongCount: 'wrong_count', notebookId: 'notebook_id' };
+  const fieldMap = { word: 'word', favorite: 'favorite', notes: 'notes', box: 'box', dueAt: 'due_at', wrongCount: 'wrong_count', notebookId: 'notebook_id' };
   if (mode === 'ko' && Object.prototype.hasOwnProperty.call(body, 'roman')) fieldMap.roman = 'meaning';
   if (mode === 'en' && Object.prototype.hasOwnProperty.call(body, 'meaning')) fieldMap.meaning = 'meaning';
 
