@@ -137,9 +137,6 @@
           <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
             <input type="checkbox" id="dictationToggle" style="accent-color:var(--accent);"><span data-i18n="dictationLabel">딕테이션 모드</span>
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
-            <input type="checkbox" id="reviewModeToggle" style="accent-color:var(--accent);"><span data-i18n="reviewLabel">🔁 복습 모드</span>
-          </label>
         </div>
       </div>
     </div>
@@ -527,7 +524,7 @@
       mobilePlaceholderEn: 'English input here',
       mobileTipEn: '※ 영어 모드일 때는 영문 키보드로 입력해 주세요.',
       sessionStatsTitle: '이번 세션', favSectionTitle: '즐겨찾기', masteryProgressTitle: '숙련도 진행',
-      dictationLabel: '딕테이션 모드', reviewLabel: '🔁 복습 모드',
+      dictationLabel: '딕테이션 모드',
       progressLine: '정답 {{correct}} · 건너뜀 {{skipped}} · 정확도 {{accuracy}}%{{streak}}',
       streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
       masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
@@ -579,9 +576,8 @@
       targetExists: "'{{name}}' 계정에는 이미 데이터가 있어요. 다른 이름을 사용해 주세요.",
       renameFailed: '이름 변경에 실패했습니다.',
       renameError: '이름 변경 중 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.',
-      reviewDoneAll: '오늘 복습할 단어를 모두 마쳤습니다! 🎉',
-      reviewNoneInMode: '이 모드에는 오늘 복습할 단어가 없습니다! 🎉',
-      reviewNoneToday: '오늘 복습할 단어가 없습니다! 🎉 모든 단어가 아직 복습 예정일이 되지 않았어요.',
+      reviewCategoryEmpty: '해당하는 단어가 없어요.',
+      reviewCategoryDone: '선택한 항목을 모두 학습했습니다! 🎉',
       cloudUnavailable: '클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.',
       cloudSaveFailed: '클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.',
       footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
@@ -599,7 +595,7 @@
       mobilePlaceholderEn: 'English input here',
       mobileTipEn: '※ In English mode, please use an English keyboard.',
       sessionStatsTitle: 'This Session', favSectionTitle: 'Favorites', masteryProgressTitle: 'Mastery Progress',
-      dictationLabel: 'Dictation Mode', reviewLabel: '🔁 Review Mode',
+      dictationLabel: 'Dictation Mode',
       progressLine: 'Correct {{correct}} · Skipped {{skipped}} · Accuracy {{accuracy}}%{{streak}}',
       streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
       masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
@@ -651,9 +647,8 @@
       targetExists: "'{{name}}' already has data. Please choose another name.",
       renameFailed: 'Failed to rename.',
       renameError: 'An error occurred while renaming. Please check your internet connection.',
-      reviewDoneAll: "You've finished all today's reviews! 🎉",
-      reviewNoneInMode: 'No words to review in this mode today! 🎉',
-      reviewNoneToday: 'No words due for review today! 🎉 None of your words are due yet.',
+      reviewCategoryEmpty: 'No words in this category.',
+      reviewCategoryDone: "You've finished everything in this category! 🎉",
       cloudUnavailable: "Can't connect to the cloud — changes made this session won't be saved.",
       cloudSaveFailed: 'Cloud save failed — refreshing may lose your latest changes.',
       footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
@@ -742,38 +737,31 @@
 
   /* SRS (spaced repetition) + accuracy/speed tracking */
   const SRS_INTERVALS = [0,1,3,7,14,30]; // days, indexed by box level 0-5
-  let reviewMode=false, currentAttemptHadError=false;
+  let currentAttemptHadError=false;
   let sessionStats={wordsCompleted:0, wordsCleanCompleted:0};
   let sessionStreak=0, bestStreak=0;
+
+  // 통계 탭의 밀린 복습/오늘 복습/예정/미학습 격자를 클릭하면 그 카테고리로만
+  // currentWordList()가 좁혀진다 (날짜 필터처럼 모드별로 독립, 서로 동시 적용 가능).
+  let reviewCategoryByMode = { ko: null, en: null }; // null | 'overdue' | 'dueToday' | 'upcoming' | 'fresh'
+  function currentReviewCategory(){ return reviewCategoryByMode[mode]; }
+  function matchesReviewCategory(w, category){
+    const today = todayStr();
+    if(category==='fresh') return !w.dueAt;
+    if(category==='overdue') return !!w.dueAt && w.dueAt<today;
+    if(category==='dueToday') return w.dueAt===today;
+    if(category==='upcoming') return !!w.dueAt && w.dueAt>today;
+    return true;
+  }
+  function reviewCategoryLabelKey(category){
+    return { overdue:'overdueLabel', dueToday:'dueTodayLabel', upcoming:'upcomingLabel', fresh:'freshLabel' }[category];
+  }
 
   function addDays(dateStr, days){
     const d = dateStr ? new Date(dateStr+'T00:00:00') : new Date();
     d.setDate(d.getDate()+days);
     const pad=n=>String(n).padStart(2,'0');
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  }
-  function isDue(w){ return !w.dueAt || w.dueAt<=todayStr(); }
-  function findDueIndex(fromIndex,dir,includeSelf){
-    const list=currentWordList(); const n=list.length;
-    if(n===0) return -1;
-    if(includeSelf && isDue(list[fromIndex])) return fromIndex;
-    for(let step=1; step<=n; step++){
-      const idx=((fromIndex+dir*step)%n+n)%n;
-      if(isDue(list[idx])) return idx;
-    }
-    return -1;
-  }
-  function reviewAdvance(dir){
-    const due=findDueIndex(wordIndex,dir,false);
-    if(due===-1){
-      if(dir>0){
-        alert(t('reviewDoneAll'));
-        reviewMode=false;
-        const toggle=$('reviewModeToggle'); if(toggle) toggle.checked=false;
-      }
-      return wordIndex;
-    }
-    return due;
   }
   function applySrsResult(word, hadError){
     if(!word) return;
@@ -994,8 +982,9 @@
   function currentWordList(){
     const all = currentNotebookAllWords();
     const sel = currentSelectedDates();
-    if(!sel) return all;
-    return all.filter(w=>sel.has(w.createdDate));
+    const dateFiltered = sel ? all.filter(w=>sel.has(w.createdDate)) : all;
+    const cat = currentReviewCategory();
+    return cat ? dateFiltered.filter(w=>matchesReviewCategory(w,cat)) : dateFiltered;
   }
   function currentWordCount(){ return currentWordList().length; }
   function currentWordObj(){ return currentWordList()[wordIndex]; }
@@ -1318,6 +1307,7 @@
     currentNotebookIdByMode[m] = id;
     localStorage.setItem(currentNotebookKey(m), String(id));
     selectedDatesByMode[m] = null;
+    reviewCategoryByMode[m] = null;
     if(m===mode){ wordIndex=loadLastIndex(m, id); updateCurrentNotebookBar(); renderDateFilterRow(); loadWord(); }
   }
 
@@ -1357,6 +1347,13 @@
       btn.addEventListener('click', onClick);
       return btn;
     };
+    const activeCategory = currentReviewCategory();
+    if(activeCategory){
+      row.appendChild(makePill(`🔁 ${t(reviewCategoryLabelKey(activeCategory))} ✕`, true, ()=>{
+        reviewCategoryByMode[mode]=null;
+        renderDateFilterRow(); wordIndex=0; loadWord();
+      }));
+    }
     row.appendChild(makePill(t('allDatesLabel'), !sel, ()=>{
       selectedDatesByMode[mode]=null;
       renderDateFilterRow(); wordIndex=0; loadWord();
@@ -1568,6 +1565,18 @@
     return title;
   }
 
+  // 격자를 클릭하면 그 카테고리 단어만 남기고 바로 연습 화면으로 진입한다
+  // (currentWordList()가 reviewCategoryByMode를 반영해 자동으로 좁혀짐).
+  function enterReviewCategory(category, count){
+    if(count===0){ alert(t('reviewCategoryEmpty')); return; }
+    reviewCategoryByMode[mode] = category;
+    wordIndex = 0;
+    updateCurrentNotebookBar(); renderDateFilterRow();
+    loadWord();
+    drawer.style.right='-520px';
+    setNavActive('practice');
+  }
+
   function buildReviewStatusSection(list){
     const section=statCard();
     section.appendChild(statSectionTitle(t('reviewStatusTitle')));
@@ -1582,13 +1591,14 @@
     const grid=document.createElement('div');
     grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
     [
-      {label:t('overdueLabel'), value:overdue, icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
-      {label:t('dueTodayLabel'), value:dueToday, icon:'🟡', bg:'rgba(var(--accent-rgb),.09)', border:'1px solid rgba(var(--accent-rgb),.4)', dot:'rgba(var(--accent-rgb),.18)', num:'var(--accent)'},
-      {label:t('upcomingLabel'), value:upcoming, icon:'⚪', bg:'rgba(var(--ink-rgb),.04)', border:'1px solid rgba(var(--ink-rgb),.14)', dot:'rgba(var(--ink-rgb),.06)', num:'rgba(var(--ink-rgb),.8)'},
-      {label:t('freshLabel'), value:fresh, icon:'🆕', bg:'rgba(var(--ink-rgb),.04)', border:'1px dashed rgba(var(--ink-rgb),.22)', dot:'rgba(var(--ink-rgb),.05)', num:'rgba(var(--ink-rgb),.6)'}
+      {label:t('overdueLabel'), value:overdue, category:'overdue', icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
+      {label:t('dueTodayLabel'), value:dueToday, category:'dueToday', icon:'🟡', bg:'rgba(var(--accent-rgb),.09)', border:'1px solid rgba(var(--accent-rgb),.4)', dot:'rgba(var(--accent-rgb),.18)', num:'var(--accent)'},
+      {label:t('upcomingLabel'), value:upcoming, category:'upcoming', icon:'⚪', bg:'rgba(var(--ink-rgb),.04)', border:'1px solid rgba(var(--ink-rgb),.14)', dot:'rgba(var(--ink-rgb),.06)', num:'rgba(var(--ink-rgb),.8)'},
+      {label:t('freshLabel'), value:fresh, category:'fresh', icon:'🆕', bg:'rgba(var(--ink-rgb),.04)', border:'1px dashed rgba(var(--ink-rgb),.22)', dot:'rgba(var(--ink-rgb),.05)', num:'rgba(var(--ink-rgb),.6)'}
     ].forEach(item=>{
       const tile=document.createElement('div');
-      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${item.bg};border:${item.border};overflow:hidden;`;
+      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${item.bg};border:${item.border};overflow:hidden;cursor:pointer;`;
+      tile.addEventListener('click', ()=>enterReviewCategory(item.category, item.value));
       const blob=document.createElement('div');
       blob.style.cssText=`position:absolute;top:-12px;right:-12px;width:46px;height:46px;border-radius:50%;background:${item.dot};`;
       const num=document.createElement('div');
@@ -1776,9 +1786,30 @@
     return renderEnglish(enEngine,dictation).complete;
   }
 
+  // 복습 카테고리 필터가 걸려 있으면 방금 완전히 맞힌 단어가 그 카테고리에서
+  // 빠질 수 있다(dueAt이 갱신되니까). 그래서 "다음/이전 단어 객체"를 먼저
+  // 잡아두고, 목록이 갱신된 뒤 그 객체가 새 목록 어디로 갔는지 찾는 식으로
+  // 진행한다 — 카테고리 필터가 없을 때는 목록이 변하지 않으니 기존 동작과 같다.
+  function advanceWordIndex(oldList, dir){
+    const n = oldList.length;
+    if(n<=1){
+      const newList = currentWordList();
+      if(newList.length===0 && currentReviewCategory()){
+        alert(t('reviewCategoryDone'));
+        reviewCategoryByMode[mode] = null;
+      }
+      wordIndex = 0;
+      return;
+    }
+    const target = oldList[(wordIndex+dir+n)%n];
+    const idx = currentWordList().indexOf(target);
+    wordIndex = idx>=0 ? idx : 0;
+  }
+
   function nextWord(markCorrect){
     if(currentWordCount()===0) return;
-    const word = currentWordObj();
+    const oldList = currentWordList();
+    const word = oldList[wordIndex];
     if(markCorrect){
       stats.correct++;
       applySrsResult(word, currentAttemptHadError);
@@ -1792,12 +1823,12 @@
     }
     if((markCorrect || currentAttemptHadError) && word) patchWordRemoteDebounced(word.id, mode, ['box','dueAt','wrongCount']);
     saveSessionStats();
-    wordIndex = reviewMode ? reviewAdvance(1) : (wordIndex+1)%currentWordCount();
+    advanceWordIndex(oldList, 1);
     loadWord();
   }
   function prevWord(){
     if(currentWordCount()===0) return;
-    wordIndex = reviewMode ? reviewAdvance(-1) : (wordIndex-1+currentWordCount())%currentWordCount();
+    advanceWordIndex(currentWordList(), -1);
     loadWord();
   }
 
@@ -1834,13 +1865,6 @@
     btn.addEventListener('click',()=>{
       mode=btn.dataset.mode; wordIndex=loadLastIndex(mode); setActiveTab(mode);
       updateCurrentNotebookBar(); renderDateFilterRow();
-      if(reviewMode){
-        const due=findDueIndex(0,1,true);
-        if(due===-1){
-          alert(t('reviewNoneInMode'));
-          reviewMode=false; reviewModeToggle.checked=false;
-        } else wordIndex=due;
-      }
       loadWord();
     });
   });
@@ -1862,22 +1886,6 @@
   drawerTabStats.addEventListener('click', ()=>setDrawerView('stats'));
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
-
-  const reviewModeToggle=$('reviewModeToggle');
-  reviewModeToggle.addEventListener('change',(e)=>{
-    if(e.target.checked){
-      if(currentWordCount()===0){ e.target.checked=false; return; }
-      const due=findDueIndex(wordIndex,1,true);
-      if(due===-1){
-        alert(t('reviewNoneToday'));
-        e.target.checked=false;
-        return;
-      }
-      reviewMode=true; wordIndex=due; loadWord();
-    } else {
-      reviewMode=false; loadWord();
-    }
-  });
 
   favoriteBtn.addEventListener('click', ()=>{
     if(currentWordCount()===0) return;
