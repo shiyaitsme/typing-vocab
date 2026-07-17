@@ -1216,8 +1216,7 @@
     const notesOnly = notesOnlyToggle.checked;
     const wrongOnly = wrongOnlyToggle.checked;
     const query = wordSearchInput.value.trim().toLowerCase();
-    let shown=0;
-    let activeEl=null;
+    let entries=[];
     list.forEach((item,index)=>{
       if(favoritesOnly && !item.favorite) return;
       const hasNotes = !!(item.notes && item.notes.trim());
@@ -1228,19 +1227,28 @@
         const haystack = `${item.word} ${sub||''} ${item.notes||''}`.toLowerCase();
         if(!haystack.includes(query)) return;
       }
-      shown++;
-      const el = createWordItemDOM(index,item.word,sub,!!item.favorite,shown,hasNotes,item.wrongCount||0,item.notes);
-      if(index===wordIndex) activeEl=el;
+      entries.push({item, index, sub, hasNotes});
+    });
+    // 오답만 볼 때는 틀린 횟수가 많은 순으로 — 원래 목록 순서/번호는 이 필터에서는
+    // 의미가 없으니 번호 없이 ❌횟수만 보여준다(아래 createWordItemDOM 호출).
+    if(wrongOnly) entries.sort((a,b)=>(b.item.wrongCount||0)-(a.item.wrongCount||0));
+    let activeEl=null;
+    entries.forEach((e,i)=>{
+      const el = createWordItemDOM(e.index, e.item.word, e.sub, !!e.item.favorite, wrongOnly?null:(i+1), e.hasNotes, e.item.wrongCount||0, e.item.notes, wrongOnly);
+      if(e.index===wordIndex) activeEl=el;
       drawerContent.appendChild(el);
     });
-    if(shown===0){
+    if(entries.length===0){
       const msg = query ? t('noSearchResults') : (notesOnly ? t('noNotesWords') : (wrongOnly ? t('noWrongWords') : t('noFavWords')));
       drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${msg}</div>`;
     }
     if(scrollToActive && activeEl) activeEl.scrollIntoView({block:'start'});
   }
 
-  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText){
+  // 오답만 볼 때만 ❌횟수 배지를 보여준다 — 평소 목록에 섞여 있으면 번호와
+  // 붙어 보여서 숫자가 튄 것처럼 헷갈리기 때문에(예: "❌1 56."), 나머지 필터
+  // (전체/즐겨찾기만/노트만/검색)에서는 순번만 보여주고 배지 자체를 안 보여준다.
+  function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge){
     const container=document.createElement('div');
     const active = index===wordIndex;
     container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
@@ -1248,7 +1256,9 @@
     const info=document.createElement('div');
     info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;min-width:0;';
     const mainSpan=document.createElement('span');
-    mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongCount>0?'❌'+wrongCount+' ':''}${displayIndex}. ${mainText}`;
+    const wrongPart = showWrongBadge && wrongCount>0 ? `❌${wrongCount} ` : '';
+    const numberPart = displayIndex!=null ? `${displayIndex}. ` : '';
+    mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongPart}${numberPart}${mainText}`;
     info.appendChild(mainSpan);
     if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
     if(hasNotes && notesText){
