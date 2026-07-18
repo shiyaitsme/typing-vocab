@@ -176,16 +176,22 @@
     <div style="display:flex;justify-content:flex-end;padding:24px 32px 0;">
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
     </div>
-    <div style="display:flex;gap:6px;padding:14px 32px 0;border-bottom:1px solid rgba(var(--ink-rgb),.1);">
-      <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">단어 목록</button>
-      <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">단어장</button>
-      <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">통계</button>
+    <div style="padding:16px 32px 4px;">
+      <div style="display:inline-flex;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
+        <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어 목록</button>
+        <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어장</button>
+        <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">통계</button>
+      </div>
     </div>
     <div class="wd-scroll" style="flex:1;overflow-y:auto;padding:32px 32px 48px;display:flex;flex-direction:column;gap:24px;">
     <div id="drawerContent" style="display:flex;flex-direction:column;gap:14px;"></div>
-    <div id="notebooksPanel" style="display:none;flex-direction:column;gap:20px;">
-      <div style="display:flex;flex-wrap:wrap;gap:20px;">
-        <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;width:224px;height:224px;flex-shrink:0;border-radius:24px;border:1.5px dashed rgba(var(--ink-rgb),.25);color:rgba(var(--ink-rgb),.5);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;letter-spacing:.02em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">+ 새 단어장</button>
+    <div id="notebooksPanel" style="display:none;flex-direction:column;gap:16px;">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="notebookSearchInput" data-i18n-placeholder="notebookSearchPlaceholder" placeholder="단어장 검색..." autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+        <button id="quickNewNotebookBtn" data-i18n="addBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 16px;font-weight:700;font-size:12px;letter-spacing:.02em;border-radius:2px;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;">+ 추가</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;aspect-ratio:1;border-radius:20px;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgba(var(--ink-rgb),.5);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;letter-spacing:.02em;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">+ 새 단어장</button>
         <div id="notebooksGrid" style="display:contents;"></div>
       </div>
     </div>
@@ -545,6 +551,7 @@
       deleteNotebookModalBody: "<b>{{name}}</b> 안에 있는 단어 <b>{{count}}</b>개가 함께 삭제됩니다. <b>이 작업은 되돌릴 수 없습니다.</b>",
       deleteNotebookConfirmBtn: '삭제하기', deleteNotebookModalTitle: '단어장을 삭제할까요?',
       notebookWordCount: '단어 {{count}}개', noNotebooks: '단어장이 없습니다.<br>새 단어장을 만들어 보세요.',
+      notebookSearchPlaceholder: '단어장 검색...', noNotebookSearchResults: '검색 결과가 없습니다.', addBtn: '+ 추가',
       newNotebookBtn: '+ 새 단어장', notebookModalTitleNew: '📖 새 단어장', notebookModalTitleEdit: '✎ 단어장 편집',
       notebookNamePlaceholder: '단어장 이름', notebookDescPlaceholder: '간단한 설명(선택)',
       notebookCoverLabel: '배경색', notebookEmojiLabel: '아이콘', deleteNotebookBtn: '삭제',
@@ -617,6 +624,7 @@
       deleteNotebookModalBody: "<b>{{count}}</b> word(s) inside <b>{{name}}</b> will be deleted too. <b>This can't be undone.</b>",
       deleteNotebookConfirmBtn: 'Delete', deleteNotebookModalTitle: 'Delete this notebook?',
       notebookWordCount: '{{count}} words', noNotebooks: 'No notebooks yet.<br>Create one to get started.',
+      notebookSearchPlaceholder: 'Search notebooks...', noNotebookSearchResults: 'No matching notebooks.', addBtn: '+ Add',
       newNotebookBtn: '+ New notebook', notebookModalTitleNew: '📖 New notebook', notebookModalTitleEdit: '✎ Edit notebook',
       notebookNamePlaceholder: 'Notebook name', notebookDescPlaceholder: 'Short description (optional)',
       notebookCoverLabel: 'Cover color', notebookEmojiLabel: 'Icon', deleteNotebookBtn: 'Delete',
@@ -814,6 +822,7 @@
   }
   window.addEventListener('resize', ()=>syncDrawerLayout(drawerOpen));
   const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), notebooksPanel=$('notebooksPanel');
+  const notebookSearchInput=$('notebookSearchInput');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
@@ -1350,8 +1359,8 @@
 
   function setDrawerView(view, scrollToActive){
     drawerView=view;
-    const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`,marginBottom:'-1px'};
-    const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent',marginBottom:'-1px'};
+    const activeStyle={background:'rgb(var(--ink-rgb))',color:'var(--bg)'};
+    const inactiveStyle={background:'transparent',color:'rgba(var(--ink-rgb),.5)'};
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
     Object.assign(drawerTabNotebooks.style, view==='notebooks'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
@@ -1454,9 +1463,11 @@
   function renderNotebooksGrid(){
     const grid = $('notebooksGrid');
     grid.innerHTML='';
-    const list = currentNotebooks();
+    const query = notebookSearchInput.value.trim().toLowerCase();
+    const list = currentNotebooks().filter(nb=>!query || nb.name.toLowerCase().includes(query));
     if(list.length===0){
-      grid.innerHTML=`<div style="width:100%;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${t('noNotebooks')}</div>`;
+      const msg = query ? t('noNotebookSearchResults') : t('noNotebooks');
+      grid.innerHTML=`<div style="width:100%;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${msg}</div>`;
       return;
     }
     list.forEach(nb=>grid.appendChild(createNotebookCardDOM(nb)));
@@ -1465,44 +1476,38 @@
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
     const card=document.createElement('div');
-    card.style.cssText='width:224px;flex-shrink:0;border-radius:24px;border:1px solid rgba(var(--ink-rgb),.14);background:rgba(var(--ink-rgb),.03);overflow:hidden;cursor:pointer;box-sizing:border-box;';
+    card.style.cssText=`position:relative;border-radius:20px;aspect-ratio:1;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;cursor:pointer;${notebookCoverCSS(nb)}`;
     card.addEventListener('click',(e)=>{ if(e.target.dataset.role==='edit') return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
 
-    const cover=document.createElement('div');
-    cover.style.cssText=`position:relative;aspect-ratio:1.6;display:flex;align-items:center;justify-content:center;${notebookCoverCSS(nb)}`;
-    if(!nb.coverUrl) setEmojiInto(cover, nb.coverEmoji, 40);
     if(active){
       const badge=document.createElement('div');
       badge.textContent=t('practicingBadge');
-      badge.style.cssText="position:absolute;top:14px;left:14px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.05em;padding:6px 12px;border-radius:100px;background:rgba(10,10,10,.55);color:#f2ede2;";
-      cover.appendChild(badge);
+      badge.style.cssText="position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.05em;padding:5px 10px;border-radius:100px;background:rgba(10,10,10,.55);color:#f2ede2;";
+      card.appendChild(badge);
     }
     const editBtn=document.createElement('button');
     editBtn.type='button'; editBtn.dataset.role='edit'; editBtn.textContent='✎';
-    editBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:100px;background:rgba(10,10,10,.45);color:#f2ede2;font-size:13px;display:flex;align-items:center;justify-content:center;';
+    editBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:100px;background:rgba(10,10,10,.35);color:#f2ede2;font-size:12px;display:flex;align-items:center;justify-content:center;';
     editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
-    cover.appendChild(editBtn);
-    card.appendChild(cover);
+    card.appendChild(editBtn);
 
-    const body=document.createElement('div');
-    body.style.cssText='padding:20px 22px 24px;display:flex;flex-direction:column;gap:6px;';
+    if(!nb.coverUrl){
+      const iconWrap=document.createElement('div');
+      iconWrap.style.cssText='line-height:1;';
+      setEmojiInto(iconWrap, nb.coverEmoji, 32);
+      card.appendChild(iconWrap);
+    }
+
     const nameEl=document.createElement('div');
-    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgb(var(--ink-rgb));";
+    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;color:#1a1714;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     nameEl.textContent=nb.name;
-    body.appendChild(nameEl);
+    card.appendChild(nameEl);
 
     const metaEl=document.createElement('div');
-    metaEl.style.cssText='font-size:12.5px;color:rgba(var(--ink-rgb),.45);';
+    metaEl.style.cssText="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(26,23,20,.55);";
     metaEl.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
-    body.appendChild(metaEl);
+    card.appendChild(metaEl);
 
-    if(nb.description){
-      const descEl=document.createElement('div');
-      descEl.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-      descEl.textContent=nb.description;
-      body.appendChild(descEl);
-    }
-    card.appendChild(body);
     return card;
   }
 
@@ -1587,6 +1592,8 @@
     renderNotebooksGrid();
   }
   $('newNotebookBtn').addEventListener('click', ()=>openNotebookModal(null));
+  $('quickNewNotebookBtn').addEventListener('click', ()=>openNotebookModal(null));
+  notebookSearchInput.addEventListener('input', renderNotebooksGrid);
   $('closeNotebookModalBtn').addEventListener('click', closeNotebookModal);
   $('saveNotebookBtn').addEventListener('click', saveNotebookModal);
 
