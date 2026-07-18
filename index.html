@@ -22,7 +22,7 @@
 </style>
 </head>
 <body>
-<div id="appRoot" style="--bg:#0a0a0a;--bg-rgb:10,10,10;--ink-rgb:242,237,226;--accent:#e3b8d6;--accent-rgb:227,184,214;--accent-ink:#0a0a0a;--input-bg:#141414;--warn:#e07a5f;min-height:100vh;background:var(--bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;overflow-x:hidden;padding-bottom:40px;transition:background .25s ease,color .25s ease;">
+<div id="appRoot" style="--bg:#0a0a0a;--bg-rgb:10,10,10;--ink-rgb:242,237,226;--accent:#e3b8d6;--accent-rgb:227,184,214;--accent-ink:#0a0a0a;--input-bg:#141414;--warn:#e07a5f;--warn-rgb:224,122,95;min-height:100vh;background:var(--bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;overflow-x:hidden;padding-bottom:40px;transition:background .25s ease,color .25s ease;">
 
   <!-- HEADER -->
   <header style="position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;border-bottom:1px solid rgba(var(--ink-rgb),.14);background:rgba(var(--bg-rgb),.88);backdrop-filter:blur(8px);flex-wrap:wrap;">
@@ -143,59 +143,63 @@
   </section>
 
   <!-- DRAWER -->
-  <div id="drawerBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s ease;"></div>
-  <div id="drawer" style="position:fixed;top:0;right:-520px;width:min(480px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.16);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
-    <div style="padding:22px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;justify-content:flex-end;align-items:center;">
-      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;font-size:20px;color:rgb(var(--ink-rgb));padding:2px 8px;">&times;</button>
+  <div id="drawerBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s ease;"></div>
+  <div id="drawer" style="position:fixed;top:0;right:-820px;width:min(780px,94vw);max-width:94vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.12);box-shadow:-30px 0 70px rgba(0,0,0,.4);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:flex-end;padding:24px 32px 0;">
+      <button id="closeDrawerBtn" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
     </div>
-    <div style="display:flex;border-bottom:1px solid rgba(var(--ink-rgb),.14);">
-      <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어 목록</button>
-      <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">단어장</button>
-      <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;flex:1;text-align:center;padding:12px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;">통계</button>
+    <div style="display:flex;gap:6px;padding:14px 32px 0;border-bottom:1px solid rgba(var(--ink-rgb),.1);">
+      <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">단어 목록</button>
+      <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">단어장</button>
+      <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">통계</button>
     </div>
-    <div id="wordsFilterRow" style="padding:16px 24px;border-bottom:1px solid rgba(var(--ink-rgb),.14);display:flex;flex-direction:column;gap:12px;">
-      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid rgba(var(--ink-rgb),.16);border-radius:4px;">
-        <div id="currentNotebookCover" style="width:40px;height:40px;border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:19px;"></div>
+    <div class="wd-scroll" style="flex:1;overflow-y:auto;padding:32px 32px 48px;display:flex;flex-direction:column;gap:24px;">
+    <div id="wordsFilterRow" style="display:flex;flex-direction:column;gap:24px;">
+      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:20px;border:1px solid rgba(var(--ink-rgb),.12);background:rgba(var(--ink-rgb),.03);box-sizing:border-box;">
+        <div id="currentNotebookCover" style="width:56px;height:56px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;font-size:26px;"></div>
         <div style="flex:1;min-width:0;">
-          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-          <div id="currentNotebookMeta" style="font-size:10.5px;color:rgba(var(--ink-rgb),.45);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+          <div id="currentNotebookMeta" style="font-size:12.5px;color:rgba(var(--ink-rgb),.45);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
         </div>
-        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:7px 11px;border-radius:2px;letter-spacing:.02em;">⇄ 전환</button>
+        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:9px 14px;border-radius:100px;letter-spacing:.02em;box-sizing:border-box;">⇌ 전환</button>
       </div>
-      <div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
-          <div data-i18n="dateFilterTitle" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);font-weight:700;text-transform:uppercase;">날짜별 필터</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div data-i18n="dateFilterTitle" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">날짜별 필터</div>
           <button id="dateFilterExpandBtn" data-i18n="dateFilterMore" style="all:unset;cursor:pointer;font-size:9.5px;color:var(--accent);font-weight:700;display:none;">더보기</button>
         </div>
-        <div id="dateFilterRow" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;"></div>
+        <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;"></div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;">
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
           <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
         </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
           <input type="checkbox" id="notesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="notesOnlyLabel">📝 노트만</span>
         </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10.5px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;">
+        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
           <input type="checkbox" id="wrongOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
         </label>
       </div>
-      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:9px 10px;font-size:12px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;">
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
-        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:12.5px;border-radius:2px;font-family:inherit;">
-        <button id="addWordBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 16px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;">+</button>
+      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:11px 14px;font-size:13px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;box-sizing:border-box;">
+      <div style="display:flex;gap:12px;">
+        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px 14px;font-size:13px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px 14px;font-size:13px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+        <button id="addWordBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 18px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;box-sizing:border-box;">+</button>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">가져오기/내보내기</button>
-        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">🤖 AI 프롬프트</button>
-        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(224,122,95,.4);color:var(--warn);padding:8px;font-size:10px;font-weight:700;letter-spacing:.02em;border-radius:2px;">초기화</button>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">가져오기/내보내기</button>
+        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">🤖 AI 프롬프트</button>
+        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--warn-rgb),.4);color:var(--warn);padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">초기화</button>
       </div>
     </div>
-    <div id="drawerContent" style="flex:1;overflow-y:auto;padding:8px 16px;"></div>
-    <div id="notebooksPanel" style="display:none;flex:1;overflow-y:auto;padding:12px 16px 16px;flex-direction:column;gap:10px;">
-      <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;text-align:center;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgb(var(--ink-rgb));padding:14px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.03em;">+ 새 단어장</button>
-      <div id="notebooksGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+    <div id="drawerContent" style="display:flex;flex-direction:column;gap:14px;"></div>
+    <div id="notebooksPanel" style="display:none;flex-direction:column;gap:20px;">
+      <div style="display:flex;flex-wrap:wrap;gap:20px;">
+        <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;width:256px;height:256px;flex-shrink:0;border-radius:24px;border:1.5px dashed rgba(var(--ink-rgb),.25);color:rgba(var(--ink-rgb),.5);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;letter-spacing:.02em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">+ 새 단어장</button>
+        <div id="notebooksGrid" style="display:contents;"></div>
+      </div>
+    </div>
     </div>
   </div>
 
@@ -713,7 +717,7 @@
     '#DFFAF5','#DBF9F2','#BCF1E0','#8ED6DE','#D7FADF','#EFFFE0','#EDFFDB','#BDF9D8', // icy mint / teal-green
     '#FDF5DA','#F5FAED','#F4FEF1','#D5EBD5','#BCE8D5','#DEEBB5','#BAC9A7','#60787A', // warm yellow-green / morandi green
   ];
-  const NOTEBOOK_EMOJI_PRESETS = ['📖','✏️','🎯','🔥','🌱','⭐','🗂️','💡','🍀','🎧','🧠','📚'];
+  const NOTEBOOK_EMOJI_PRESETS = ['🍡','🫧','💥','🤹🏻‍♀️','🦄','🐈‍⬛','🐈','🪽','🦢','🦩','🎄','🌸','🌷','🍃','🌙','🪐','💫','🌟','✨','💥','🫯','🌈','❄️','🌊','🍓','🫐','🍒','🥑','🥞','🧀','🥯','🍟','🍔','🍣','🍥','🍧','🍭','🎪','🩰','🏝️','🎠','🎡','🗺️','💒','🎇','🌌','🌄','🌃','🎀','🧸','🩵','💙','💚','🧡','💛','🤍','🖤','💭'];
 
   function notebookCoverCSS(nb){
     if(nb && nb.coverUrl) return `background-image:url('${nb.coverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
@@ -1312,39 +1316,47 @@
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge,wordId){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;padding:12px;margin-bottom:6px;cursor:pointer;font-size:13px;border-radius:2px;border:1px solid ${active?'var(--accent)':'transparent'};background:${active?'rgba(var(--accent-rgb),.12)':'transparent'};color:${active?'var(--accent)':'rgb(var(--ink-rgb))'};`;
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};`;
     container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice'); });
     const info=document.createElement('div');
-    info.style.cssText='display:flex;flex-direction:column;gap:2px;max-width:80%;min-width:0;';
-    const mainSpan=document.createElement('span');
+    info.style.cssText='display:flex;align-items:baseline;gap:16px;min-width:0;';
     const wrongPart = showWrongBadge && wrongCount>0 ? `❌${wrongCount} ` : '';
     const numberPart = displayIndex!=null ? `${displayIndex}. ` : '';
-    mainSpan.textContent = `${hasNotes?'📝 ':''}${wrongPart}${numberPart}${mainText}`;
-    info.appendChild(mainSpan);
-    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; info.appendChild(subSpan); }
+    const metaSpan=document.createElement('span');
+    metaSpan.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(var(--ink-rgb),${active?'.45':'.35'});flex-shrink:0;white-space:nowrap;`;
+    metaSpan.textContent = `${hasNotes?'📝 ':''}${wrongPart}${numberPart}`.trim();
+    const textStack=document.createElement('div');
+    textStack.style.cssText='display:flex;flex-direction:column;gap:6px;min-width:0;';
+    const mainSpan=document.createElement('span');
+    mainSpan.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:17px;color:rgb(var(--ink-rgb));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    mainSpan.textContent = mainText;
+    textStack.appendChild(mainSpan);
+    if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:13px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; textStack.appendChild(subSpan); }
     if(hasNotes && notesText){
       const notePreview=document.createElement('span');
       notePreview.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
       const flat = notesText.trim().replace(/\s+/g,' ');
       notePreview.textContent = flat.length>36 ? flat.slice(0,36)+'…' : flat;
-      info.appendChild(notePreview);
+      textStack.appendChild(notePreview);
     }
+    if(metaSpan.textContent) info.appendChild(metaSpan);
+    info.appendChild(textStack);
     const actions=document.createElement('div');
-    actions.style.cssText='display:flex;align-items:center;gap:2px;';
+    actions.style.cssText='display:flex;align-items:center;gap:8px;flex-shrink:0;';
     const editBtn=document.createElement('button');
     editBtn.dataset.role='edit';
     editBtn.textContent='✎';
-    editBtn.style.cssText='border:none;background:none;color:rgba(var(--ink-rgb),.4);font-weight:bold;cursor:pointer;padding:6px 6px;font-size:13px;';
+    editBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
     editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); const w=wordsById.get(wordId); if(w) openEditWordModal(w); });
     const favBtn=document.createElement('button');
     favBtn.dataset.role='fav';
     favBtn.textContent = isFavorite ? '★' : '☆';
-    favBtn.style.cssText=`border:none;background:none;color:${isFavorite?'var(--accent)':'rgba(var(--ink-rgb),.4)'};font-weight:bold;cursor:pointer;padding:6px 8px;font-size:14px;`;
+    favBtn.style.cssText=`all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;background:${isFavorite?'rgba(var(--accent-rgb),.18)':'rgba(var(--ink-rgb),.06)'};color:${isFavorite?'var(--accent)':'rgba(var(--ink-rgb),.55)'};`;
     favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
     const delBtn=document.createElement('button');
     delBtn.dataset.role='del';
     delBtn.textContent='✕';
-    delBtn.style.cssText='border:none;background:none;color:rgba(var(--ink-rgb),.35);font-weight:bold;cursor:pointer;padding:6px 10px;font-size:14px;';
+    delBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgba(var(--ink-rgb),.55);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
     delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
     actions.appendChild(editBtn); actions.appendChild(favBtn); actions.appendChild(delBtn);
     container.appendChild(info); container.appendChild(actions);
@@ -1357,13 +1369,13 @@
 
   function setDrawerView(view, scrollToActive){
     drawerView=view;
-    const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`};
-    const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent'};
+    const activeStyle={color:'rgb(var(--ink-rgb))',borderBottom:`2px solid ${'var(--accent)'}`,marginBottom:'-1px'};
+    const inactiveStyle={color:'rgba(var(--ink-rgb),.45)',borderBottom:'2px solid transparent',marginBottom:'-1px'};
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
     Object.assign(drawerTabNotebooks.style, view==='notebooks'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
-    wordsFilterRow.style.display = view==='words' ? 'block' : 'none';
-    drawerContent.style.display = view==='notebooks' ? 'none' : 'block';
+    wordsFilterRow.style.display = view==='words' ? 'flex' : 'none';
+    drawerContent.style.display = view==='notebooks' ? 'none' : 'flex';
     notebooksPanel.style.display = view==='notebooks' ? 'flex' : 'none';
     if(view==='words'){ updateCurrentNotebookBar(); renderDateFilterRow(); }
     renderActiveDrawerView(scrollToActive);
@@ -1391,13 +1403,13 @@
     const nb = currentNotebook();
     const coverEl = $('currentNotebookCover');
     if(!nb){
-      coverEl.style.cssText='width:40px;height:40px;border-radius:4px;flex:none;background:rgba(var(--ink-rgb),.08);';
+      coverEl.style.cssText='width:56px;height:56px;border-radius:16px;flex:none;background:rgba(var(--ink-rgb),.08);';
       coverEl.innerHTML='';
       $('currentNotebookName').textContent=''; $('currentNotebookMeta').textContent='';
       return;
     }
-    coverEl.style.cssText=`width:40px;height:40px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex:none;${notebookCoverCSS(nb)}`;
-    if(nb.coverUrl) coverEl.innerHTML=''; else setEmojiInto(coverEl, nb.coverEmoji, 19);
+    coverEl.style.cssText=`width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;flex:none;${notebookCoverCSS(nb)}`;
+    if(nb.coverUrl) coverEl.innerHTML=''; else setEmojiInto(coverEl, nb.coverEmoji, 26);
     $('currentNotebookName').textContent = nb.name;
     const count = currentNotebookAllWords().length;
     $('currentNotebookMeta').textContent = nb.description ? t('notebookWordCountWithDesc',{count,description:nb.description}) : t('notebookWordCount',{count});
@@ -1465,7 +1477,7 @@
     grid.innerHTML='';
     const list = currentNotebooks();
     if(list.length===0){
-      grid.innerHTML=`<div style="grid-column:1/-1;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${t('noNotebooks')}</div>`;
+      grid.innerHTML=`<div style="width:100%;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${t('noNotebooks')}</div>`;
       return;
     }
     list.forEach(nb=>grid.appendChild(createNotebookCardDOM(nb)));
@@ -1474,41 +1486,44 @@
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
     const card=document.createElement('div');
-    card.style.cssText=`display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:4px;cursor:pointer;border:1px solid ${active?'var(--accent)':'rgba(var(--ink-rgb),.16)'};background:${active?'rgba(var(--accent-rgb),.08)':'transparent'};`;
+    card.style.cssText='width:256px;flex-shrink:0;border-radius:24px;border:1px solid rgba(var(--ink-rgb),.14);background:rgba(var(--ink-rgb),.03);overflow:hidden;cursor:pointer;box-sizing:border-box;';
     card.addEventListener('click',(e)=>{ if(e.target.dataset.role==='edit') return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
 
     const cover=document.createElement('div');
-    cover.style.cssText=`width:100%;aspect-ratio:1.6;border-radius:3px;display:flex;align-items:center;justify-content:center;position:relative;${notebookCoverCSS(nb)}`;
-    if(!nb.coverUrl) setEmojiInto(cover, nb.coverEmoji, 30);
+    cover.style.cssText=`position:relative;height:156px;display:flex;align-items:center;justify-content:center;${notebookCoverCSS(nb)}`;
+    if(!nb.coverUrl) setEmojiInto(cover, nb.coverEmoji, 40);
     if(active){
       const badge=document.createElement('div');
       badge.textContent=t('practicingBadge');
-      badge.style.cssText='position:absolute;top:6px;left:6px;background:rgba(10,10,10,.55);color:#fff;font-size:8.5px;font-weight:700;letter-spacing:.03em;padding:3px 7px;border-radius:100px;';
+      badge.style.cssText="position:absolute;top:14px;left:14px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.05em;padding:6px 12px;border-radius:100px;background:rgba(10,10,10,.55);color:#f2ede2;";
       cover.appendChild(badge);
     }
     const editBtn=document.createElement('button');
     editBtn.type='button'; editBtn.dataset.role='edit'; editBtn.textContent='✎';
-    editBtn.style.cssText='all:unset;cursor:pointer;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:4px;background:rgba(10,10,10,.4);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;';
+    editBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:100px;background:rgba(10,10,10,.45);color:#f2ede2;font-size:13px;display:flex;align-items:center;justify-content:center;';
     editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
     cover.appendChild(editBtn);
     card.appendChild(cover);
 
+    const body=document.createElement('div');
+    body.style.cssText='padding:20px 22px 24px;display:flex;flex-direction:column;gap:6px;';
     const nameEl=document.createElement('div');
-    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgb(var(--ink-rgb));";
+    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgb(var(--ink-rgb));";
     nameEl.textContent=nb.name;
-    card.appendChild(nameEl);
+    body.appendChild(nameEl);
 
     const metaEl=document.createElement('div');
-    metaEl.style.cssText='font-size:10px;color:rgba(var(--ink-rgb),.45);';
+    metaEl.style.cssText='font-size:12.5px;color:rgba(var(--ink-rgb),.45);';
     metaEl.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
-    card.appendChild(metaEl);
+    body.appendChild(metaEl);
 
     if(nb.description){
       const descEl=document.createElement('div');
-      descEl.style.cssText='font-size:10px;color:rgba(var(--ink-rgb),.4);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+      descEl.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
       descEl.textContent=nb.description;
-      card.appendChild(descEl);
+      body.appendChild(descEl);
     }
+    card.appendChild(body);
     return card;
   }
 
@@ -1636,7 +1651,7 @@
   function statSectionTitle(text,marginBottom){
     const title=document.createElement('div');
     const mb = marginBottom==null ? 12 : marginBottom;
-    title.style.cssText=`font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:${mb}px;`;
+    title.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;margin-bottom:${mb}px;`;
     title.textContent=text;
     return title;
   }
@@ -1654,8 +1669,9 @@
   }
 
   function buildReviewStatusSection(list){
-    const section=statCard();
-    section.appendChild(statSectionTitle(t('reviewStatusTitle')));
+    const section=document.createElement('div');
+    section.style.cssText='display:flex;flex-direction:column;gap:14px;';
+    section.appendChild(statSectionTitle(t('reviewStatusTitle'), 0));
     const today=todayStr();
     let overdue=0, dueToday=0, upcoming=0, fresh=0;
     list.forEach(w=>{
@@ -1665,25 +1681,36 @@
       else upcoming++;
     });
     const grid=document.createElement('div');
-    grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+    grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;';
     [
-      {label:t('overdueLabel'), value:overdue, category:'overdue', icon:'🔴', bg:'rgba(192,57,43,.08)', border:'1px solid rgba(192,57,43,.32)', dot:'rgba(192,57,43,.16)', num:'#e0685a'},
-      {label:t('dueTodayLabel'), value:dueToday, category:'dueToday', icon:'🟡', bg:'rgba(var(--accent-rgb),.09)', border:'1px solid rgba(var(--accent-rgb),.4)', dot:'rgba(var(--accent-rgb),.18)', num:'var(--accent)'},
-      {label:t('upcomingLabel'), value:upcoming, category:'upcoming', icon:'⚪', bg:'rgba(var(--ink-rgb),.04)', border:'1px solid rgba(var(--ink-rgb),.14)', dot:'rgba(var(--ink-rgb),.06)', num:'rgba(var(--ink-rgb),.8)'},
-      {label:t('freshLabel'), value:fresh, category:'fresh', icon:'🆕', bg:'rgba(var(--ink-rgb),.04)', border:'1px dashed rgba(var(--ink-rgb),.22)', dot:'rgba(var(--ink-rgb),.05)', num:'rgba(var(--ink-rgb),.6)'}
+      {label:t('overdueLabel'), value:overdue, category:'overdue', icon:'🔴', bg:'rgba(var(--warn-rgb),.1)', border:'1px solid rgba(var(--warn-rgb),.25)', blob:'rgba(var(--warn-rgb),.15)', dot:'var(--warn)', num:'var(--warn)'},
+      {label:t('dueTodayLabel'), value:dueToday, category:'dueToday', icon:'🟡', bg:'rgba(var(--ink-rgb),.035)', border:'1px solid rgba(var(--ink-rgb),.12)', blob:'rgba(var(--accent-rgb),.15)', dot:'var(--accent)', num:'var(--accent)'},
+      {label:t('upcomingLabel'), value:upcoming, category:'upcoming', icon:'⚪', bg:'rgba(var(--ink-rgb),.035)', border:'1px solid rgba(var(--ink-rgb),.12)', blob:'rgba(var(--ink-rgb),.08)', dot:'rgba(var(--ink-rgb),.4)', num:'rgba(var(--ink-rgb),.85)'},
+      {label:t('freshLabel'), value:fresh, category:'fresh', icon:'🆕', bg:'rgba(var(--ink-rgb),.02)', border:'1.5px dashed rgba(var(--ink-rgb),.18)', blob:null, dot:null, num:'rgba(var(--ink-rgb),.5)'}
     ].forEach(item=>{
       const tile=document.createElement('div');
-      tile.style.cssText=`position:relative;padding:14px 12px;border-radius:3px;background:${item.bg};border:${item.border};overflow:hidden;cursor:pointer;`;
+      tile.style.cssText=`position:relative;overflow:hidden;border-radius:22px;padding:22px 24px;box-sizing:border-box;background:${item.bg};border:${item.border};cursor:pointer;`;
       tile.addEventListener('click', ()=>enterReviewCategory(item.category, item.value));
-      const blob=document.createElement('div');
-      blob.style.cssText=`position:absolute;top:-12px;right:-12px;width:46px;height:46px;border-radius:50%;background:${item.dot};`;
+      if(item.blob){
+        const blob=document.createElement('div');
+        blob.style.cssText=`position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:100px;background:${item.blob};`;
+        tile.appendChild(blob);
+      }
       const num=document.createElement('div');
-      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:23px;color:${item.num};position:relative;`;
+      num.style.cssText=`position:relative;font-family:'Unbounded',sans-serif;font-weight:900;font-size:40px;line-height:1;color:${item.num};`;
       num.textContent=String(item.value);
+      tile.appendChild(num);
       const lab=document.createElement('div');
-      lab.style.cssText='font-size:10px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);margin-top:3px;position:relative;';
-      lab.textContent=`${item.icon} ${item.label}`;
-      tile.appendChild(blob); tile.appendChild(num); tile.appendChild(lab);
+      lab.style.cssText='position:relative;margin-top:8px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:rgba(var(--ink-rgb),.7);';
+      if(item.dot){
+        const dotEl=document.createElement('span');
+        dotEl.style.cssText=`width:7px;height:7px;border-radius:100px;background:${item.dot};flex-shrink:0;`;
+        lab.appendChild(dotEl);
+      }
+      const labText=document.createElement('span');
+      labText.textContent=`${item.icon} ${item.label}`;
+      lab.appendChild(labText);
+      tile.appendChild(lab);
       grid.appendChild(tile);
     });
     section.appendChild(grid);
@@ -1692,26 +1719,27 @@
 
   function buildBarRow(label,count,max,barColor,labelWidth,numColor,numWeight){
     const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:8px;';
-    const lab=document.createElement('div');
-    lab.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(var(--ink-rgb),.4);width:${labelWidth}px;flex:none;`;
+    row.style.cssText='display:flex;align-items:center;gap:14px;';
+    const lab=document.createElement('span');
+    lab.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(var(--ink-rgb),.5);width:${labelWidth}px;flex-shrink:0;`;
     lab.textContent=label;
     const track=document.createElement('div');
-    track.style.cssText='flex:1;height:13px;background:rgba(var(--ink-rgb),.08);border-radius:2px;overflow:hidden;';
+    track.style.cssText='flex:1;height:12px;border-radius:100px;background:rgba(var(--ink-rgb),.06);overflow:hidden;';
     const fill=document.createElement('div');
     const pct = max>0 ? Math.round(count/max*100) : 0;
-    fill.style.cssText=`height:100%;width:${pct}%;background:${barColor};transition:width .3s ease;`;
+    fill.style.cssText=`height:100%;border-radius:100px;width:${pct}%;background:${barColor};transition:width .3s ease;`;
     track.appendChild(fill);
-    const num=document.createElement('div');
-    num.style.cssText=`font-size:11px;color:${numColor||'rgba(var(--ink-rgb),.5)'};width:20px;text-align:right;flex:none;${numWeight?`font-weight:${numWeight};`:''}`;
+    const num=document.createElement('span');
+    num.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:12px;color:${numColor||'rgba(var(--ink-rgb),.6)'};width:22px;text-align:right;flex-shrink:0;${numWeight?`font-weight:${numWeight};`:''}`;
     num.textContent=String(count);
     row.appendChild(lab); row.appendChild(track); row.appendChild(num);
     return row;
   }
 
   function buildMasterySection(list){
-    const section=statCard();
-    section.appendChild(statSectionTitle(t('masteryDistTitle')));
+    const section=document.createElement('div');
+    section.style.cssText='display:flex;flex-direction:column;gap:16px;';
+    section.appendChild(statSectionTitle(t('masteryDistTitle'), 0));
     if(list.length===0){
       const empty=document.createElement('div');
       empty.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);';
@@ -1719,15 +1747,13 @@
       section.appendChild(empty);
       return section;
     }
-    const RAMP=['#5c4256','#6f4d67','#8a5a7d','#a4699a','#c26fae','var(--accent)'];
     const counts=[0,0,0,0,0,0];
     list.forEach(w=>{ counts[Math.min(w.box||0,5)]++; });
     const max=Math.max(...counts,1);
     const rows=document.createElement('div');
-    rows.style.cssText='display:flex;flex-direction:column;gap:7px;';
+    rows.style.cssText='display:flex;flex-direction:column;gap:12px;';
     counts.forEach((c,box)=>{
-      const isTop = box===5;
-      rows.appendChild(buildBarRow(`LV.${box}`, c, max, RAMP[box], 30, isTop?'var(--accent)':null, isTop?700:null));
+      rows.appendChild(buildBarRow(`LV.${box}`, c, max, 'var(--accent)', 44));
     });
     section.appendChild(rows);
     return section;
@@ -1736,37 +1762,37 @@
   function buildWeakWordsSection(list){
     const weak = list.filter(w=>(w.wrongCount||0)>0).sort((a,b)=>(b.wrongCount||0)-(a.wrongCount||0)).slice(0,5);
     if(weak.length===0) return null;
-    const section=statCard();
+    const section=document.createElement('div');
+    section.style.cssText='display:flex;flex-direction:column;gap:16px;';
     const header=document.createElement('div');
-    header.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+    header.style.cssText='display:flex;align-items:center;justify-content:space-between;';
     header.appendChild(statSectionTitle(t('weakWordsTitle'), 0));
     const tag=document.createElement('div');
-    tag.style.cssText='font-size:9.5px;color:#e0685a;font-weight:700;letter-spacing:.03em;';
+    tag.style.cssText="font-family:'Space Grotesk',sans-serif;font-size:11.5px;color:var(--warn);font-weight:700;letter-spacing:.03em;";
     tag.textContent=t('wrongOrderTag');
     header.appendChild(tag);
     section.appendChild(header);
 
-    const badgeAlphas=[.18,.14,.11,.09,.07];
     const max=Math.max(...weak.map(w=>w.wrongCount||0),1);
     const rows=document.createElement('div');
-    rows.style.cssText='display:flex;flex-direction:column;gap:8px;';
+    rows.style.cssText='display:flex;flex-direction:column;gap:16px;';
     weak.forEach((w,i)=>{
       const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:8px;';
-      const badge=document.createElement('div');
-      badge.style.cssText=`width:16px;height:16px;border-radius:50%;background:rgba(192,57,43,${badgeAlphas[i]??.07});color:#e0685a;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;`;
+      row.style.cssText='display:flex;align-items:center;gap:16px;';
+      const badge=document.createElement('span');
+      badge.style.cssText="width:24px;height:24px;border-radius:100px;background:rgba(var(--warn-rgb),.15);color:var(--warn);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;";
       badge.textContent=String(i+1);
-      const lab=document.createElement('div');
-      lab.style.cssText='width:58px;font-size:11px;color:rgb(var(--ink-rgb));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;';
+      const lab=document.createElement('span');
+      lab.style.cssText="width:112px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;color:rgb(var(--ink-rgb));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;";
       lab.textContent=w.word;
       const track=document.createElement('div');
-      track.style.cssText='flex:1;height:10px;background:rgba(var(--ink-rgb),.08);border-radius:2px;overflow:hidden;';
+      track.style.cssText='flex:1;height:10px;border-radius:100px;background:rgba(var(--ink-rgb),.07);overflow:hidden;';
       const fill=document.createElement('div');
       const pct=Math.round((w.wrongCount||0)/max*100);
-      fill.style.cssText=`height:100%;width:${pct}%;background:linear-gradient(90deg,#c0392b,#e0685a);`;
+      fill.style.cssText=`height:100%;border-radius:100px;width:${pct}%;background:linear-gradient(90deg,rgba(var(--warn-rgb),.5),var(--warn));`;
       track.appendChild(fill);
-      const num=document.createElement('div');
-      num.style.cssText='width:16px;text-align:right;font-size:10.5px;color:#e0685a;font-weight:700;';
+      const num=document.createElement('span');
+      num.style.cssText="width:22px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--warn);font-weight:700;";
       num.textContent=String(w.wrongCount||0);
       row.appendChild(badge); row.appendChild(lab); row.appendChild(track); row.appendChild(num);
       rows.appendChild(row);
@@ -1834,7 +1860,7 @@
     drawerContent.innerHTML='';
     const list = currentWordList();
     const wrap=document.createElement('div');
-    wrap.style.cssText='display:flex;flex-direction:column;gap:14px;padding:8px 0 16px;';
+    wrap.style.cssText='display:flex;flex-direction:column;gap:32px;';
     wrap.appendChild(buildReviewStatusSection(list));
     wrap.appendChild(buildMasterySection(list));
     const weakSection=buildWeakWordsSection(list);
@@ -2300,8 +2326,8 @@
   switchUserInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); submitSwitchUserModal(); } });
 
   const THEMES = {
-    dark:  { bg:'#0a0a0a', bgRgb:'10,10,10',    inkRgb:'242,237,226', inputBg:'#141414', accent:'#e3b8d6', accentRgb:'227,184,214', accentInk:'#0a0a0a', warn:'#e07a5f' },
-    light: { bg:'#f1efe9', bgRgb:'241,239,233', inkRgb:'26,23,20',    inputBg:'#ffffff', accent:'#F7CDCE', accentRgb:'247,205,206', accentInk:'#1a1714', warn:'#b8451f' }
+    dark:  { bg:'#0a0a0a', bgRgb:'10,10,10',    inkRgb:'242,237,226', inputBg:'#141414', accent:'#e3b8d6', accentRgb:'227,184,214', accentInk:'#0a0a0a', warn:'#e07a5f', warnRgb:'224,122,95' },
+    light: { bg:'#f1efe9', bgRgb:'241,239,233', inkRgb:'26,23,20',    inputBg:'#ffffff', accent:'#F7CDCE', accentRgb:'247,205,206', accentInk:'#1a1714', warn:'#b8451f', warnRgb:'184,69,31' }
   };
   const THEME_KEY = 'TRAINER_THEME';
   let theme = localStorage.getItem(THEME_KEY) || 'dark';
@@ -2318,6 +2344,7 @@
       root.style.setProperty('--accent-rgb', p.accentRgb);
       root.style.setProperty('--accent-ink', p.accentInk);
       root.style.setProperty('--warn', p.warn);
+      root.style.setProperty('--warn-rgb', p.warnRgb);
     }
     localStorage.setItem(THEME_KEY, t);
     const btn = $('themeToggleBtn');
