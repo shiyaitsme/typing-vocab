@@ -82,9 +82,9 @@
       <div style="position:absolute;top:4px;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(40px,7vw,92px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(var(--ink-rgb),.14);">PRACTICE</div>
     </div>
 
-    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin-top:-18px;position:relative;">
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:stretch;margin-top:-18px;position:relative;">
       <!-- PRACTICE CARD -->
-      <div style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;">
+      <div style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
           <div>
             <div style="display:flex;align-items:baseline;gap:10px;">
@@ -100,7 +100,7 @@
           </div>
         </div>
 
-        <div style="border-top:1.5px solid #0a0a0a;border-bottom:1.5px solid #0a0a0a;padding:30px 0;text-align:center;">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;border-top:1.5px solid #0a0a0a;border-bottom:1.5px solid #0a0a0a;padding:30px 0;text-align:center;">
           <div id="romanization" style="font-size:11px;letter-spacing:.12em;font-weight:700;color:rgba(10,10,10,.5);margin-bottom:16px;min-height:14px;text-transform:uppercase;"></div>
           <div class="word-row" id="koRow" style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
           <div class="letter-row" id="enRow" style="display:none;gap:8px;align-items:flex-end;flex-wrap:wrap;justify-content:center;min-height:80px;"></div>
