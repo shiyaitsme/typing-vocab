@@ -116,23 +116,44 @@
 
       <!-- SIDEBAR -->
       <div style="flex:1 1 240px;max-width:320px;display:flex;flex-direction:column;gap:12px;">
-        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
-          <div data-i18n="sessionStatsTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">이번 세션</div>
-          <div id="progress" style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;line-height:1.8;letter-spacing:.02em;color:rgb(var(--ink-rgb));"></div>
-        </div>
-        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
-          <div data-i18n="favSectionTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;margin-bottom:8px;text-transform:uppercase;">즐겨찾기</div>
-          <div id="favCountLabel" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;"></div>
-        </div>
-        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:4px;">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
-            <span data-i18n="masteryProgressTitle" style="font-size:10.5px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;">숙련도 진행</span>
-            <span id="masteryPct" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;"></span>
+        <div id="currentNotebookBar" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;border:1px solid rgba(var(--ink-rgb),.12);background:rgba(var(--ink-rgb),.03);box-sizing:border-box;">
+          <div id="currentNotebookCover" style="width:44px;height:44px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px;"></div>
+          <div style="flex:1;min-width:0;">
+            <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <div id="currentNotebookMeta" style="font-size:11.5px;color:rgba(var(--ink-rgb),.45);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
           </div>
-          <div style="height:5px;background:rgba(var(--ink-rgb),.12);border-radius:3px;overflow:hidden;">
-            <div id="masteryFill" style="height:100%;width:0%;background:var(--accent);transition:width .35s cubic-bezier(.4,0,.2,1);"></div>
+          <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;font-size:10.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:7px 10px;border-radius:100px;letter-spacing:.02em;box-sizing:border-box;">⇌ 전환</button>
+        </div>
+        <div id="wordsFilterRow" style="border:1px solid rgba(var(--ink-rgb),.16);padding:16px;border-radius:4px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div data-i18n="dateFilterTitle" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">날짜별 필터</div>
+              <button id="dateFilterExpandBtn" data-i18n="dateFilterMore" style="all:unset;cursor:pointer;font-size:9.5px;color:var(--accent);font-weight:700;display:none;">더보기</button>
+            </div>
+            <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"></div>
           </div>
-          <div id="masteryLabel" style="font-size:10.5px;color:rgba(var(--ink-rgb),.4);margin-top:8px;letter-spacing:.02em;"></div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
+              <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
+              <input type="checkbox" id="notesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="notesOnlyLabel">📝 노트만</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
+              <input type="checkbox" id="wrongOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
+            </label>
+          </div>
+          <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:10px 12px;font-size:12.5px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;box-sizing:border-box;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+            <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+            <button id="addWordBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:var(--accent);color:var(--accent-ink);padding:9px;font-weight:700;font-size:14px;border-radius:2px;box-sizing:border-box;">+ 추가</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">가져오기/내보내기</button>
+            <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">🤖 AI 프롬프트</button>
+            <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--warn-rgb),.4);color:var(--warn);padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">초기화</button>
+          </div>
         </div>
         <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
           <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
@@ -155,45 +176,6 @@
       <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;padding:14px 20px;font-size:13px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;box-sizing:border-box;">통계</button>
     </div>
     <div class="wd-scroll" style="flex:1;overflow-y:auto;padding:32px 32px 48px;display:flex;flex-direction:column;gap:24px;">
-    <div id="wordsFilterRow" style="display:flex;flex-direction:column;gap:24px;">
-      <div id="currentNotebookBar" style="display:flex;align-items:center;gap:18px;padding:18px 22px;border-radius:20px;border:1px solid rgba(var(--ink-rgb),.12);background:rgba(var(--ink-rgb),.03);box-sizing:border-box;">
-        <div id="currentNotebookCover" style="width:56px;height:56px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center;font-size:26px;"></div>
-        <div style="flex:1;min-width:0;">
-          <div id="currentNotebookName" style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-          <div id="currentNotebookMeta" style="font-size:12.5px;color:rgba(var(--ink-rgb),.45);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-        </div>
-        <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:9px 14px;border-radius:100px;letter-spacing:.02em;box-sizing:border-box;">⇌ 전환</button>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div data-i18n="dateFilterTitle" style="font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">날짜별 필터</div>
-          <button id="dateFilterExpandBtn" data-i18n="dateFilterMore" style="all:unset;cursor:pointer;font-size:9.5px;color:var(--accent);font-weight:700;display:none;">더보기</button>
-        </div>
-        <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;"></div>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;">
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-          <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
-        </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-          <input type="checkbox" id="notesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="notesOnlyLabel">📝 노트만</span>
-        </label>
-        <label style="flex:1;min-width:96px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-          <input type="checkbox" id="wrongOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
-        </label>
-      </div>
-      <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:11px 14px;font-size:13px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;box-sizing:border-box;">
-      <div style="display:flex;gap:12px;">
-        <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px 14px;font-size:13px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
-        <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px 14px;font-size:13px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
-        <button id="addWordBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 18px;font-weight:700;font-size:16px;border-radius:2px;display:flex;align-items:center;box-sizing:border-box;">+</button>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;">
-        <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">가져오기/내보내기</button>
-        <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">🤖 AI 프롬프트</button>
-        <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;flex:1;text-align:center;border:1px solid rgba(var(--warn-rgb),.4);color:var(--warn);padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">초기화</button>
-      </div>
-    </div>
     <div id="drawerContent" style="display:flex;flex-direction:column;gap:14px;"></div>
     <div id="notebooksPanel" style="display:none;flex-direction:column;gap:20px;">
       <div style="display:flex;flex-wrap:wrap;gap:20px;">
@@ -541,11 +523,7 @@
       mobileTipKo: '※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.',
       mobilePlaceholderEn: 'English input here',
       mobileTipEn: '※ 영어 모드일 때는 영문 키보드로 입력해 주세요.',
-      sessionStatsTitle: '이번 세션', favSectionTitle: '즐겨찾기', masteryProgressTitle: '숙련도 진행',
       dictationLabel: '딕테이션 모드',
-      progressLine: '정답 {{correct}} · 건너뜀 {{skipped}} · 정확도 {{accuracy}}%{{streak}}',
-      streakTagFire: ' · 연속 {{n}}🔥', streakTag: ' · 연속 {{n}}',
-      masteryEmpty: '단어를 추가해 주세요', masteryProgressLabel: '완전 숙련 {{mastered}} / {{total}}개',
       correctNext: '정답! Enter로 다음',
       drawerTabWords: '단어 목록', drawerTabNotebooks: '단어장', drawerTabStats: '통계',
       favOnlyLabel: '★ 즐겨찾기만', notesOnlyLabel: '📝 노트만', wrongOnlyLabel: '❌ 오답만',
@@ -616,11 +594,7 @@
       mobileTipKo: '※ In Korean mode, please use your phone\'s Korean keyboard.',
       mobilePlaceholderEn: 'English input here',
       mobileTipEn: '※ In English mode, please use an English keyboard.',
-      sessionStatsTitle: 'This Session', favSectionTitle: 'Favorites', masteryProgressTitle: 'Mastery Progress',
       dictationLabel: 'Dictation Mode',
-      progressLine: 'Correct {{correct}} · Skipped {{skipped}} · Accuracy {{accuracy}}%{{streak}}',
-      streakTagFire: ' · Streak {{n}}🔥', streakTag: ' · Streak {{n}}',
-      masteryEmpty: 'Please add some words', masteryProgressLabel: 'Fully mastered {{mastered}} / {{total}}',
       correctNext: 'Correct! Press Enter for next',
       drawerTabWords: 'Words', drawerTabNotebooks: 'Notebooks', drawerTabStats: 'Stats',
       favOnlyLabel: '★ Favorites only', notesOnlyLabel: '📝 Notes only', wrongOnlyLabel: '❌ Wrong only',
@@ -803,7 +777,7 @@
 
   const $ = (id)=> document.getElementById(id);
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
-  const progressEl=$('progress'), pageCounter=$('pageCounter');
+  const pageCounter=$('pageCounter');
   const drawer=$('drawer'), drawerContent=$('drawerContent'), drawerBackdrop=$('drawerBackdrop');
   function openDrawer(){
     drawer.style.right='0';
@@ -813,7 +787,7 @@
     drawer.style.right='-820px';
     drawerBackdrop.style.opacity='0'; drawerBackdrop.style.pointerEvents='none';
   }
-  const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), wordsFilterRow=$('wordsFilterRow'), notebooksPanel=$('notebooksPanel');
+  const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), notebooksPanel=$('notebooksPanel');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
@@ -823,7 +797,6 @@
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
   const currentUserLabel=$('currentUserLabel');
-  const favCountLabel=$('favCountLabel');
   const switchUserModalOverlay=$('switchUserModalOverlay'), switchUserInput=$('switchUserInput');
 
   /* =========================================================
@@ -1031,7 +1004,6 @@
     item.favorite = !item.favorite;
     patchWordRemote(item.id, mode, {favorite:item.favorite});
     renderDrawer();
-    favCountLabel.textContent = String(list.filter(x=>x.favorite).length);
     if(index===wordIndex) updateFavoriteBtn();
   }
 
@@ -1040,7 +1012,6 @@
     const fav = !!(w && w.favorite);
     favoriteBtn.style.background = fav ? '#0a0a0a' : 'transparent';
     favoriteBtn.style.color = fav ? '#e3b8d6' : '#0a0a0a';
-    favCountLabel.textContent = String(currentWordList().filter(x=>x.favorite).length);
   }
 
   function updateNotesBtn(){
@@ -1102,19 +1073,6 @@
     updateNotesBtn();
     renderActiveDrawerView();
     closeNotesModal();
-  }
-
-  function renderMasteryProgress(){
-    const fill=$('masteryFill'), pct=$('masteryPct'), label=$('masteryLabel');
-    if(!fill) return;
-    const list=currentWordList();
-    if(list.length===0){ fill.style.width='0%'; pct.textContent=''; label.textContent=t('masteryEmpty'); return; }
-    const sum=list.reduce((s,w)=>s+(w.box||0),0);
-    const p=Math.round(sum/(list.length*5)*100);
-    const mastered=list.filter(w=>(w.box||0)>=5).length;
-    fill.style.width=`${p}%`;
-    pct.textContent=`${p}%`;
-    label.textContent=t('masteryProgressLabel',{mastered,total:list.length});
   }
 
   function renderMasteryDots(word){
@@ -1179,13 +1137,9 @@
 
   function render(){
     const total=currentWordCount();
-    const accuracy = sessionStats.wordsCompleted>0 ? Math.round(sessionStats.wordsCleanCompleted/sessionStats.wordsCompleted*100) : 100;
-    const streakTag = sessionStreak>=3 ? t('streakTagFire',{n:sessionStreak}) : (sessionStreak>0 ? t('streakTag',{n:sessionStreak}) : '');
-    progressEl.textContent = t('progressLine',{correct:stats.correct,skipped:stats.skipped,accuracy,streak:streakTag});
     pageCounter.textContent = total>0 ? `${wordIndex+1} / ${total}` : '0 / 0';
     const pageBadge=$('pageBadge'); if(pageBadge) pageBadge.textContent = total>0 ? `NO.${String(wordIndex+1).padStart(3,'0')}` : '';
     renderMasteryDots(currentWordObj());
-    renderMasteryProgress();
     renderKeyHint();
 
     if(total===0){
@@ -1375,10 +1329,8 @@
     Object.assign(drawerTabWords.style, view==='words'?activeStyle:inactiveStyle);
     Object.assign(drawerTabNotebooks.style, view==='notebooks'?activeStyle:inactiveStyle);
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
-    wordsFilterRow.style.display = view==='words' ? 'flex' : 'none';
     drawerContent.style.display = view==='notebooks' ? 'none' : 'flex';
     notebooksPanel.style.display = view==='notebooks' ? 'flex' : 'none';
-    if(view==='words'){ updateCurrentNotebookBar(); renderDateFilterRow(); }
     renderActiveDrawerView(scrollToActive);
   }
 
@@ -1640,7 +1592,7 @@
   $('closeDeleteNotebookBtn').addEventListener('click', closeDeleteNotebookConfirm);
   $('confirmDeleteNotebookBtn').addEventListener('click', confirmDeleteNotebook);
 
-  $('switchNotebookBtn').addEventListener('click', ()=>{ setDrawerView('notebooks'); setNavActive('notebooks'); });
+  $('switchNotebookBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('notebooks'); setNavActive('notebooks'); });
   drawerTabNotebooks.addEventListener('click', ()=>setDrawerView('notebooks'));
 
   function statCard(){
@@ -1995,10 +1947,15 @@
     if(currentWordCount()===0) return;
     toggleFavoriteAt(wordIndex);
   });
-  favoritesOnlyToggle.addEventListener('change', ()=>renderDrawer());
-  notesOnlyToggle.addEventListener('change', ()=>renderDrawer());
-  wrongOnlyToggle.addEventListener('change', ()=>renderDrawer());
-  wordSearchInput.addEventListener('input', ()=>renderDrawer());
+  function openWordsDrawer(){
+    openDrawer();
+    if(drawerView!=='words') setDrawerView('words'); else renderDrawer();
+    setNavActive('words');
+  }
+  favoritesOnlyToggle.addEventListener('change', openWordsDrawer);
+  notesOnlyToggle.addEventListener('change', openWordsDrawer);
+  wrongOnlyToggle.addEventListener('change', openWordsDrawer);
+  wordSearchInput.addEventListener('input', openWordsDrawer);
 
   notesBtn.addEventListener('click', ()=>{
     if(currentWordCount()===0) return;
