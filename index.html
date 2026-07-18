@@ -717,7 +717,7 @@
     '#DFFAF5','#DBF9F2','#BCF1E0','#8ED6DE','#D7FADF','#EFFFE0','#EDFFDB','#BDF9D8', // icy mint / teal-green
     '#FDF5DA','#F5FAED','#F4FEF1','#D5EBD5','#BCE8D5','#DEEBB5','#BAC9A7','#60787A', // warm yellow-green / morandi green
   ];
-  const NOTEBOOK_EMOJI_PRESETS = ['🍡','🫧','💥','🤹🏻‍♀️','🦄','🐈‍⬛','🐈','🪽','🦢','🦩','🎄','🌸','🌷','🍃','🌙','🪐','💫','🌟','✨','💥','🫯','🌈','❄️','🌊','🍓','🫐','🍒','🥑','🥞','🧀','🥯','🍟','🍔','🍣','🍥','🍧','🍭','🎪','🩰','🏝️','🎠','🎡','🗺️','💒','🎇','🌌','🌄','🌃','🎀','🧸','🩵','💙','💚','🧡','💛','🤍','🖤','💭'];
+  const NOTEBOOK_EMOJI_PRESETS = ['🍡','🫧','💥','🤹🏻‍♀️','🦄','🐈‍⬛','🐈','🪽','🦢','🦩','🎄','🌸','🌷','🍃','🌙','🪐','💫','🌟','✨','💥','🌈','❄️','🌊','🍓','🫐','🍒','🥑','🥞','🧀','🥯','🍟','🍔','🍣','🍥','🍧','🍭','🎪','🩰','🏝️','🎠','🎡','🗺️','💒','🎇','🌌','🌄','🌃','🎀','🧸','🩵','💙','💚','🧡','💛','🤍','🖤','💭'];
 
   function notebookCoverCSS(nb){
     if(nb && nb.coverUrl) return `background-image:url('${nb.coverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
@@ -1994,10 +1994,10 @@
     if(currentWordCount()===0) return;
     toggleFavoriteAt(wordIndex);
   });
-  favoritesOnlyToggle.addEventListener('change', renderDrawer);
-  notesOnlyToggle.addEventListener('change', renderDrawer);
-  wrongOnlyToggle.addEventListener('change', renderDrawer);
-  wordSearchInput.addEventListener('input', renderDrawer);
+  favoritesOnlyToggle.addEventListener('change', ()=>renderDrawer());
+  notesOnlyToggle.addEventListener('change', ()=>renderDrawer());
+  wrongOnlyToggle.addEventListener('change', ()=>renderDrawer());
+  wordSearchInput.addEventListener('input', ()=>renderDrawer());
 
   notesBtn.addEventListener('click', ()=>{
     if(currentWordCount()===0) return;
