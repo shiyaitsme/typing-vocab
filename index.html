@@ -20,6 +20,7 @@
   .tab-btn:hover .tab-glyph{color:var(--accent) !important;}
   .arrow-btn{transition:background .18s ease,color .18s ease,letter-spacing .18s ease;}
   .arrow-btn:hover{background:#0a0a0a !important;color:rgb(var(--ink-rgb)) !important;letter-spacing:.1em;}
+  .filter-seg-chk:checked + .filter-seg{background:rgb(var(--ink-rgb));color:var(--bg) !important;}
 </style>
 </head>
 <body>
@@ -133,15 +134,18 @@
             </div>
             <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"></div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-              <input type="checkbox" id="favoritesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="favOnlyLabel">★ 즐겨찾기만</span>
+          <div style="display:flex;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
+            <label style="flex:1;display:flex;cursor:pointer;">
+              <input type="checkbox" id="favoritesOnlyToggle" class="filter-seg-chk" style="display:none;">
+              <span class="filter-seg" data-i18n="favOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">★ 즐겨찾기만</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-              <input type="checkbox" id="notesOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="notesOnlyLabel">📝 노트만</span>
+            <label style="flex:1;display:flex;cursor:pointer;">
+              <input type="checkbox" id="notesOnlyToggle" class="filter-seg-chk" style="display:none;">
+              <span class="filter-seg" data-i18n="notesOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">📝 노트만</span>
             </label>
-            <label style="display:flex;align-items:center;gap:8px;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;border-radius:2px;cursor:pointer;box-sizing:border-box;">
-              <input type="checkbox" id="wrongOnlyToggle" style="accent-color:var(--accent);"><span data-i18n="wrongOnlyLabel">❌ 오답만</span>
+            <label style="flex:1;display:flex;cursor:pointer;">
+              <input type="checkbox" id="wrongOnlyToggle" class="filter-seg-chk" style="display:none;">
+              <span class="filter-seg" data-i18n="wrongOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">❌ 오답만</span>
             </label>
           </div>
           <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="width:100%;padding:10px 12px;font-size:12.5px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;box-sizing:border-box;">
