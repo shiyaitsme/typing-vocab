@@ -548,6 +548,7 @@
       deleteNotebookConfirm: "'{{name}}' 단어장과 안의 단어를 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
       cantDeleteLastNotebook: '마지막 남은 단어장은 삭제할 수 없습니다. 먼저 새 단어장을 만들어 주세요.',
       reviewStatusTitle: '복습 현황', overdueLabel: '밀린 복습', dueTodayLabel: '오늘 복습', upcomingLabel: '예정', freshLabel: '미학습',
+      reviewStatusCount: '04 STATS', freshBadge: 'NEW',
       masteryDistTitle: '숙련도 분포', weakWordsTitle: '취약 단어 TOP 5', wrongOrderTag: '❌ 오답순',
       activityTitle: '단어 추가 활동', activityCaption: '이 단어장에 단어를 추가한 날짜 기준',
       legendLess: '적음', legendMore: '많음', activityTooltip: '{{date}}: {{count}}개',
@@ -619,6 +620,7 @@
       deleteNotebookConfirm: "Delete notebook '{{name}}' and all its words? This can't be undone.",
       cantDeleteLastNotebook: "Can't delete your last notebook. Create another one first.",
       reviewStatusTitle: 'Review Status', overdueLabel: 'Overdue', dueTodayLabel: 'Due Today', upcomingLabel: 'Upcoming', freshLabel: 'Not Studied',
+      reviewStatusCount: '04 STATS', freshBadge: 'NEW',
       masteryDistTitle: 'Mastery Distribution', weakWordsTitle: 'Top 5 Weak Words', wrongOrderTag: '❌ By mistakes',
       activityTitle: 'Word Addition Activity', activityCaption: 'Based on dates words were added to this notebook',
       legendLess: 'Less', legendMore: 'More', activityTooltip: '{{date}}: {{count}}',
@@ -1643,8 +1645,19 @@
 
   function buildReviewStatusSection(list){
     const section=document.createElement('div');
-    section.style.cssText='display:flex;flex-direction:column;gap:14px;';
-    section.appendChild(statSectionTitle(t('reviewStatusTitle'), 0));
+    section.style.cssText='display:flex;flex-direction:column;gap:16px;';
+
+    const header=document.createElement('div');
+    header.style.cssText='display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid rgba(var(--ink-rgb),.15);padding-bottom:12px;';
+    const headerTitle=document.createElement('span');
+    headerTitle.style.cssText="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(var(--ink-rgb),.55);";
+    headerTitle.textContent=t('reviewStatusTitle');
+    const headerCount=document.createElement('span');
+    headerCount.style.cssText="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.3);";
+    headerCount.textContent=t('reviewStatusCount');
+    header.appendChild(headerTitle); header.appendChild(headerCount);
+    section.appendChild(header);
+
     const today=todayStr();
     let overdue=0, dueToday=0, upcoming=0, fresh=0;
     list.forEach(w=>{
@@ -1654,34 +1667,44 @@
       else upcoming++;
     });
     const grid=document.createElement('div');
-    grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:16px;';
+    grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:12px;';
     [
-      {label:t('overdueLabel'), value:overdue, category:'overdue', icon:'🔴', bg:'rgba(var(--warn-rgb),.1)', border:'1px solid rgba(var(--warn-rgb),.25)', blob:'rgba(var(--warn-rgb),.15)', dot:'var(--warn)', num:'var(--warn)'},
-      {label:t('dueTodayLabel'), value:dueToday, category:'dueToday', icon:'🟡', bg:'rgba(var(--ink-rgb),.035)', border:'1px solid rgba(var(--ink-rgb),.12)', blob:'rgba(var(--accent-rgb),.15)', dot:'var(--accent)', num:'var(--accent)'},
-      {label:t('upcomingLabel'), value:upcoming, category:'upcoming', icon:'⚪', bg:'rgba(var(--ink-rgb),.035)', border:'1px solid rgba(var(--ink-rgb),.12)', blob:'rgba(var(--ink-rgb),.08)', dot:'rgba(var(--ink-rgb),.4)', num:'rgba(var(--ink-rgb),.85)'},
-      {label:t('freshLabel'), value:fresh, category:'fresh', icon:'🆕', bg:'rgba(var(--ink-rgb),.02)', border:'1.5px dashed rgba(var(--ink-rgb),.18)', blob:null, dot:null, num:'rgba(var(--ink-rgb),.5)'}
+      {label:t('overdueLabel'), value:overdue, category:'overdue', filled:true, dot:'solid'},
+      {label:t('dueTodayLabel'), value:dueToday, category:'dueToday', numColor:'var(--accent)', labelOpacity:.75, dot:'solid', dotColor:'var(--accent)'},
+      {label:t('upcomingLabel'), value:upcoming, category:'upcoming', numOpacity:.85, labelOpacity:.5, dot:'hollow'},
+      {label:t('freshLabel'), value:fresh, category:'fresh', dashed:true, numOpacity:.35, labelOpacity:.4, dot:'hollow-dashed', badge:true}
     ].forEach(item=>{
       const tile=document.createElement('div');
-      tile.style.cssText=`position:relative;overflow:hidden;border-radius:22px;padding:22px 24px;box-sizing:border-box;background:${item.bg};border:${item.border};cursor:pointer;`;
+      const edge = item.dashed ? 'outline:1px dashed rgba(var(--ink-rgb),.3);outline-offset:-2px;' : (item.filled ? '' : 'border:1px solid rgba(var(--ink-rgb),.15);');
+      const fill = item.filled ? 'background:var(--accent);color:var(--accent-ink);' : '';
+      tile.style.cssText=`position:relative;box-sizing:border-box;padding:18px 16px;border-radius:18px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;${edge}${fill}`;
       tile.addEventListener('click', ()=>enterReviewCategory(item.category, item.value));
-      if(item.blob){
-        const blob=document.createElement('div');
-        blob.style.cssText=`position:absolute;top:-30px;right:-30px;width:90px;height:90px;border-radius:100px;background:${item.blob};`;
-        tile.appendChild(blob);
+
+      if(item.badge){
+        const badge=document.createElement('span');
+        badge.style.cssText="position:absolute;top:12px;right:12px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:8.5px;letter-spacing:.08em;padding:3px 7px;border-radius:100px;background:rgba(var(--ink-rgb),.08);color:rgba(var(--ink-rgb),.5);";
+        badge.textContent=t('freshBadge');
+        tile.appendChild(badge);
       }
+
       const num=document.createElement('div');
-      num.style.cssText=`position:relative;font-family:'Unbounded',sans-serif;font-weight:900;font-size:40px;line-height:1;color:${item.num};`;
+      const numColor = item.filled ? 'inherit' : (item.numColor || `rgba(var(--ink-rgb),${item.numOpacity!=null?item.numOpacity:1})`);
+      num.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:900;font-size:38px;line-height:.85;letter-spacing:-.03em;color:${numColor};`;
       num.textContent=String(item.value);
       tile.appendChild(num);
+
       const lab=document.createElement('div');
-      lab.style.cssText='position:relative;margin-top:8px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:rgba(var(--ink-rgb),.7);';
-      if(item.dot){
-        const dotEl=document.createElement('span');
-        dotEl.style.cssText=`width:7px;height:7px;border-radius:100px;background:${item.dot};flex-shrink:0;`;
-        lab.appendChild(dotEl);
-      }
+      const labColor = item.filled ? 'inherit' : `rgba(var(--ink-rgb),${item.labelOpacity!=null?item.labelOpacity:.6})`;
+      lab.style.cssText=`display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${labColor};`;
+      const dotEl=document.createElement('span');
+      let dotCss='width:6px;height:6px;flex-shrink:0;';
+      if(item.dot==='solid') dotCss+=`background:${item.dotColor||'currentColor'};`;
+      else if(item.dot==='hollow') dotCss+='border:1px solid currentColor;';
+      else if(item.dot==='hollow-dashed') dotCss+='border:1px dashed currentColor;';
+      dotEl.style.cssText=dotCss;
+      lab.appendChild(dotEl);
       const labText=document.createElement('span');
-      labText.textContent=`${item.icon} ${item.label}`;
+      labText.textContent=item.label;
       lab.appendChild(labText);
       tile.appendChild(lab);
       grid.appendChild(tile);
