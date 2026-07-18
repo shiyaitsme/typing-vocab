@@ -58,6 +58,7 @@
     </div>
   </header>
 
+  <div id="mainContent" style="transition:margin-right .32s cubic-bezier(.4,0,.2,1);">
   <!-- HERO -->
   <section style="padding:56px 32px 26px;border-bottom:1px solid rgba(var(--ink-rgb),.14);max-width:1100px;margin:0 auto;">
     <div style="display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:flex-end;">
@@ -163,10 +164,11 @@
       </div>
     </div>
   </section>
+  </div>
 
   <!-- DRAWER -->
   <div id="drawerBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s ease;"></div>
-  <div id="drawer" style="position:fixed;top:0;right:-820px;width:min(780px,94vw);max-width:94vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.12);box-shadow:-30px 0 70px rgba(0,0,0,.4);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
+  <div id="drawer" style="position:fixed;top:0;right:-500px;width:min(460px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.12);box-shadow:-30px 0 70px rgba(0,0,0,.4);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
     <div style="display:flex;justify-content:flex-end;padding:24px 32px 0;">
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
     </div>
@@ -778,15 +780,33 @@
   const $ = (id)=> document.getElementById(id);
   const koRow=$('koRow'), enRow=$('enRow'), romanizationEl=$('romanization'), statusBanner=$('statusBanner');
   const pageCounter=$('pageCounter');
-  const drawer=$('drawer'), drawerContent=$('drawerContent'), drawerBackdrop=$('drawerBackdrop');
+  const drawer=$('drawer'), drawerContent=$('drawerContent'), drawerBackdrop=$('drawerBackdrop'), mainContent=$('mainContent');
+  // 화면이 넓을 때는 서랍이 본문을 가리지 않고 본문이 옆으로 밀려나(둘 다 동시에 보임 + 조작
+  // 가능), 화면이 좁을 때(모바일)는 밀어낼 공간이 없으니 기존처럼 반투명 배경 위에 덮어씌운다.
+  function isWideLayout(){ return window.matchMedia('(min-width: 900px)').matches; }
+  function drawerWidthPx(){ return Math.min(460, window.innerWidth*0.92); }
+  function syncDrawerLayout(open){
+    if(isWideLayout()){
+      mainContent.style.marginRight = open ? `${drawerWidthPx()+32}px` : '';
+      drawerBackdrop.style.opacity='0'; drawerBackdrop.style.pointerEvents='none';
+    } else {
+      mainContent.style.marginRight = '';
+      drawerBackdrop.style.opacity = open ? '1' : '0';
+      drawerBackdrop.style.pointerEvents = open ? 'auto' : 'none';
+    }
+  }
+  let drawerOpen = false;
   function openDrawer(){
+    drawerOpen = true;
     drawer.style.right='0';
-    drawerBackdrop.style.opacity='1'; drawerBackdrop.style.pointerEvents='auto';
+    syncDrawerLayout(true);
   }
   function closeDrawer(){
-    drawer.style.right='-820px';
-    drawerBackdrop.style.opacity='0'; drawerBackdrop.style.pointerEvents='none';
+    drawerOpen = false;
+    drawer.style.right='-500px';
+    syncDrawerLayout(false);
   }
+  window.addEventListener('resize', ()=>syncDrawerLayout(drawerOpen));
   const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), notebooksPanel=$('notebooksPanel');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
