@@ -26,7 +26,7 @@
   .wb-card-open:hover{background:#000 !important;}
   .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .34s cubic-bezier(.4,0,.2,1),margin-top .34s cubic-bezier(.4,0,.2,1),box-shadow .34s ease,filter .25s ease;transform-origin:center center;z-index:1;}
   .wb-card--peak{box-shadow:0 26px 50px rgba(0,0,0,.45) !important;filter:brightness(1.05);}
-  .wd-scroll{scrollbar-gutter:stable;scroll-snap-type:y proximity;}
+  .wd-scroll{scrollbar-gutter:stable;scroll-snap-type:y mandatory;}
 </style>
 </head>
 <body>
@@ -1326,7 +1326,7 @@
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge,wordId){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;`;
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;scroll-margin-top:14px;`;
     container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice'); });
     const info=document.createElement('div');
     info.style.cssText='display:flex;align-items:baseline;gap:16px;min-width:0;';
