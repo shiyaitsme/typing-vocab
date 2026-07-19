@@ -810,13 +810,19 @@
     }
   }
   let drawerOpen = false;
+  // 사용자가 오른쪽 위 X(또는 배경)를 눌러 드로어를 직접 닫으면, 그 뒤로는
+  // 즐겨찾기만/노트만/오답만 토글을 눌러도 드로어가 다시 저절로 열리지 않는다.
+  // 내비게이션 버튼으로 드로어를 다시 열면(openDrawer) 이 억제 상태는 풀린다.
+  let suppressAutoOpenDrawer = false;
   function openDrawer(){
     drawerOpen = true;
+    suppressAutoOpenDrawer = false;
     drawer.style.right='0';
     syncDrawerLayout(true);
   }
   function closeDrawer(){
     drawerOpen = false;
+    suppressAutoOpenDrawer = true;
     drawer.style.right='-500px';
     syncDrawerLayout(false);
   }
@@ -2006,7 +2012,10 @@
     toggleFavoriteAt(wordIndex);
   });
   function openWordsDrawer(){
-    openDrawer();
+    if(!drawerOpen){
+      if(suppressAutoOpenDrawer) return;
+      openDrawer();
+    }
     if(drawerView!=='words') setDrawerView('words'); else renderDrawer();
     setNavActive('words');
   }
