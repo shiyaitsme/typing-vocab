@@ -27,6 +27,10 @@
   .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .34s cubic-bezier(.4,0,.2,1),margin-top .34s cubic-bezier(.4,0,.2,1),box-shadow .34s ease,filter .25s ease;transform-origin:center center;z-index:1;}
   .wb-card--peak{box-shadow:0 26px 50px rgba(0,0,0,.45) !important;filter:brightness(1.05);}
   .wd-scroll{scrollbar-gutter:stable;scroll-snap-type:y mandatory;}
+  .notebook-emoji-grid{scrollbar-width:thin;scrollbar-color:rgba(var(--ink-rgb),.25) transparent;}
+  .notebook-emoji-grid::-webkit-scrollbar{width:6px;}
+  .notebook-emoji-grid::-webkit-scrollbar-track{background:transparent;}
+  .notebook-emoji-grid::-webkit-scrollbar-thumb{background:rgba(var(--ink-rgb),.25);border-radius:6px;}
 </style>
 </head>
 <body>
@@ -245,7 +249,7 @@
         <div id="notebookPreview" style="width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);"></div>
         <div style="flex:1;min-width:0;">
           <div data-i18n="notebookEmojiLabel" style="font-size:11px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.5);font-weight:600;margin-bottom:10px;">아이콘</div>
-          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:150px;overflow-y:auto;padding-right:2px;">
+          <div class="notebook-emoji-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:150px;overflow-y:auto;overflow-x:hidden;padding-right:2px;">
             <div id="notebookEmojiRow" style="display:contents;"></div>
             <input type="text" id="notebookEmojiInput" maxlength="4" placeholder="＋" autocomplete="off" style="width:36px;height:36px;text-align:center;background:var(--input-bg);border:1.5px dashed rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));font-size:15px;border-radius:11px;font-family:inherit;box-sizing:border-box;padding:0;outline:none;">
           </div>
