@@ -237,35 +237,27 @@
 
   <!-- NOTEBOOK EDIT MODAL -->
   <div id="notebookModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
-    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:26px;width:100%;max-width:420px;border-radius:4px;display:flex;flex-direction:column;gap:14px;box-sizing:border-box;max-height:88vh;overflow-y:auto;">
-      <div id="notebookModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;"></div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <input type="text" id="notebookNameInput" data-i18n-placeholder="notebookNamePlaceholder" placeholder="단어장 이름" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:11px;font-size:13px;border-radius:2px;font-family:inherit;">
-        <textarea id="notebookDescInput" data-i18n-placeholder="notebookDescPlaceholder" placeholder="간단한 설명(선택)" style="width:100%;height:52px;padding:11px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:2px;resize:none;box-sizing:border-box;"></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:104px 1fr;gap:14px;align-items:start;">
-        <div id="notebookPreview" style="width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:36px;flex:none;"></div>
-        <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
-          <div>
-            <div data-i18n="notebookEmojiLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">아이콘</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-              <div id="notebookEmojiRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-              <input type="text" id="notebookEmojiInput" maxlength="4" placeholder="＋" autocomplete="off" style="width:34px;height:30px;text-align:center;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));font-size:15px;border-radius:2px;font-family:inherit;flex:none;">
-            </div>
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:28px;width:100%;max-width:420px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;box-sizing:border-box;max-height:88vh;overflow-y:auto;">
+      <div id="notebookModalTitle" style="display:flex;align-items:center;gap:10px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:18px;margin-bottom:20px;"></div>
+      <input type="text" id="notebookNameInput" data-i18n-placeholder="notebookNamePlaceholder" placeholder="단어장 이름" autocomplete="off" style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:14px 16px;font-size:15px;border-radius:16px;font-family:inherit;outline:none;margin-bottom:12px;">
+      <textarea id="notebookDescInput" data-i18n-placeholder="notebookDescPlaceholder" placeholder="간단한 설명(선택)" rows="2" style="width:100%;padding:14px 16px;border:1.5px solid rgba(var(--ink-rgb),.15);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:inherit;font-size:13px;border-radius:16px;resize:none;box-sizing:border-box;outline:none;margin-bottom:22px;"></textarea>
+      <div style="display:flex;gap:16px;margin-bottom:22px;">
+        <div id="notebookPreview" style="width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);"></div>
+        <div style="flex:1;min-width:0;">
+          <div data-i18n="notebookEmojiLabel" style="font-size:11px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.5);font-weight:600;margin-bottom:10px;">아이콘</div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-height:150px;overflow-y:auto;padding-right:2px;">
+            <div id="notebookEmojiRow" style="display:contents;"></div>
+            <input type="text" id="notebookEmojiInput" maxlength="4" placeholder="＋" autocomplete="off" style="width:36px;height:36px;text-align:center;background:var(--input-bg);border:1.5px dashed rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));font-size:15px;border-radius:11px;font-family:inherit;box-sizing:border-box;padding:0;outline:none;">
           </div>
         </div>
       </div>
-      <div>
-        <div data-i18n="notebookCoverLabel" style="font-size:9.5px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.45);font-weight:700;text-transform:uppercase;margin-bottom:6px;">배경색</div>
-        <div id="notebookGradientRow" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;"></div>
-      </div>
-      <div data-i18n="notebookCoverPhotoComingSoon" style="font-size:9.5px;color:rgba(var(--ink-rgb),.35);line-height:1.5;">📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.</div>
-      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:14px;">
-        <button id="deleteNotebookBtn" data-i18n="deleteNotebookBtn" style="all:unset;cursor:pointer;padding:9px 4px;font-size:11px;letter-spacing:.03em;color:var(--warn);font-weight:700;display:none;">삭제</button>
-        <div style="display:flex;gap:8px;margin-left:auto;">
-          <button id="closeNotebookModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 16px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;color:rgb(var(--ink-rgb));">취소</button>
-          <button id="saveNotebookBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;padding:9px 16px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;font-weight:700;">저장</button>
-        </div>
+      <div data-i18n="notebookCoverLabel" style="font-size:11px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.5);font-weight:600;margin-bottom:10px;">배경색</div>
+      <div id="notebookGradientRow" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;"></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button id="deleteNotebookBtn" data-i18n="deleteNotebookBtn" style="all:unset;cursor:pointer;color:var(--warn);font-size:13px;font-weight:600;padding:12px 4px;display:none;">삭제</button>
+        <div style="flex:1;"></div>
+        <button id="closeNotebookModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.18);color:rgb(var(--ink-rgb));font-size:13px;font-weight:600;padding:12px 22px;border-radius:14px;box-sizing:border-box;">취소</button>
+        <button id="saveNotebookBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:700;padding:12px 26px;border-radius:14px;box-sizing:border-box;">저장</button>
       </div>
     </div>
   </div>
@@ -558,7 +550,6 @@
       switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', addWordSectionTitle: '단어 추가', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
       dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
       notebookWordCountWithDesc: '단어 {{count}}개 · {{description}}',
-      notebookCoverPhotoComingSoon: '📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.',
       deleteNotebookModalBody: "<b>{{name}}</b> 안에 있는 단어 <b>{{count}}</b>개가 함께 삭제됩니다. <b>이 작업은 되돌릴 수 없습니다.</b>",
       deleteNotebookConfirmBtn: '삭제하기', deleteNotebookModalTitle: '단어장을 삭제할까요?',
       notebookWordCount: '단어 {{count}}개', noNotebooks: '단어장이 없습니다.<br>새 단어장을 만들어 보세요.',
@@ -631,7 +622,6 @@
       switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', addWordSectionTitle: 'Add word', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
       dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
       notebookWordCountWithDesc: '{{count}} words · {{description}}',
-      notebookCoverPhotoComingSoon: '📷 Uploading your own photo as a cover is coming soon.',
       deleteNotebookModalBody: "<b>{{count}}</b> word(s) inside <b>{{name}}</b> will be deleted too. <b>This can't be undone.</b>",
       deleteNotebookConfirmBtn: 'Delete', deleteNotebookModalTitle: 'Delete this notebook?',
       notebookWordCount: '{{count}} words', noNotebooks: 'No notebooks yet.<br>Create one to get started.',
@@ -1594,36 +1584,43 @@
   NOTEBOOK_COLOR_SWATCHES.forEach(color=>{
     const sw=document.createElement('button');
     sw.type='button'; sw.dataset.color=color;
-    sw.style.cssText=`all:unset;cursor:pointer;aspect-ratio:1;width:100%;border-radius:6px;background:${color};border:2px solid transparent;box-shadow:0 0 0 1px rgba(var(--ink-rgb),.1);`;
+    sw.style.cssText=`all:unset;cursor:pointer;box-sizing:border-box;width:30px;height:30px;border-radius:50%;background:${color};border:2px solid transparent;box-shadow:0 0 0 1px rgba(var(--ink-rgb),.08);`;
     sw.addEventListener('click', ()=>{ pendingGradient=color; refreshNotebookModalSwatches(); updateNotebookPreview(); });
     notebookGradientRow.appendChild(sw);
   });
   NOTEBOOK_EMOJI_PRESETS.forEach(em=>{
     const b=document.createElement('button');
     b.type='button'; b.dataset.emoji=em;
-    b.style.cssText='all:unset;cursor:pointer;width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(var(--ink-rgb),.18);';
-    b.appendChild(makeEmojiImg(em, 17));
+    b.style.cssText='all:unset;cursor:pointer;box-sizing:border-box;width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--input-bg);border:1.5px solid transparent;';
+    b.appendChild(makeEmojiImg(em, 20));
     b.addEventListener('click', ()=>{ pendingEmoji=em; notebookEmojiInput.value=''; refreshNotebookModalSwatches(); updateNotebookPreview(); });
     notebookEmojiRow.appendChild(b);
   });
   notebookEmojiInput.addEventListener('input', ()=>{ if(notebookEmojiInput.value.trim()){ pendingEmoji=notebookEmojiInput.value.trim(); refreshNotebookModalSwatches(); updateNotebookPreview(); } });
+  notebookNameInput.addEventListener('input', ()=>{ notebookNameInput.style.borderColor = notebookNameInput.value.trim() ? 'rgba(var(--ink-rgb),.15)' : 'var(--accent)'; });
 
   function refreshNotebookModalSwatches(){
-    notebookGradientRow.querySelectorAll('button').forEach(b=>{ b.style.borderColor = b.dataset.color===pendingGradient ? 'rgb(var(--ink-rgb))' : 'transparent'; });
+    notebookGradientRow.querySelectorAll('button').forEach(b=>{
+      const active = b.dataset.color===pendingGradient;
+      b.style.borderColor = active ? '#fff' : 'transparent';
+      b.style.boxShadow = active ? '0 0 0 2px var(--accent)' : '0 0 0 1px rgba(var(--ink-rgb),.08)';
+    });
     notebookEmojiRow.querySelectorAll('button').forEach(b=>{
-      b.style.background = b.dataset.emoji===pendingEmoji ? 'rgba(var(--accent-rgb),.25)' : 'transparent';
-      b.style.borderColor = b.dataset.emoji===pendingEmoji ? 'var(--accent)' : 'rgba(var(--ink-rgb),.18)';
+      const active = b.dataset.emoji===pendingEmoji;
+      b.style.borderColor = active ? 'var(--accent)' : 'transparent';
+      b.style.boxShadow = active ? '0 0 0 1px var(--accent) inset' : 'none';
     });
   }
   function updateNotebookPreview(){
-    notebookPreview.style.cssText=`width:104px;height:104px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none;background:${pendingGradient};`;
-    setEmojiInto(notebookPreview, pendingEmoji, 44);
+    notebookPreview.style.cssText=`width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);background:${pendingGradient};`;
+    setEmojiInto(notebookPreview, pendingEmoji, 38);
   }
 
   function openNotebookModal(nb){
     editingNotebookId = nb ? nb.id : null;
     $('notebookModalTitle').textContent = nb ? t('notebookModalTitleEdit') : t('notebookModalTitleNew');
     notebookNameInput.value = nb ? nb.name : '';
+    notebookNameInput.style.borderColor = notebookNameInput.value.trim() ? 'rgba(var(--ink-rgb),.15)' : 'var(--accent)';
     notebookDescInput.value = nb ? nb.description : '';
     pendingGradient = (nb && nb.coverGradient && nb.coverGradient.charAt(0)==='#') ? nb.coverGradient : NOTEBOOK_COLOR_SWATCHES[0];
     pendingEmoji = nb ? nb.coverEmoji : '📖';
