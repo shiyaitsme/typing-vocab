@@ -131,7 +131,7 @@
           </div>
           <button id="switchNotebookBtn" data-i18n="switchNotebookBtn" style="all:unset;cursor:pointer;flex:none;font-size:10.5px;font-weight:700;color:rgb(var(--ink-rgb));border:1px solid rgba(var(--ink-rgb),.25);padding:7px 10px;border-radius:100px;letter-spacing:.02em;box-sizing:border-box;">⇌ 전환</button>
         </div>
-        <div id="wordsFilterRow" style="border:1px solid rgba(var(--ink-rgb),.16);padding:16px;border-radius:4px;display:flex;flex-direction:column;gap:16px;">
+        <div id="wordsFilterRow" style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px;border-radius:20px;display:flex;flex-direction:column;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
               <div data-i18n="dateFilterTitle" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">날짜별 필터</div>
@@ -139,19 +139,23 @@
             </div>
             <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"></div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
-            <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
-            <button id="addWordBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:var(--accent);color:var(--accent-ink);padding:9px;font-weight:700;font-size:14px;border-radius:2px;box-sizing:border-box;">+ 추가</button>
+          <div style="border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:16px;">
+            <div style="position:relative;border:2px solid var(--accent);border-radius:14px;padding:14px;">
+              <span style="position:absolute;top:-10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:100px;background:var(--accent);color:var(--accent-ink);">NEW</span>
+              <div data-i18n="addWordSectionTitle" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;margin-bottom:10px;">단어 추가</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+                <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="width:100%;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+                <button id="addWordBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:var(--accent);color:var(--accent-ink);padding:9px;font-weight:700;font-size:14px;border-radius:2px;box-sizing:border-box;">+ 추가</button>
+              </div>
+            </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:16px;">
             <button id="openBulkBtn" data-i18n="openBulkBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">가져오기/내보내기</button>
             <button id="openAiPromptBtn" data-i18n="openAiPromptBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--ink-rgb),.25);color:rgb(var(--ink-rgb));padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">🤖 AI 프롬프트</button>
             <button id="clearWordsBtn" data-i18n="clearWordsBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;border:1px solid rgba(var(--warn-rgb),.4);color:var(--warn);padding:9px;font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:100px;box-sizing:border-box;">초기화</button>
           </div>
-        </div>
-        <div style="border:1px solid rgba(var(--ink-rgb),.16);padding:18px 18px 16px;border-radius:4px;display:flex;flex-direction:column;gap:12px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.03em;color:rgba(var(--ink-rgb),.65);cursor:pointer;border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:14px;">
             <input type="checkbox" id="dictationToggle" style="accent-color:var(--accent);"><span data-i18n="dictationLabel">딕테이션 모드</span>
           </label>
         </div>
@@ -173,21 +177,27 @@
         <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">통계</button>
       </div>
     </div>
-    <div id="drawerWordsFilterBar" style="display:flex;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;margin:12px 32px 0;">
-      <label style="flex:1;display:flex;cursor:pointer;">
-        <input type="checkbox" id="favoritesOnlyToggle" class="filter-seg-chk" style="display:none;">
-        <span class="filter-seg" data-i18n="favOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">★ 즐겨찾기만</span>
-      </label>
-      <label style="flex:1;display:flex;cursor:pointer;">
-        <input type="checkbox" id="notesOnlyToggle" class="filter-seg-chk" style="display:none;">
-        <span class="filter-seg" data-i18n="notesOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">📝 노트만</span>
-      </label>
-      <label style="flex:1;display:flex;cursor:pointer;">
-        <input type="checkbox" id="wrongOnlyToggle" class="filter-seg-chk" style="display:none;">
-        <span class="filter-seg" data-i18n="wrongOnlyLabel" style="padding:7px 4px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.02em;color:rgba(var(--ink-rgb),.55);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">❌ 오답만</span>
-      </label>
+    <div id="drawerWordsFilterBar" style="background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.12);border-radius:22px;overflow:hidden;margin:12px 32px 0;">
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;">
+        <span style="opacity:.5;font-size:14px;flex-shrink:0;">🔍</span>
+        <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="단어, 뜻, 노트 검색..." autocomplete="off" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:13.5px;padding:0;">
+      </div>
+      <div style="height:1px;background:rgba(var(--ink-rgb),.08);"></div>
+      <div style="display:flex;padding:6px;">
+        <label style="flex:1;display:flex;cursor:pointer;">
+          <input type="checkbox" id="favoritesOnlyToggle" class="filter-seg-chk" style="display:none;">
+          <span class="filter-seg" data-i18n="favOnlyLabel" style="padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">★ 즐겨찾기만</span>
+        </label>
+        <label style="flex:1;display:flex;cursor:pointer;">
+          <input type="checkbox" id="notesOnlyToggle" class="filter-seg-chk" style="display:none;">
+          <span class="filter-seg" data-i18n="notesOnlyLabel" style="padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">📝 노트만</span>
+        </label>
+        <label style="flex:1;display:flex;cursor:pointer;">
+          <input type="checkbox" id="wrongOnlyToggle" class="filter-seg-chk" style="display:none;">
+          <span class="filter-seg" data-i18n="wrongOnlyLabel" style="padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">❌ 오답만</span>
+        </label>
+      </div>
     </div>
-    <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="🔍 단어, 뜻, 노트 검색..." autocomplete="off" style="margin:10px 32px 0;width:calc(100% - 64px);padding:10px 12px;font-size:12.5px;font-family:'Space Grotesk',sans-serif;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));outline:none;border-radius:2px;box-sizing:border-box;">
     <div class="wd-scroll" style="flex:1;overflow-y:auto;padding:20px 32px 48px;display:flex;flex-direction:column;gap:24px;">
     <div id="drawerContent" style="display:flex;flex-direction:column;gap:14px;"></div>
     <div id="notebooksPanel" style="display:none;flex-direction:column;gap:16px;">
@@ -542,12 +552,12 @@
       correctNext: '정답! Enter로 다음',
       drawerTabWords: '단어 목록', drawerTabNotebooks: '단어장', drawerTabStats: '통계',
       favOnlyLabel: '★ 즐겨찾기만', notesOnlyLabel: '📝 노트만', wrongOnlyLabel: '❌ 오답만',
-      wordSearchPlaceholder: '🔍 단어, 뜻, 노트 검색...', newWordPlaceholder: '단어 (한국어/english)', newMeaningPlaceholder: '뜻/로마자',
+      wordSearchPlaceholder: '단어, 뜻, 노트 검색...', newWordPlaceholder: '단어 (한국어/english)', newMeaningPlaceholder: '뜻/로마자',
       openBulkBtn: '가져오기/내보내기', openAiPromptBtn: '🤖 AI 프롬프트', clearWordsBtn: '초기화',
       noWords: '단어가 없습니다.', noSearchResults: '검색 결과가 없습니다.', noNotesWords: '노트를 남긴 단어가 없습니다.',
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
-      switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
+      switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', addWordSectionTitle: '단어 추가', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
       dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
       notebookWordCountWithDesc: '단어 {{count}}개 · {{description}}',
       notebookCoverPhotoComingSoon: '📷 직접 찍은 사진을 커버로 쓰는 기능은 곧 추가됩니다.',
@@ -615,12 +625,12 @@
       correctNext: 'Correct! Press Enter for next',
       drawerTabWords: 'Words', drawerTabNotebooks: 'Notebooks', drawerTabStats: 'Stats',
       favOnlyLabel: '★ Favorites only', notesOnlyLabel: '📝 Notes only', wrongOnlyLabel: '❌ Wrong only',
-      wordSearchPlaceholder: '🔍 Search word, meaning, notes...', newWordPlaceholder: 'Word (한국어/english)', newMeaningPlaceholder: 'Meaning / romanization',
+      wordSearchPlaceholder: 'Search word, meaning, notes...', newWordPlaceholder: 'Word (한국어/english)', newMeaningPlaceholder: 'Meaning / romanization',
       openBulkBtn: 'Import/Export', openAiPromptBtn: '🤖 AI Prompt', clearWordsBtn: 'Reset',
       noWords: 'No words yet.', noSearchResults: 'No search results.', noNotesWords: 'No words with notes.',
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
-      switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
+      switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', addWordSectionTitle: 'Add word', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
       dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
       notebookWordCountWithDesc: '{{count}} words · {{description}}',
       notebookCoverPhotoComingSoon: '📷 Uploading your own photo as a cover is coming soon.',
@@ -1375,8 +1385,7 @@
     Object.assign(drawerTabStats.style, view==='stats'?activeStyle:inactiveStyle);
     drawerContent.style.display = view==='notebooks' ? 'none' : 'flex';
     notebooksPanel.style.display = view==='notebooks' ? 'flex' : 'none';
-    drawerWordsFilterBar.style.display = view==='words' ? 'flex' : 'none';
-    wordSearchInput.style.display = view==='words' ? 'block' : 'none';
+    drawerWordsFilterBar.style.display = view==='words' ? 'block' : 'none';
     renderActiveDrawerView(scrollToActive);
   }
 
