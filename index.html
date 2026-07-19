@@ -168,11 +168,7 @@
   <!-- DRAWER -->
   <div id="drawerBackdrop" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;opacity:0;pointer-events:none;transition:opacity .3s ease;"></div>
   <div id="drawer" style="position:fixed;top:0;right:-500px;width:min(460px,92vw);max-width:92vw;height:100%;background:var(--bg);border-left:1px solid rgba(var(--ink-rgb),.12);box-shadow:-30px 0 70px rgba(0,0,0,.4);z-index:999;transition:right .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;padding:24px 32px 0;">
-      <button id="closeDrawerBtnLeft" data-i18n-title="closeDrawerTitle" title="닫기" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
-      <button id="closeDrawerBtn" data-i18n-title="closeDrawerTitle" title="닫기" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
-    </div>
-    <div style="padding:16px 32px 4px;">
+    <div style="padding:28px 32px 4px;">
       <div style="display:flex;width:100%;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
         <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어 목록</button>
         <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어장</button>
@@ -541,7 +537,7 @@
     ko: {
       tagline: '+ 한글 &amp; 영어 타자 연습기',
       navPractice: '연습', navWords: '단어 목록', navNotebooks: '단어장', navStats: '통계',
-      renameTitle: '이름 변경', closeDrawerTitle: '닫기',
+      renameTitle: '이름 변경',
       heroTitle: '타자로 배우는<br>한글 &amp; 영어',
       heroDesc: '매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.',
       favTitle: '즐겨찾기', notesTitle: '노트', restartTitle: '다시 시작',
@@ -614,7 +610,7 @@
     en: {
       tagline: '+ Korean &amp; English Typing Trainer',
       navPractice: 'Practice', navWords: 'Words', navNotebooks: 'Notebooks', navStats: 'Stats',
-      renameTitle: 'Rename', closeDrawerTitle: 'Close',
+      renameTitle: 'Rename',
       heroTitle: 'Learn Korean<br>&amp; English by Typing',
       heroDesc: "A little every day — memorize Korean and English words with your fingertips. Only words you truly learn stick.",
       favTitle: 'Favorite', notesTitle: 'Notes', restartTitle: 'Restart',
@@ -1695,7 +1691,7 @@
   $('confirmDeleteNotebookBtn').addEventListener('click', confirmDeleteNotebook);
 
   $('switchNotebookBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('notebooks'); setNavActive('notebooks'); });
-  drawerTabNotebooks.addEventListener('click', ()=>setDrawerView('notebooks'));
+  drawerTabNotebooks.addEventListener('click', ()=>toggleDrawerView('notebooks'));
 
   function statCard(){
     const card=document.createElement('div');
@@ -2055,15 +2051,26 @@
     const map = {practice:'navPracticeBtn', words:'openDrawerBtn', notebooks:'openNotebooksBtn', stats:'openStatsBtn'};
     Object.keys(map).forEach(k=>{ $(map[k]).style.color = (k===which) ? 'rgb(var(--ink-rgb))' : 'rgba(var(--ink-rgb),.45)'; });
   }
+  // 단어 목록/단어장/통계는 X 버튼 없이 그 자체가 토글 스위치 역할을 한다 —
+  // 이미 그 화면이 열려 있는 상태에서 같은 버튼(헤더 내비게이션이든 서랍 안
+  // 탭이든)을 다시 누르면 서랍이 닫힌다.
+  function toggleDrawerView(view){
+    if(drawerOpen && drawerView===view){
+      closeDrawer();
+      setNavActive('practice');
+    } else {
+      openDrawer();
+      setDrawerView(view, view==='words');
+      setNavActive(view);
+    }
+  }
   $('navPracticeBtn').addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
-  $('openDrawerBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('words', true); setNavActive('words'); });
-  $('openNotebooksBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('notebooks'); setNavActive('notebooks'); });
-  $('openStatsBtn').addEventListener('click', ()=>{ openDrawer(); setDrawerView('stats'); setNavActive('stats'); });
-  $('closeDrawerBtn').addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
-  $('closeDrawerBtnLeft').addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
+  $('openDrawerBtn').addEventListener('click', ()=>toggleDrawerView('words'));
+  $('openNotebooksBtn').addEventListener('click', ()=>toggleDrawerView('notebooks'));
+  $('openStatsBtn').addEventListener('click', ()=>toggleDrawerView('stats'));
   drawerBackdrop.addEventListener('click', ()=>{ closeDrawer(); setNavActive('practice'); });
-  drawerTabWords.addEventListener('click', ()=>setDrawerView('words', true));
-  drawerTabStats.addEventListener('click', ()=>setDrawerView('stats'));
+  drawerTabWords.addEventListener('click', ()=>toggleDrawerView('words'));
+  drawerTabStats.addEventListener('click', ()=>toggleDrawerView('stats'));
 
   $('dictationToggle').addEventListener('change',(e)=>{ dictation=e.target.checked; render(); });
 
