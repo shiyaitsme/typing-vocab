@@ -24,11 +24,8 @@
   #newNotebookBtn:hover{border-color:rgba(var(--ink-rgb),.5);color:rgb(var(--ink-rgb));}
   .wb-card-edit:hover{background:rgba(10,10,10,.2) !important;}
   .wb-card-open:hover{background:#000 !important;}
-  .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s cubic-bezier(.4,0,.2,1),filter .2s ease;transform-origin:top center;z-index:1;}
-  .wb-card + .wb-card{margin-top:-96px;}
-  .wb-card:hover{transform:translateY(-14px) scale(1.03);box-shadow:0 22px 44px rgba(0,0,0,.4);filter:brightness(1.04);z-index:50;}
-  .wb-card--active{transform:scale(1.02);box-shadow:0 16px 34px rgba(0,0,0,.3);z-index:5;}
-  .wb-card--active:hover{transform:translateY(-14px) scale(1.05);z-index:50;}
+  .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .34s cubic-bezier(.4,0,.2,1),margin-top .34s cubic-bezier(.4,0,.2,1),box-shadow .34s ease,filter .25s ease;transform-origin:center center;z-index:1;}
+  .wb-card--peak{box-shadow:0 26px 50px rgba(0,0,0,.45) !important;filter:brightness(1.05);}
 </style>
 </head>
 <body>
@@ -830,6 +827,7 @@
   window.addEventListener('resize', ()=>syncDrawerLayout(drawerOpen));
   const drawerTabWords=$('drawerTabWords'), drawerTabNotebooks=$('drawerTabNotebooks'), drawerTabStats=$('drawerTabStats'), notebooksPanel=$('notebooksPanel');
   const notebookSearchInput=$('notebookSearchInput');
+  const notebooksGrid=$('notebooksGrid');
   let drawerView='words';
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
@@ -1474,17 +1472,50 @@
   }
 
   function renderNotebooksGrid(){
-    const grid = $('notebooksGrid');
-    grid.innerHTML='';
+    notebooksGrid.innerHTML='';
+    stackHoverIndex = null;
     const query = notebookSearchInput.value.trim().toLowerCase();
     const list = currentNotebooks().filter(nb=>!query || nb.name.toLowerCase().includes(query));
     if(list.length===0){
       const msg = query ? t('noNotebookSearchResults') : t('noNotebooks');
-      grid.innerHTML=`<div style="width:100%;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${msg}</div>`;
+      notebooksGrid.innerHTML=`<div style="width:100%;color:rgba(var(--ink-rgb),.45);text-align:center;padding:24px 12px;font-size:12px;line-height:1.6;">${msg}</div>`;
       return;
     }
-    list.forEach(nb=>grid.appendChild(createNotebookCardDOM(nb)));
+    list.forEach(nb=>notebooksGrid.appendChild(createNotebookCardDOM(nb)));
+    updateNotebookStack();
   }
+
+  // 단어본 카드가 겹쳐 쌓인 스택 위에서 하나를 hover하면, 그 카드만 커지는 게
+  // 아니라 위아래 이웃 카드도 거리에 따라 부드럽게 밀려나며 틈을 벌린다.
+  // 그래야 hover된 카드가 바로 다음 카드를 가려버려서 마우스를 한 번 치웠다가
+  // 다시 눌러야 하는 문제 없이, 관성을 타고 위/아래로 죽 훑을 수 있다.
+  let stackHoverIndex = null;
+  function updateNotebookStack(){
+    const cards = [...notebooksGrid.querySelectorAll('.wb-card')];
+    const BASE_OVERLAP = -96;
+    cards.forEach((card, i)=>{
+      const dist = stackHoverIndex==null ? Infinity : Math.abs(i - stackHoverIndex);
+      const isActive = card.classList.contains('wb-card--active');
+      let scale = (isActive && stackHoverIndex==null) ? 1.02 : 1;
+      let gapBoost = 0, z = 1;
+      if(dist===0){ scale=1.06; gapBoost=60; z=60; }
+      else if(dist===1){ scale=1.015; gapBoost=30; z=20; }
+      else if(dist===2){ gapBoost=10; z=3; }
+      card.style.transform = `scale(${scale})`;
+      card.style.zIndex = String(z);
+      card.classList.toggle('wb-card--peak', dist===0);
+      if(i>0) card.style.marginTop = `${BASE_OVERLAP + gapBoost}px`;
+    });
+  }
+  notebooksGrid.addEventListener('mouseover', (e)=>{
+    const card = e.target.closest('.wb-card');
+    if(!card) return;
+    const idx = [...notebooksGrid.children].indexOf(card);
+    if(idx!==stackHoverIndex){ stackHoverIndex=idx; updateNotebookStack(); }
+  });
+  notebooksGrid.addEventListener('mouseleave', ()=>{
+    if(stackHoverIndex!=null){ stackHoverIndex=null; updateNotebookStack(); }
+  });
 
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
