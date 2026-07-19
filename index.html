@@ -1203,7 +1203,11 @@
         }
         const charEl=document.createElement('div');
         const color = r.mode==='light'?COL.gray : r.mode==='dark'?COL.black : r.mode==='blue'?COL.pinkDeep : COL.red;
-        charEl.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:700;font-size:40px;line-height:1;min-height:48px;display:flex;align-items:center;color:${color};`;
+        // 받침 없는 음절(2 자모)은 3 자모 음절과 같은 폰트 크기라도 글자 안에 여백이 적어
+        // 눈에 띄게 더 크고 무거워 보인다 — 줄을 나란히 놓았을 때 삐뚤어 보이지 않도록
+        // 살짝 줄인다. 실제 정렬(박스 위치)은 이미 동일하다.
+        const hasJong = !!(koEngine.targets[i] && koEngine.targets[i].jong);
+        charEl.style.cssText=`font-family:'Unbounded',sans-serif;font-weight:700;font-size:${hasJong?40:34}px;line-height:1;min-height:48px;display:flex;align-items:center;color:${color};`;
         charEl.textContent=r.text; block.appendChild(charEl);
         const dashes=document.createElement('div');
         dashes.style.cssText='display:flex;gap:4px;margin-top:6px;';
