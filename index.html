@@ -21,6 +21,9 @@
   .arrow-btn{transition:background .18s ease,color .18s ease,letter-spacing .18s ease;}
   .arrow-btn:hover{background:#0a0a0a !important;color:rgb(var(--ink-rgb)) !important;letter-spacing:.1em;}
   .filter-seg-chk:checked + .filter-seg{background:rgb(var(--ink-rgb));color:var(--bg) !important;}
+  #newNotebookBtn:hover{border-color:rgba(var(--ink-rgb),.5);color:rgb(var(--ink-rgb));}
+  .wb-card-edit:hover{background:rgba(10,10,10,.2) !important;}
+  .wb-card-open:hover{background:#000 !important;}
 </style>
 </head>
 <body>
@@ -163,10 +166,10 @@
       <button id="closeDrawerBtn" style="all:unset;cursor:pointer;width:38px;height:38px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));font-size:15px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">&times;</button>
     </div>
     <div style="padding:16px 32px 4px;">
-      <div style="display:inline-flex;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
-        <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어 목록</button>
-        <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어장</button>
-        <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;box-sizing:border-box;padding:8px 16px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">통계</button>
+      <div style="display:flex;width:100%;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;">
+        <button id="drawerTabWords" data-i18n="drawerTabWords" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어 목록</button>
+        <button id="drawerTabNotebooks" data-i18n="drawerTabNotebooks" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">단어장</button>
+        <button id="drawerTabStats" data-i18n="drawerTabStats" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.03em;font-family:'Space Grotesk',sans-serif;transition:background .15s ease,color .15s ease;">통계</button>
       </div>
     </div>
     <div id="drawerWordsFilterBar" style="display:flex;background:rgba(var(--ink-rgb),.08);border-radius:100px;padding:3px;gap:2px;margin:12px 32px 0;">
@@ -190,10 +193,8 @@
         <input type="text" id="notebookSearchInput" data-i18n-placeholder="notebookSearchPlaceholder" placeholder="단어장 검색..." autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
         <button id="quickNewNotebookBtn" data-i18n="addBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 16px;font-weight:700;font-size:12px;letter-spacing:.02em;border-radius:2px;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;">+ 추가</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;aspect-ratio:1;border-radius:20px;border:1.5px dashed rgba(var(--ink-rgb),.3);color:rgba(var(--ink-rgb),.5);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;letter-spacing:.02em;font-family:'JetBrains Mono',monospace;box-sizing:border-box;">+ 새 단어장</button>
-        <div id="notebooksGrid" style="display:contents;"></div>
-      </div>
+      <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;width:100%;box-sizing:border-box;padding:16px 20px;border-radius:24px;border:1.5px dashed rgba(var(--ink-rgb),.3);background:none;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;color:rgba(var(--ink-rgb),.55);transition:border-color .15s ease,color .15s ease;">+ 새 단어장</button>
+      <div id="notebooksGrid" style="display:flex;flex-direction:column;gap:14px;"></div>
     </div>
     </div>
   </div>
@@ -1488,37 +1489,50 @@
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
     const card=document.createElement('div');
-    card.style.cssText=`position:relative;border-radius:20px;aspect-ratio:1;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;cursor:pointer;${notebookCoverCSS(nb)}`;
-    card.addEventListener('click',(e)=>{ if(e.target.dataset.role==='edit') return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
+    card.style.cssText=`position:relative;border-radius:30px;box-sizing:border-box;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);${notebookCoverCSS(nb)}`;
+    card.addEventListener('click',(e)=>{ if(e.target.closest('[data-role="edit"]')) return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
 
+    const topRow=document.createElement('div');
+    topRow.style.cssText='display:flex;align-items:flex-start;justify-content:space-between;gap:8px;';
+
+    const iconWrap=document.createElement('span');
+    iconWrap.style.cssText='width:44px;height:44px;border-radius:100px;background:rgba(10,10,10,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;';
+    if(!nb.coverUrl) setEmojiInto(iconWrap, nb.coverEmoji, 24);
+    topRow.appendChild(iconWrap);
+
+    const rightRow=document.createElement('div');
+    rightRow.style.cssText='display:flex;align-items:center;gap:8px;';
     if(active){
-      const badge=document.createElement('div');
+      const badge=document.createElement('span');
       badge.textContent=t('practicingBadge');
-      badge.style.cssText="position:absolute;top:12px;left:12px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.05em;padding:5px 10px;border-radius:100px;background:rgba(10,10,10,.55);color:#f2ede2;";
-      card.appendChild(badge);
+      badge.style.cssText="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.05em;padding:7px 12px;border-radius:100px;background:rgba(10,10,10,.62);color:#f2ede2;white-space:nowrap;flex-shrink:0;";
+      rightRow.appendChild(badge);
     }
     const editBtn=document.createElement('button');
-    editBtn.type='button'; editBtn.dataset.role='edit'; editBtn.textContent='✎';
-    editBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:100px;background:rgba(10,10,10,.35);color:#f2ede2;font-size:12px;display:flex;align-items:center;justify-content:center;';
+    editBtn.type='button'; editBtn.dataset.role='edit'; editBtn.className='wb-card-edit'; editBtn.textContent='✎';
+    editBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;width:34px;height:34px;border-radius:100px;background:rgba(10,10,10,.1);color:rgba(10,10,10,.75);font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
     editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); openNotebookModal(nb); });
-    card.appendChild(editBtn);
-
-    if(!nb.coverUrl){
-      const iconWrap=document.createElement('div');
-      iconWrap.style.cssText='line-height:1;';
-      setEmojiInto(iconWrap, nb.coverEmoji, 32);
-      card.appendChild(iconWrap);
-    }
+    rightRow.appendChild(editBtn);
+    topRow.appendChild(rightRow);
+    card.appendChild(topRow);
 
     const nameEl=document.createElement('div');
-    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:700;font-size:14px;color:#1a1714;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    nameEl.style.cssText="font-family:'Unbounded',sans-serif;font-weight:800;font-size:20px;letter-spacing:-.01em;color:rgba(10,10,10,.9);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     nameEl.textContent=nb.name;
     card.appendChild(nameEl);
 
-    const metaEl=document.createElement('div');
-    metaEl.style.cssText="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(26,23,20,.55);";
-    metaEl.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
-    card.appendChild(metaEl);
+    const bottomRow=document.createElement('div');
+    bottomRow.style.cssText='display:flex;align-items:center;gap:8px;';
+    const countPill=document.createElement('span');
+    countPill.style.cssText="font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;padding:7px 13px;border-radius:100px;background:rgba(10,10,10,.08);color:rgba(10,10,10,.7);white-space:nowrap;";
+    countPill.textContent=t('notebookWordCount',{count:(notebookWords[mode].get(nb.id)||[]).length});
+    bottomRow.appendChild(countPill);
+
+    const openBtn=document.createElement('button');
+    openBtn.type='button'; openBtn.className='wb-card-open'; openBtn.textContent='→';
+    openBtn.style.cssText='all:unset;box-sizing:border-box;cursor:pointer;margin-left:auto;width:38px;height:38px;border-radius:100px;background:rgba(10,10,10,.85);color:#f2ede2;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+    bottomRow.appendChild(openBtn);
+    card.appendChild(bottomRow);
 
     return card;
   }
