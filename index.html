@@ -196,7 +196,7 @@
         </label>
       </div>
     </div>
-    <div id="wdScroll" class="wd-scroll" style="flex:1;overflow-y:auto;padding:20px 32px 48px;display:flex;flex-direction:column;gap:24px;">
+    <div id="wdScroll" class="wd-scroll" style="flex:1;overflow-y:auto;padding:14px 32px 48px;display:flex;flex-direction:column;gap:24px;">
     <div id="drawerContent" style="display:flex;flex-direction:column;gap:14px;"></div>
     <div id="notebooksPanel" style="display:none;flex-direction:column;gap:16px;">
       <div style="display:flex;gap:8px;">
@@ -1319,7 +1319,7 @@
       const scrollerBox = wdScroll.getBoundingClientRect();
       const activeBox = activeEl.getBoundingClientRect();
       const contentTop = activeBox.top - scrollerBox.top + wdScroll.scrollTop;
-      wdScroll.scrollTop = contentTop - 20;
+      wdScroll.scrollTop = contentTop - 14;
     }
   }
 
@@ -1329,7 +1329,7 @@
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge,wordId){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;scroll-margin-top:20px;`;
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;scroll-margin-top:14px;`;
     container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice'); });
     const info=document.createElement('div');
     info.style.cssText='display:flex;align-items:baseline;gap:16px;min-width:0;';
