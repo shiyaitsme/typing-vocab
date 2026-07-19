@@ -24,6 +24,11 @@
   #newNotebookBtn:hover{border-color:rgba(var(--ink-rgb),.5);color:rgb(var(--ink-rgb));}
   .wb-card-edit:hover{background:rgba(10,10,10,.2) !important;}
   .wb-card-open:hover{background:#000 !important;}
+  .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .28s cubic-bezier(.4,0,.2,1),box-shadow .28s cubic-bezier(.4,0,.2,1),filter .2s ease;transform-origin:top center;z-index:1;}
+  .wb-card + .wb-card{margin-top:-96px;}
+  .wb-card:hover{transform:translateY(-14px) scale(1.03);box-shadow:0 22px 44px rgba(0,0,0,.4);filter:brightness(1.04);z-index:50;}
+  .wb-card--active{transform:scale(1.02);box-shadow:0 16px 34px rgba(0,0,0,.3);z-index:5;}
+  .wb-card--active:hover{transform:translateY(-14px) scale(1.05);z-index:50;}
 </style>
 </head>
 <body>
@@ -194,7 +199,7 @@
         <button id="quickNewNotebookBtn" data-i18n="addBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:0 16px;font-weight:700;font-size:12px;letter-spacing:.02em;border-radius:2px;display:flex;align-items:center;box-sizing:border-box;white-space:nowrap;">+ 추가</button>
       </div>
       <button id="newNotebookBtn" data-i18n="newNotebookBtn" style="all:unset;cursor:pointer;width:100%;box-sizing:border-box;padding:16px 20px;border-radius:24px;border:1.5px dashed rgba(var(--ink-rgb),.3);background:none;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Unbounded',sans-serif;font-weight:700;font-size:13px;color:rgba(var(--ink-rgb),.55);transition:border-color .15s ease,color .15s ease;">+ 새 단어장</button>
-      <div id="notebooksGrid" style="display:flex;flex-direction:column;gap:14px;"></div>
+      <div id="notebooksGrid" style="display:flex;flex-direction:column;padding-top:4px;"></div>
     </div>
     </div>
   </div>
@@ -1484,7 +1489,8 @@
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
     const card=document.createElement('div');
-    card.style.cssText=`position:relative;border-radius:30px;box-sizing:border-box;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);${notebookCoverCSS(nb)}`;
+    card.className = 'wb-card' + (active ? ' wb-card--active' : '');
+    card.style.cssText = notebookCoverCSS(nb);
     card.addEventListener('click',(e)=>{ if(e.target.closest('[data-role="edit"]')) return; selectNotebook(mode, nb.id); setDrawerView('words', true); setNavActive('words'); });
 
     const topRow=document.createElement('div');
