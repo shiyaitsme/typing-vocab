@@ -1493,6 +1493,7 @@
     }
     list.forEach(nb=>notebooksGrid.appendChild(createNotebookCardDOM(nb)));
     updateNotebookStack();
+    if(!HAS_HOVER) updateStackFromScrollCenter();
   }
 
   // 단어본 카드가 겹쳐 쌓인 스택 위에서 하나를 hover하면, 그 카드만 커지는 게
@@ -1517,6 +1518,23 @@
       if(i>0) card.style.marginTop = `${BASE_OVERLAP + gapBoost}px`;
     });
   }
+  // 터치 기기는 hover가 없으니, 화면(스크롤 영역) 세로 중앙에 가장 가까운
+  // 카드를 "선택된" 카드로 치고 hover와 똑같은 확대/여백 효과를 준다 — 애플
+  // 지갑 카드처럼 손가락으로 쭉 넘기면 가운데 온 카드가 튀어나오는 느낌.
+  function updateStackFromScrollCenter(){
+    if(drawerView!=='notebooks') return;
+    const cards = [...notebooksGrid.querySelectorAll('.wb-card')];
+    if(cards.length===0) return;
+    const scRect = wdScroll.getBoundingClientRect();
+    const centerY = scRect.top + scRect.height/2;
+    let closestIdx=0, closestDist=Infinity;
+    cards.forEach((card,i)=>{
+      const r = card.getBoundingClientRect();
+      const dist = Math.abs((r.top+r.height/2) - centerY);
+      if(dist<closestDist){ closestDist=dist; closestIdx=i; }
+    });
+    if(closestIdx!==stackHoverIndex){ stackHoverIndex=closestIdx; updateNotebookStack(); }
+  }
   // 카드들이 hover에 반응해 margin-top/transform을 바꾸는 건 마우스/트랙패드처럼
   // 진짜 hover가 있는 입력 장치에서만 켠다 — 터치 기기는 손가락이 닿는 순간
   // synthetic mouseover가 발생해 카드 레이아웃이 바뀌면서 그 스크롤 제스처
@@ -1531,6 +1549,13 @@
     });
     notebooksGrid.addEventListener('mouseleave', ()=>{
       if(stackHoverIndex!=null){ stackHoverIndex=null; updateNotebookStack(); }
+    });
+  } else {
+    let stackScrollTicking = false;
+    wdScroll.addEventListener('scroll', ()=>{
+      if(stackScrollTicking) return;
+      stackScrollTicking = true;
+      requestAnimationFrame(()=>{ updateStackFromScrollCenter(); stackScrollTicking=false; });
     });
   }
 
