@@ -26,7 +26,8 @@
   .wb-card-open:hover{background:#000 !important;}
   .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .34s cubic-bezier(.4,0,.2,1),margin-top .34s cubic-bezier(.4,0,.2,1),box-shadow .34s ease,filter .25s ease;transform-origin:center center;z-index:1;}
   .wb-card--peak{box-shadow:0 26px 50px rgba(0,0,0,.45) !important;filter:brightness(1.05);}
-  .wd-scroll{scrollbar-gutter:stable;scroll-snap-type:y mandatory;}
+  .wd-scroll{scrollbar-gutter:stable;}
+  .wd-scroll--snap{scroll-snap-type:y mandatory;}
   .notebook-emoji-grid{scrollbar-width:thin;scrollbar-color:rgba(var(--ink-rgb),.25) transparent;}
   .notebook-emoji-grid::-webkit-scrollbar{width:6px;}
   .notebook-emoji-grid::-webkit-scrollbar-track{background:transparent;}
@@ -1385,6 +1386,7 @@
     drawerContent.style.display = view==='notebooks' ? 'none' : 'flex';
     notebooksPanel.style.display = view==='notebooks' ? 'flex' : 'none';
     drawerWordsFilterBar.style.display = view==='words' ? 'block' : 'none';
+    wdScroll.classList.toggle('wd-scroll--snap', view==='words');
     renderActiveDrawerView(scrollToActive);
   }
 
