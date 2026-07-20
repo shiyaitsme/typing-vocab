@@ -1517,15 +1517,22 @@
       if(i>0) card.style.marginTop = `${BASE_OVERLAP + gapBoost}px`;
     });
   }
-  notebooksGrid.addEventListener('mouseover', (e)=>{
-    const card = e.target.closest('.wb-card');
-    if(!card) return;
-    const idx = [...notebooksGrid.children].indexOf(card);
-    if(idx!==stackHoverIndex){ stackHoverIndex=idx; updateNotebookStack(); }
-  });
-  notebooksGrid.addEventListener('mouseleave', ()=>{
-    if(stackHoverIndex!=null){ stackHoverIndex=null; updateNotebookStack(); }
-  });
+  // 카드들이 hover에 반응해 margin-top/transform을 바꾸는 건 마우스/트랙패드처럼
+  // 진짜 hover가 있는 입력 장치에서만 켠다 — 터치 기기는 손가락이 닿는 순간
+  // synthetic mouseover가 발생해 카드 레이아웃이 바뀌면서 그 스크롤 제스처
+  // 자체를 브라우저가 인식하지 못해 "전혀 안 움직이는" 문제가 생겼기 때문.
+  const HAS_HOVER = window.matchMedia('(hover: hover)').matches;
+  if(HAS_HOVER){
+    notebooksGrid.addEventListener('mouseover', (e)=>{
+      const card = e.target.closest('.wb-card');
+      if(!card) return;
+      const idx = [...notebooksGrid.children].indexOf(card);
+      if(idx!==stackHoverIndex){ stackHoverIndex=idx; updateNotebookStack(); }
+    });
+    notebooksGrid.addEventListener('mouseleave', ()=>{
+      if(stackHoverIndex!=null){ stackHoverIndex=null; updateNotebookStack(); }
+    });
+  }
 
   function createNotebookCardDOM(nb){
     const active = nb.id===currentNotebookId();
