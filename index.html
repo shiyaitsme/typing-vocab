@@ -33,6 +33,7 @@
   .notebook-emoji-grid::-webkit-scrollbar-track{background:transparent;}
   .notebook-emoji-grid::-webkit-scrollbar-thumb{background:rgba(var(--ink-rgb),.25);border-radius:6px;}
   .notebook-desc-input::-webkit-scrollbar{width:0;height:0;}
+  #dateFilterRow::-webkit-scrollbar{width:0;height:0;}
 </style>
 </head>
 <body>
@@ -144,7 +145,7 @@
               <div data-i18n="dateFilterTitle" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">날짜별 필터</div>
               <button id="dateFilterExpandBtn" data-i18n="dateFilterMore" style="all:unset;cursor:pointer;font-size:9.5px;color:var(--accent);font-weight:700;display:none;">더보기</button>
             </div>
-            <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;"></div>
+            <div id="dateFilterRow" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;scrollbar-width:none;"></div>
           </div>
           <div style="border-top:1px solid rgba(var(--ink-rgb),.12);padding-top:16px;">
             <div style="position:relative;border:2px solid var(--accent);border-radius:14px;padding:14px;">
