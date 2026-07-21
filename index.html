@@ -701,6 +701,10 @@
   let currentNotebookIdByMode = { ko: null, en: null };
   let selectedDatesByMode = { ko: null, en: null }; // null = "All"; else Set of 'YYYY-MM-DD'
   let dateFilterExpandedByMode = { ko: false, en: false };
+  // wordId(mode-scoped) -> Set of 'YYYY-MM-DD' this word was correctly completed on
+  // (Enter on a fully-correct word). Drives the 날짜별 필터 pills together with
+  // created_date, so a day with only practice and no newly-added words still gets a pill.
+  let practiceDatesByWordId = { ko: new Map(), en: new Map() };
   let localIdSeq = 0;
   function nextLocalId(){ return --localIdSeq; } // negative ids = never-synced-to-cloud
 
@@ -859,6 +863,7 @@
   function apiWordsBulkUrl(m){ return `/api/words/bulk?user=${encodeURIComponent(userId)}&mode=${m}`; }
   function apiNotebooksUrl(m){ return `/api/notebooks?user=${encodeURIComponent(userId)}&mode=${m}`; }
   function apiNotebookUrl(id){ return `/api/notebooks/${id}?user=${encodeURIComponent(userId)}`; }
+  function apiPracticeLogUrl(m){ return `/api/practice-log?user=${encodeURIComponent(userId)}&mode=${m}`; }
 
   let cloudWarningKey = null;
   function showCloudWarning(key){
@@ -871,6 +876,12 @@
   async function fetchWordsFromCloud(m){
     const res = await fetch(apiWordsUrl(m));
     if(!res.ok) throw new Error('words fetch failed: '+res.status);
+    return res.json();
+  }
+
+  async function fetchPracticeLogFromCloud(m){
+    const res = await fetch(apiPracticeLogUrl(m));
+    if(!res.ok) throw new Error('practice log fetch failed: '+res.status);
     return res.json();
   }
 
@@ -918,6 +929,23 @@
       const fields={}; fieldNames.forEach(f=>fields[f]=w[f]);
       patchWordRemote(id, m, fields);
     }, 700));
+  }
+  // Marks today as a practice day for this word (날짜별 필터 pills, see wordActiveDates).
+  // Local-only mode still updates the in-memory set (matches this app's usual
+  // graceful-degradation behavior), it just never reaches the cloud. A no-op if this
+  // word was already marked practiced today, so hammering Enter on the same word
+  // doesn't spam the network.
+  function recordPractice(m, wordId){
+    const d = todayStr();
+    let set = practiceDatesByWordId[m].get(wordId);
+    if(!set){ set = new Set(); practiceDatesByWordId[m].set(wordId, set); }
+    if(set.has(d)) return;
+    set.add(d);
+    renderDateFilterRow();
+    if(cloudOk && wordId>0){
+      fetch(apiPracticeLogUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ wordId, date: d }) })
+        .catch(err=>{ console.error('cloud practice log failed', err); });
+    }
   }
   function deleteWordRemote(id, m){
     if(!cloudOk || id<0) return;
@@ -1028,6 +1056,19 @@
     }
   }
 
+  // A word "belongs to" a date if it was created that day OR correctly practiced that
+  // day (날짜별 필터 pills and the filter itself both key off this union) — created_date
+  // alone would mean a day with only practice and no newly-added words gets no pill,
+  // and practice-only would make freshly-added, not-yet-practiced words unreachable
+  // under their own add-date pill.
+  function wordActiveDates(m, w){
+    const dates = new Set();
+    if(w.createdDate) dates.add(w.createdDate);
+    const practiced = practiceDatesByWordId[m].get(w.id);
+    if(practiced) practiced.forEach(d=>dates.add(d));
+    return dates;
+  }
+
   // currentWordList() is the practice queue AND the base list the drawer sub-filters
   // (favorites/notes/wrong/search) — scoped to the current notebook, narrowed further
   // by the date-filter selection. Every item is the exact same object reference stored
@@ -1035,7 +1076,11 @@
   function currentWordList(){
     const all = currentNotebookAllWords();
     const sel = currentSelectedDates();
-    const dateFiltered = sel ? all.filter(w=>sel.has(w.createdDate)) : all;
+    const dateFiltered = sel ? all.filter(w=>{
+      const dates = wordActiveDates(mode, w);
+      for(const d of sel) if(dates.has(d)) return true;
+      return false;
+    }) : all;
     const cat = currentReviewCategory();
     return cat ? dateFiltered.filter(w=>matchesReviewCategory(w,cat)) : dateFiltered;
   }
@@ -1431,7 +1476,7 @@
   function renderDateFilterRow(){
     const row = $('dateFilterRow');
     row.innerHTML='';
-    const dates = Array.from(new Set(currentNotebookAllWords().map(w=>w.createdDate).filter(Boolean))).sort().reverse();
+    const dates = Array.from(new Set(currentNotebookAllWords().flatMap(w=>Array.from(wordActiveDates(mode, w))))).sort().reverse();
     const sel = currentSelectedDates();
     const expanded = dateFilterExpandedByMode[mode];
     row.style.flexWrap = expanded ? 'wrap' : 'nowrap';
@@ -2032,6 +2077,7 @@
       sessionStats.wordsCompleted++;
       if(!currentAttemptHadError){ sessionStats.wordsCleanCompleted++; sessionStreak++; bestStreak=Math.max(bestStreak,sessionStreak); }
       else sessionStreak=0;
+      if(word) recordPractice(mode, word.id);
     } else {
       stats.skipped++;
       if(currentAttemptHadError && word) word.wrongCount=(word.wrongCount||0)+1;
@@ -2339,20 +2385,34 @@
     return { notebooks:[nb], words:result.inserted };
   }
 
+  function applyPracticeLog(m, rows){
+    const map = practiceDatesByWordId[m];
+    rows.forEach(r=>{
+      let set = map.get(r.wordId);
+      if(!set){ set = new Set(); map.set(r.wordId, set); }
+      set.add(r.date);
+    });
+  }
+
   async function loadCloudData(){
     wordsById = new Map();
     notebookWords = { ko: new Map(), en: new Map() };
+    practiceDatesByWordId = { ko: new Map(), en: new Map() };
     try{
-      let [nbKo, nbEn, wKo, wEn] = await Promise.all([
+      let [nbKo, nbEn, wKo, wEn, plKo, plEn] = await Promise.all([
         fetchNotebooksFromCloud('ko'),
         fetchNotebooksFromCloud('en'),
         fetchWordsFromCloud('ko'),
         fetchWordsFromCloud('en'),
+        fetchPracticeLogFromCloud('ko'),
+        fetchPracticeLogFromCloud('en'),
       ]);
       if(nbKo.length===0 && wKo.length===0) ({notebooks: nbKo, words: wKo} = await seedDefaultNotebook('ko', DEFAULT_KO_WORDS));
       if(nbEn.length===0 && wEn.length===0) ({notebooks: nbEn, words: wEn} = await seedDefaultNotebook('en', DEFAULT_EN_WORDS));
       setupModeData('ko', nbKo, wKo);
       setupModeData('en', nbEn, wEn);
+      applyPracticeLog('ko', plKo);
+      applyPracticeLog('en', plEn);
     } catch(err){
       console.error('cloud load failed', err);
       setupModeData('ko', null, null);

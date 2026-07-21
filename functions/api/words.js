@@ -66,7 +66,11 @@ export async function onRequestDelete({ request, env }) {
   const notebookId = parseInt(new URL(request.url).searchParams.get('notebook'), 10);
   if (!Number.isFinite(notebookId)) return new Response('Bad Request', { status: 400 });
 
-  await env.DB.prepare('DELETE FROM words WHERE user_id=? AND mode=? AND notebook_id=?')
-    .bind(user, mode, notebookId).run();
+  await env.DB.batch([
+    env.DB.prepare(
+      'DELETE FROM practice_log WHERE user_id=? AND mode=? AND word_id IN (SELECT id FROM words WHERE user_id=? AND mode=? AND notebook_id=?)'
+    ).bind(user, mode, user, mode, notebookId),
+    env.DB.prepare('DELETE FROM words WHERE user_id=? AND mode=? AND notebook_id=?').bind(user, mode, notebookId),
+  ]);
   return Response.json({ ok: true });
 }

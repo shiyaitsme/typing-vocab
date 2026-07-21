@@ -53,6 +53,9 @@ export async function onRequestDelete({ request, env, params }) {
   const id = parseInt(params.id, 10);
   if (!user || (mode !== 'ko' && mode !== 'en') || !Number.isFinite(id)) return new Response('Bad Request', { status: 400 });
 
-  await env.DB.prepare('DELETE FROM words WHERE id=? AND user_id=? AND mode=?').bind(id, user, mode).run();
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM practice_log WHERE word_id=? AND user_id=? AND mode=?').bind(id, user, mode),
+    env.DB.prepare('DELETE FROM words WHERE id=? AND user_id=? AND mode=?').bind(id, user, mode),
+  ]);
   return Response.json({ ok: true });
 }
