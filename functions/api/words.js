@@ -34,9 +34,11 @@ export async function onRequestGet({ request, env }) {
   return Response.json(results.map(r => normalizeRow(mode, r)));
 }
 
-// POST /api/words?user=&mode= — add a single word to a notebook. created_date is always
-// set server-side to today; the whole point of the redesign is that a word's date never
-// gets rewritten by client-side merge logic.
+// POST /api/words?user=&mode= — add a single word to a notebook. created_date comes from
+// the client's local date (Workers run in UTC, which would otherwise misfile words added
+// near local midnight in Korea/China under the wrong day — see README); a missing/malformed
+// value falls back to the worker's own UTC today for older clients. A word's date never
+// gets rewritten by client-side merge logic once set.
 export async function onRequestPost({ request, env }) {
   const params = parseUserMode(new URL(request.url));
   if (!params) return new Response('Bad Request', { status: 400 });
@@ -46,12 +48,13 @@ export async function onRequestPost({ request, env }) {
   const notebookId = body && parseInt(body.notebookId, 10);
   if (!word || !Number.isFinite(notebookId)) return new Response('Bad Request', { status: 400 });
   const meaning = mode === 'ko' ? (body.roman || '') : (body.meaning || '');
+  const createdDate = /^\d{4}-\d{2}-\d{2}$/.test(body.createdDate || '') ? body.createdDate : todayStr();
 
   const row = await env.DB.prepare(
     `INSERT INTO words (user_id, mode, notebook_id, word, meaning, created_date)
      VALUES (?,?,?,?,?,?)
      RETURNING id, notebook_id, created_date, word, meaning, favorite, notes, box, due_at, wrong_count`
-  ).bind(user, mode, notebookId, word, meaning, todayStr()).first();
+  ).bind(user, mode, notebookId, word, meaning, createdDate).first();
   return Response.json(normalizeRow(mode, row));
 }
 

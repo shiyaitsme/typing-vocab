@@ -898,7 +898,7 @@
   }
 
   async function createWordRemote(m, notebookId, fields){
-    const res = await fetch(apiWordsUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, ...fields }) });
+    const res = await fetch(apiWordsUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, createdDate: todayStr(), ...fields }) });
     if(!res.ok) throw new Error('create word failed: '+res.status);
     return res.json();
   }
@@ -925,7 +925,7 @@
       .catch(err=>{ console.error('cloud delete failed', err); showCloudWarning('cloudSaveFailed'); });
   }
   async function bulkImportRemote(m, notebookId, items){
-    const res = await fetch(apiWordsBulkUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, items }) });
+    const res = await fetch(apiWordsBulkUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notebookId, createdDate: todayStr(), items }) });
     if(!res.ok) throw new Error('bulk import failed: '+res.status);
     return res.json();
   }

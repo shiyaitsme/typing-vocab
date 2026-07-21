@@ -40,7 +40,8 @@ export async function onRequestPost({ request, env }) {
   ).bind(user, mode, notebookId).all();
   const existingByWord = new Map(existing.map(r => [r.word, { id: r.id, meaning: r.meaning || '' }]));
 
-  const date = todayStr();
+  // Client's local date, same UTC-vs-local reasoning as functions/api/words.js.
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(body.createdDate || '') ? body.createdDate : todayStr();
   const newByWord = new Map(); // brand-new word (possibly repeated in this batch) -> merged meaning
   const toUpdate = new Map(); // existing row id -> merged meaning
   for (const item of items) {
