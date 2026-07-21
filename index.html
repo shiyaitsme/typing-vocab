@@ -884,6 +884,14 @@
     if(!res.ok) throw new Error('practice log fetch failed: '+res.status);
     return res.json();
   }
+  // Practice-log is supplementary (날짜별 필터 pills degrade gracefully to created_date-only
+  // without it) — a failure here (e.g. practice_log migration not yet run on this DB) must
+  // never take down the words/notebooks load with it, unlike a real notebooks/words failure
+  // which should still trigger the local-fallback + cloud warning.
+  async function fetchPracticeLogSafe(m){
+    try{ return await fetchPracticeLogFromCloud(m); }
+    catch(err){ console.error('practice log fetch failed (non-fatal)', err); return []; }
+  }
 
   async function fetchNotebooksFromCloud(m){
     const res = await fetch(apiNotebooksUrl(m));
@@ -2404,8 +2412,8 @@
         fetchNotebooksFromCloud('en'),
         fetchWordsFromCloud('ko'),
         fetchWordsFromCloud('en'),
-        fetchPracticeLogFromCloud('ko'),
-        fetchPracticeLogFromCloud('en'),
+        fetchPracticeLogSafe('ko'),
+        fetchPracticeLogSafe('en'),
       ]);
       if(nbKo.length===0 && wKo.length===0) ({notebooks: nbKo, words: wKo} = await seedDefaultNotebook('ko', DEFAULT_KO_WORDS));
       if(nbEn.length===0 && wEn.length===0) ({notebooks: nbEn, words: wEn} = await seedDefaultNotebook('en', DEFAULT_EN_WORDS));
