@@ -23,6 +23,19 @@
 `u`→ㅕ, `s`→ㄴ 打出"연"）。手机等触屏设备则通过页面中间的输入框，用系统自带的
 韩语/英语软键盘直接输入（`syncWithString`，不走두벌식映射）。
 
+**手机打字时页面自己往上跳、要手动往下拉才能继续打**：这是两个原因叠加的
+浏览器行为，不是逻辑 bug。一是原来的 viewport meta 没写
+`interactive-widget=resizes-content`，安卓/新版 iOS 弹出软键盘时只会缩小"可视
+视口"而不缩小"布局视口"，`position:sticky`的顶部导航栏跟浏览器实际可见区域算
+的不是一回事，浏览器就会反复尝试把输入框重新滚回可见范围。二是每敲一个字母
+`render()` 都会把输入框上方的音节/字母格整段 `innerHTML` 清空重建（保证正确/
+错误高亮逐字符刷新），这种"整段节点全部换新"的写法会触发 Chrome 的
+scroll-anchoring（滚动锚定）——它以为页面布局意外变了，想帮你"纠正"滚动位置，
+但因为锚点节点每次都是新建的、找不到上次锚定的那个，纠正就会越纠越偏。
+修复是给 viewport meta 加上`interactive-widget=resizes-content`，再给
+`body` 加 `overflow-anchor: none`关掉这种自动纠正——纯 CSS/meta 改动，不碰
+渲染逻辑。
+
 ## 界面
 
 配色/字体照着一份 Claude Design 设计稿（`Typing Vocab UI`）重做过：
@@ -400,6 +413,12 @@ npx wrangler pages dev .
 
 **已知会导致 500 的原因（都遇到过）：**
 
+- **Preview 环境没单独配 D1 绑定**：Cloudflare Pages 的 Production（`main`
+  分支）和 Preview（其他分支自动生成的`xxxx.typing-vocab.pages.dev`预览链接）
+  是两套独立的绑定配置，Settings → Bindings 里给 Production 加的 D1 绑定
+  **不会**自动带给 Preview，要在同一个页面单独为 Preview 环境也加一遍。没配的
+  话预览分支上打开页面就会看到"클라우드에 연결할 수 없습니다"，但这不影响
+  Production——把改动合并进`main`部署到正式环境就没事了，不是代码问题。
 - **绑定没跟着部署生效**：在 Cloudflare 后台 Settings → Bindings 里加/改 D1
   绑定，只对**之后**的新部署生效，不会补给已经部署好的旧版本。改完绑定要
   触发一次新部署（随便 push 一个空提交，或去 Deployments 里点 Retry deployment）。
