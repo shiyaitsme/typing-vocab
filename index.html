@@ -186,6 +186,7 @@
       <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;">
         <span style="opacity:.5;font-size:14px;flex-shrink:0;">🔍</span>
         <input type="text" id="wordSearchInput" data-i18n-placeholder="wordSearchPlaceholder" placeholder="단어, 뜻, 노트 검색..." autocomplete="off" style="flex:1;min-width:0;background:transparent;border:none;outline:none;color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:13.5px;padding:0;">
+        <button id="selectModeBtn" data-i18n="selectModeBtn" style="all:unset;cursor:pointer;flex-shrink:0;font-size:10.5px;font-weight:700;color:rgba(var(--ink-rgb),.55);padding:6px 12px;border:1px solid rgba(var(--ink-rgb),.22);border-radius:100px;white-space:nowrap;box-sizing:border-box;">선택</button>
       </div>
       <div style="height:1px;background:rgba(var(--ink-rgb),.08);"></div>
       <div style="display:flex;padding:6px;">
@@ -201,6 +202,16 @@
           <input type="checkbox" id="wrongOnlyToggle" class="filter-seg-chk" style="display:none;">
           <span class="filter-seg" data-i18n="wrongOnlyLabel" style="padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">❌ 오답만</span>
         </label>
+      </div>
+      <div id="selectModeBar" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid rgba(var(--ink-rgb),.08);">
+        <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
+          <input type="checkbox" id="selectAllChk" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;">
+          <span data-i18n="selectAllLabel">전체 선택</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="selectedCountLabel" style="font-size:11px;color:rgba(var(--ink-rgb),.45);white-space:nowrap;"></span>
+          <button id="bulkDeleteBtn" data-i18n="bulkDeleteBtn" style="all:unset;cursor:pointer;background:var(--warn);color:#fff;padding:7px 14px;font-size:11px;font-weight:700;border-radius:100px;box-sizing:border-box;">삭제</button>
+        </div>
       </div>
     </div>
     <div id="wdScroll" class="wd-scroll" style="flex:1;overflow-y:auto;padding:14px 32px 48px;display:flex;flex-direction:column;gap:24px;">
@@ -570,6 +581,8 @@ md文件内容如下（或已上传）：
       noWords: '단어가 없습니다.', noSearchResults: '검색 결과가 없습니다.', noNotesWords: '노트를 남긴 단어가 없습니다.',
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
+      selectModeBtn: '선택', cancelSelectBtn: '취소', selectAllLabel: '전체 선택',
+      bulkDeleteBtn: '삭제', selectedCountLabel: '{{n}}개 선택됨', bulkDeleteConfirm: '선택한 단어 {{n}}개를 삭제할까요?',
       switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', addWordSectionTitle: '단어 추가', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
       dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
       notebookWordCountWithDesc: '단어 {{count}}개 · {{description}}',
@@ -642,6 +655,8 @@ md文件内容如下（或已上传）：
       noWords: 'No words yet.', noSearchResults: 'No search results.', noNotesWords: 'No words with notes.',
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
+      selectModeBtn: 'Select', cancelSelectBtn: 'Cancel', selectAllLabel: 'Select all',
+      bulkDeleteBtn: 'Delete', selectedCountLabel: '{{n}} selected', bulkDeleteConfirm: 'Delete {{n}} selected words?',
       switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', addWordSectionTitle: 'Add word', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
       dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
       notebookWordCountWithDesc: '{{count}} words · {{description}}',
@@ -858,6 +873,11 @@ md文件内容如下（或已上传）：
   const mobileInput=$('mobileInput'), mobileTip=$('mobileTip');
   const favoriteBtn=$('favoriteBtn'), favoritesOnlyToggle=$('favoritesOnlyToggle');
   const notesOnlyToggle=$('notesOnlyToggle'), wordSearchInput=$('wordSearchInput'), wrongOnlyToggle=$('wrongOnlyToggle');
+  const selectModeBtn=$('selectModeBtn'), selectModeBar=$('selectModeBar'), selectAllChk=$('selectAllChk');
+  const selectedCountLabel=$('selectedCountLabel'), bulkDeleteBtn=$('bulkDeleteBtn');
+  let selectMode=false;
+  const selectedWordIds=new Set();
+  let visibleWordIds=[];
   const notesBtn=$('notesBtn'), notesModalOverlay=$('notesModalOverlay'), notesModalTitle=$('notesModalTitle'), notesTextarea=$('notesTextarea');
   const editWordModalOverlay=$('editWordModalOverlay'), editWordInput=$('editWordInput'), editMeaningInput=$('editMeaningInput');
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
@@ -1349,7 +1369,12 @@ md文件内容如下（或已上传）：
   function renderDrawer(scrollToActive){
     drawerContent.innerHTML='';
     const total=currentWordCount();
-    if(total===0){ drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noWords')}</div>`; return; }
+    if(total===0){
+      drawerContent.innerHTML=`<div style="color:rgba(var(--ink-rgb),.45);text-align:center;padding:20px;">${t('noWords')}</div>`;
+      visibleWordIds=[];
+      if(selectMode) updateSelectModeBar();
+      return;
+    }
     const list = currentWordList();
     const favoritesOnly = favoritesOnlyToggle.checked;
     const notesOnly = notesOnlyToggle.checked;
@@ -1371,6 +1396,7 @@ md文件内容如下（或已上传）：
     // 오답만 볼 때는 틀린 횟수가 많은 순으로 — 원래 목록 순서/번호는 이 필터에서는
     // 의미가 없으니 번호 없이 ❌횟수만 보여준다(아래 createWordItemDOM 호출).
     if(wrongOnly) entries.sort((a,b)=>(b.item.wrongCount||0)-(a.item.wrongCount||0));
+    visibleWordIds = entries.map(e=>e.item.id);
     let activeEl=null;
     entries.forEach((e,i)=>{
       const el = createWordItemDOM(e.index, e.item.word, e.sub, !!e.item.favorite, wrongOnly?null:(i+1), e.hasNotes, e.item.wrongCount||0, e.item.notes, wrongOnly, e.item.id);
@@ -1387,6 +1413,30 @@ md文件内容如下（或已上传）：
       const contentTop = activeBox.top - scrollerBox.top + wdScroll.scrollTop;
       wdScroll.scrollTop = contentTop - 14;
     }
+    if(selectMode) updateSelectModeBar();
+  }
+
+  function updateSelectModeBar(){
+    const allSelected = visibleWordIds.length>0 && visibleWordIds.every(id=>selectedWordIds.has(id));
+    selectAllChk.checked = allSelected;
+    selectedCountLabel.textContent = t('selectedCountLabel',{n:selectedWordIds.size});
+    const hasSelection = selectedWordIds.size>0;
+    bulkDeleteBtn.style.opacity = hasSelection ? '1' : '.4';
+    bulkDeleteBtn.style.pointerEvents = hasSelection ? 'auto' : 'none';
+  }
+
+  function setSelectMode(on){
+    selectMode = on;
+    if(!on) selectedWordIds.clear();
+    selectModeBtn.textContent = on ? t('cancelSelectBtn') : t('selectModeBtn');
+    selectModeBtn.style.background = on ? 'rgb(var(--ink-rgb))' : 'transparent';
+    selectModeBtn.style.color = on ? 'var(--bg)' : 'rgba(var(--ink-rgb),.55)';
+    selectModeBar.style.display = on ? 'flex' : 'none';
+  }
+
+  function toggleWordSelection(id){
+    if(selectedWordIds.has(id)) selectedWordIds.delete(id); else selectedWordIds.add(id);
+    renderDrawer(false);
   }
 
   // 오답만 볼 때만 ❌횟수 배지를 보여준다 — 평소 목록에 섞여 있으면 번호와
@@ -1395,10 +1445,24 @@ md文件内容如下（或已上传）：
   function createWordItemDOM(index,mainText,subText,isFavorite,displayIndex,hasNotes,wrongCount,notesText,showWrongBadge,wordId){
     const container=document.createElement('div');
     const active = index===wordIndex;
-    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;scroll-margin-top:14px;`;
-    container.addEventListener('click',(e)=>{ if(e.target.dataset.role) return; wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice'); });
+    const selected = selectMode && selectedWordIds.has(wordId);
+    container.style.cssText=`display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 26px;cursor:pointer;border-radius:20px;box-sizing:border-box;border:${selected?'1.5px solid var(--accent)':active?'1.5px solid var(--accent)':'1px solid rgba(var(--ink-rgb),.08)'};background:${selected?'rgba(var(--accent-rgb),.12)':active?'rgba(var(--accent-rgb),.07)':'rgba(var(--ink-rgb),.03)'};scroll-snap-align:start;scroll-margin-top:14px;`;
+    container.addEventListener('click',(e)=>{
+      if(selectMode){ toggleWordSelection(wordId); return; }
+      if(e.target.dataset.role) return;
+      wordIndex=index; loadWord(); closeDrawer(); setNavActive('practice');
+    });
     const info=document.createElement('div');
-    info.style.cssText='display:flex;align-items:baseline;gap:16px;min-width:0;';
+    info.style.cssText='display:flex;align-items:center;gap:16px;min-width:0;';
+    if(selectMode){
+      const selChk=document.createElement('input');
+      selChk.type='checkbox';
+      selChk.checked=selected;
+      selChk.dataset.role='select';
+      selChk.style.cssText='width:19px;height:19px;flex-shrink:0;accent-color:var(--accent);cursor:pointer;';
+      selChk.addEventListener('click',(e)=>{ e.stopPropagation(); toggleWordSelection(wordId); });
+      info.appendChild(selChk);
+    }
     const wrongPart = showWrongBadge && wrongCount>0 ? `❌${wrongCount} ` : '';
     const numberPart = displayIndex!=null ? `${displayIndex}. ` : '';
     const metaSpan=document.createElement('span');
@@ -1422,22 +1486,24 @@ md文件内容如下（或已上传）：
     info.appendChild(textStack);
     const actions=document.createElement('div');
     actions.style.cssText='display:flex;align-items:center;gap:8px;flex-shrink:0;';
-    const editBtn=document.createElement('button');
-    editBtn.dataset.role='edit';
-    editBtn.textContent='✎';
-    editBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
-    editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); const w=wordsById.get(wordId); if(w) openEditWordModal(w); });
-    const favBtn=document.createElement('button');
-    favBtn.dataset.role='fav';
-    favBtn.textContent = isFavorite ? '★' : '☆';
-    favBtn.style.cssText=`all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;background:${isFavorite?'rgba(var(--accent-rgb),.18)':'rgba(var(--ink-rgb),.06)'};color:${isFavorite?'var(--accent)':'rgba(var(--ink-rgb),.55)'};`;
-    favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
-    const delBtn=document.createElement('button');
-    delBtn.dataset.role='del';
-    delBtn.textContent='✕';
-    delBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgba(var(--ink-rgb),.55);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
-    delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
-    actions.appendChild(editBtn); actions.appendChild(favBtn); actions.appendChild(delBtn);
+    if(!selectMode){
+      const editBtn=document.createElement('button');
+      editBtn.dataset.role='edit';
+      editBtn.textContent='✎';
+      editBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgb(var(--ink-rgb));cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
+      editBtn.addEventListener('click',(e)=>{ e.stopPropagation(); const w=wordsById.get(wordId); if(w) openEditWordModal(w); });
+      const favBtn=document.createElement('button');
+      favBtn.dataset.role='fav';
+      favBtn.textContent = isFavorite ? '★' : '☆';
+      favBtn.style.cssText=`all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;background:${isFavorite?'rgba(var(--accent-rgb),.18)':'rgba(var(--ink-rgb),.06)'};color:${isFavorite?'var(--accent)':'rgba(var(--ink-rgb),.55)'};`;
+      favBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFavoriteAt(index); });
+      const delBtn=document.createElement('button');
+      delBtn.dataset.role='del';
+      delBtn.textContent='✕';
+      delBtn.style.cssText='all:unset;box-sizing:border-box;width:36px;height:36px;border-radius:100px;background:rgba(var(--ink-rgb),.06);color:rgba(var(--ink-rgb),.55);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;';
+      delBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm(t('deleteConfirm',{word:mainText}))) deleteWordAt(index); });
+      actions.appendChild(editBtn); actions.appendChild(favBtn); actions.appendChild(delBtn);
+    }
     container.appendChild(info); container.appendChild(actions);
     return container;
   }
@@ -1471,6 +1537,7 @@ md文件内容如下（或已上传）：
   function currentNotebookKey(m){ return `TRAINER_CURRENT_NOTEBOOK_${userId}_${m}`; }
 
   function selectNotebook(m, id){
+    if(selectMode) setSelectMode(false);
     currentNotebookIdByMode[m] = id;
     localStorage.setItem(currentNotebookKey(m), String(id));
     selectedDatesByMode[m] = null;
@@ -2150,6 +2217,7 @@ md文件内容如下（或已上传）：
   }
   document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
+      if(selectMode) setSelectMode(false);
       mode=btn.dataset.mode; wordIndex=loadLastIndex(mode); setActiveTab(mode);
       updateCurrentNotebookBar(); renderDateFilterRow();
       loadWord();
@@ -2195,6 +2263,23 @@ md文件内容如下（或已上传）：
   notesOnlyToggle.addEventListener('change', ()=>renderDrawer());
   wrongOnlyToggle.addEventListener('change', ()=>renderDrawer());
   wordSearchInput.addEventListener('input', ()=>renderDrawer());
+
+  selectModeBtn.addEventListener('click', ()=>{ setSelectMode(!selectMode); renderDrawer(false); });
+  selectAllChk.addEventListener('change', ()=>{
+    if(selectAllChk.checked) visibleWordIds.forEach(id=>selectedWordIds.add(id));
+    else visibleWordIds.forEach(id=>selectedWordIds.delete(id));
+    renderDrawer(false);
+  });
+  bulkDeleteBtn.addEventListener('click', ()=>{
+    if(selectedWordIds.size===0) return;
+    if(!confirm(t('bulkDeleteConfirm',{n:selectedWordIds.size}))) return;
+    const ids=[...selectedWordIds];
+    ids.forEach(id=>{ deleteWordRemote(id, mode); removeWordFromStore(mode, id); });
+    setSelectMode(false);
+    if(wordIndex>=currentWordCount()) wordIndex=Math.max(0,currentWordCount()-1);
+    updateCurrentNotebookBar();
+    loadWord();
+  });
 
   notesBtn.addEventListener('click', ()=>{
     if(currentWordCount()===0) return;
