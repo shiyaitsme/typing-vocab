@@ -273,6 +273,13 @@
           </div>
         </div>
       </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;">
+        <button id="notebookCoverUploadBtn" type="button" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;padding:9px 14px;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;font-size:11px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">
+          <span>📷</span><span data-i18n="notebookCoverUploadBtn">사진 업로드</span>
+        </button>
+        <button id="notebookCoverRemoveBtn" type="button" style="all:unset;cursor:pointer;display:none;padding:9px 14px;border:1px solid rgba(var(--warn-rgb),.4);border-radius:100px;font-size:11px;font-weight:700;color:var(--warn);box-sizing:border-box;" data-i18n="notebookCoverRemoveBtn">사진 제거</button>
+        <input type="file" id="notebookCoverFileInput" accept="image/*" style="display:none;">
+      </div>
       <div data-i18n="notebookCoverLabel" style="font-size:11px;letter-spacing:.02em;color:rgba(var(--ink-rgb),.5);font-weight:600;margin-bottom:10px;">배경색</div>
       <div id="notebookGradientRow" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;"></div>
       <div style="display:flex;gap:10px;align-items:center;">
@@ -280,6 +287,25 @@
         <div style="flex:1;"></div>
         <button id="closeNotebookModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.18);color:rgb(var(--ink-rgb));font-size:13px;font-weight:600;padding:12px 22px;border-radius:14px;box-sizing:border-box;">취소</button>
         <button id="saveNotebookBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:700;padding:12px 26px;border-radius:14px;box-sizing:border-box;">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COVER IMAGE CROP MODAL -->
+  <div id="coverCropOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1500;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:28px;width:100%;max-width:420px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:16px;box-sizing:border-box;">
+      <div data-i18n="coverCropTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">이미지 위치 조정</div>
+      <div data-i18n="coverCropHint" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">드래그해서 위치를 옮기고, 슬라이더로 확대/축소하세요.</div>
+      <div id="coverCropViewport" style="position:relative;width:100%;aspect-ratio:3/2;border-radius:16px;overflow:hidden;background:#000;cursor:grab;touch-action:none;">
+        <img id="coverCropImg" draggable="false" style="position:absolute;top:0;left:0;transform-origin:top left;user-select:none;pointer-events:none;max-width:none;">
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:14px;flex-shrink:0;">🔍</span>
+        <input type="range" id="coverCropZoom" min="100" max="300" value="100" style="flex:1;accent-color:var(--accent);">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="coverCropCancelBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">취소</button>
+        <button id="coverCropApplyBtn" data-i18n="coverCropApplyBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">적용</button>
       </div>
     </div>
   </div>
@@ -597,6 +623,9 @@ md文件内容如下（或已上传）：
       newNotebookBtn: '+ 새 단어장', notebookModalTitleNew: '📖 새 단어장', notebookModalTitleEdit: '✎ 단어장 편집',
       notebookNamePlaceholder: '단어장 이름', notebookDescPlaceholder: '간단한 설명(선택)',
       notebookCoverLabel: '배경색', notebookEmojiLabel: '아이콘', deleteNotebookBtn: '삭제',
+      notebookCoverUploadBtn: '사진 업로드', notebookCoverRemoveBtn: '사진 제거',
+      coverCropTitle: '이미지 위치 조정', coverCropHint: '드래그해서 위치를 옮기고, 슬라이더로 확대/축소하세요.',
+      coverCropApplyBtn: '적용',
       notebookNameAlertEmpty: '단어장 이름을 입력해 주세요!',
       deleteNotebookConfirm: "'{{name}}' 단어장과 안의 단어를 모두 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
       cantDeleteLastNotebook: '마지막 남은 단어장은 삭제할 수 없습니다. 먼저 새 단어장을 만들어 주세요.',
@@ -671,6 +700,9 @@ md文件内容如下（或已上传）：
       newNotebookBtn: '+ New notebook', notebookModalTitleNew: '📖 New notebook', notebookModalTitleEdit: '✎ Edit notebook',
       notebookNamePlaceholder: 'Notebook name', notebookDescPlaceholder: 'Short description (optional)',
       notebookCoverLabel: 'Cover color', notebookEmojiLabel: 'Icon', deleteNotebookBtn: 'Delete',
+      notebookCoverUploadBtn: 'Upload photo', notebookCoverRemoveBtn: 'Remove photo',
+      coverCropTitle: 'Adjust photo position', coverCropHint: 'Drag to reposition, use the slider to zoom.',
+      coverCropApplyBtn: 'Apply',
       notebookNameAlertEmpty: 'Please enter a notebook name!',
       deleteNotebookConfirm: "Delete notebook '{{name}}' and all its words? This can't be undone.",
       cantDeleteLastNotebook: "Can't delete your last notebook. Create another one first.",
@@ -1754,13 +1786,17 @@ md文件内容如下（或已上传）：
   }
 
   let editingNotebookId = null, pendingDeleteNotebookId = null;
-  let pendingGradient = NOTEBOOK_COLOR_SWATCHES[0], pendingEmoji = '📖';
+  let pendingGradient = NOTEBOOK_COLOR_SWATCHES[0], pendingEmoji = '📖', pendingCoverUrl = '';
   const notebookModalOverlay = $('notebookModalOverlay');
   const notebookNameInput = $('notebookNameInput'), notebookDescInput = $('notebookDescInput');
   const notebookEmojiInput = $('notebookEmojiInput');
   const notebookGradientRow = $('notebookGradientRow'), notebookEmojiRow = $('notebookEmojiRow');
   const notebookPreview = $('notebookPreview');
   const deleteNotebookOverlay = $('deleteNotebookOverlay');
+  const notebookCoverUploadBtn = $('notebookCoverUploadBtn'), notebookCoverRemoveBtn = $('notebookCoverRemoveBtn');
+  const notebookCoverFileInput = $('notebookCoverFileInput');
+  const coverCropOverlay = $('coverCropOverlay'), coverCropViewport = $('coverCropViewport');
+  const coverCropImg = $('coverCropImg'), coverCropZoom = $('coverCropZoom');
 
   NOTEBOOK_COLOR_SWATCHES.forEach(color=>{
     const sw=document.createElement('button');
@@ -1793,8 +1829,14 @@ md文件内容如下（或已上传）：
     });
   }
   function updateNotebookPreview(){
-    notebookPreview.style.cssText=`width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);background:${pendingGradient};`;
-    setEmojiInto(notebookPreview, pendingEmoji, 38);
+    if(pendingCoverUrl){
+      notebookPreview.style.cssText=`width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);background-image:url('${pendingCoverUrl.replace(/'/g,"%27")}');background-size:cover;background-position:center;`;
+      notebookPreview.innerHTML='';
+    } else {
+      notebookPreview.style.cssText=`width:88px;height:88px;flex:none;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);background:${pendingGradient};`;
+      setEmojiInto(notebookPreview, pendingEmoji, 38);
+    }
+    notebookCoverRemoveBtn.style.display = pendingCoverUrl ? 'block' : 'none';
   }
 
   function openNotebookModal(nb){
@@ -1805,6 +1847,7 @@ md文件内容如下（或已上传）：
     notebookDescInput.value = nb ? nb.description : '';
     pendingGradient = (nb && nb.coverGradient && nb.coverGradient.charAt(0)==='#') ? nb.coverGradient : NOTEBOOK_COLOR_SWATCHES[0];
     pendingEmoji = nb ? nb.coverEmoji : '📖';
+    pendingCoverUrl = nb ? (nb.coverUrl || '') : '';
     notebookEmojiInput.value='';
     refreshNotebookModalSwatches();
     updateNotebookPreview();
@@ -1815,10 +1858,103 @@ md文件内容如下（或已上传）：
   function closeNotebookModal(){
     notebookModalOverlay.style.opacity='0'; notebookModalOverlay.style.pointerEvents='none';
   }
+
+  // Cover photo crop: lets the user pan/zoom an uploaded image inside a fixed 3:2
+  // viewport, then bakes the visible region to a fixed-resolution canvas so the
+  // stored coverUrl is always a clean, predictably-sized JPEG regardless of the
+  // source photo's dimensions or the on-screen preview scale.
+  let cropNaturalW=0, cropNaturalH=0, cropBaseScale=1, cropZoomFactor=1;
+  let cropPanX=0, cropPanY=0, cropVpW=0, cropVpH=0;
+  let cropDragging=false, cropDragStartX=0, cropDragStartY=0, cropPanStartX=0, cropPanStartY=0;
+
+  function applyCropTransform(){
+    const scale = cropBaseScale*cropZoomFactor;
+    coverCropImg.style.width = (cropNaturalW*scale)+'px';
+    coverCropImg.style.height = (cropNaturalH*scale)+'px';
+    coverCropImg.style.transform = `translate(${cropPanX}px, ${cropPanY}px)`;
+  }
+  function clampCropPan(){
+    const scale = cropBaseScale*cropZoomFactor;
+    const dispW = cropNaturalW*scale, dispH = cropNaturalH*scale;
+    cropPanX = Math.min(0, Math.max(cropVpW-dispW, cropPanX));
+    cropPanY = Math.min(0, Math.max(cropVpH-dispH, cropPanY));
+  }
+  function openCoverCrop(dataUrl){
+    coverCropImg.onload = ()=>{
+      cropNaturalW = coverCropImg.naturalWidth;
+      cropNaturalH = coverCropImg.naturalHeight;
+      const vpRect = coverCropViewport.getBoundingClientRect();
+      cropVpW = vpRect.width; cropVpH = vpRect.height;
+      cropBaseScale = Math.max(cropVpW/cropNaturalW, cropVpH/cropNaturalH);
+      cropZoomFactor = 1;
+      coverCropZoom.value = 100;
+      cropPanX = (cropVpW - cropNaturalW*cropBaseScale)/2;
+      cropPanY = (cropVpH - cropNaturalH*cropBaseScale)/2;
+      applyCropTransform();
+    };
+    coverCropImg.src = dataUrl;
+    coverCropOverlay.style.opacity='1'; coverCropOverlay.style.pointerEvents='auto';
+  }
+  function closeCoverCrop(){
+    coverCropOverlay.style.opacity='0'; coverCropOverlay.style.pointerEvents='none';
+  }
+  coverCropZoom.addEventListener('input', ()=>{
+    const newZoomFactor = coverCropZoom.value/100;
+    const oldScale = cropBaseScale*cropZoomFactor;
+    const newScale = cropBaseScale*newZoomFactor;
+    const centerX = (cropVpW/2 - cropPanX)/oldScale;
+    const centerY = (cropVpH/2 - cropPanY)/oldScale;
+    cropZoomFactor = newZoomFactor;
+    cropPanX = cropVpW/2 - centerX*newScale;
+    cropPanY = cropVpH/2 - centerY*newScale;
+    clampCropPan();
+    applyCropTransform();
+  });
+  coverCropViewport.addEventListener('pointerdown', (e)=>{
+    cropDragging = true;
+    cropDragStartX = e.clientX; cropDragStartY = e.clientY;
+    cropPanStartX = cropPanX; cropPanStartY = cropPanY;
+    coverCropViewport.setPointerCapture(e.pointerId);
+    coverCropViewport.style.cursor = 'grabbing';
+  });
+  coverCropViewport.addEventListener('pointermove', (e)=>{
+    if(!cropDragging) return;
+    cropPanX = cropPanStartX + (e.clientX-cropDragStartX);
+    cropPanY = cropPanStartY + (e.clientY-cropDragStartY);
+    clampCropPan();
+    applyCropTransform();
+  });
+  function endCropDrag(){ cropDragging=false; coverCropViewport.style.cursor='grab'; }
+  coverCropViewport.addEventListener('pointerup', endCropDrag);
+  coverCropViewport.addEventListener('pointercancel', endCropDrag);
+
+  notebookCoverUploadBtn.addEventListener('click', ()=>notebookCoverFileInput.click());
+  notebookCoverFileInput.addEventListener('change', ()=>{
+    const file = notebookCoverFileInput.files && notebookCoverFileInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>openCoverCrop(reader.result);
+    reader.readAsDataURL(file);
+    notebookCoverFileInput.value='';
+  });
+  notebookCoverRemoveBtn.addEventListener('click', ()=>{ pendingCoverUrl=''; updateNotebookPreview(); });
+  $('coverCropCancelBtn').addEventListener('click', closeCoverCrop);
+  $('coverCropApplyBtn').addEventListener('click', ()=>{
+    const scale = cropBaseScale*cropZoomFactor;
+    const srcX = -cropPanX/scale, srcY = -cropPanY/scale;
+    const srcW = cropVpW/scale, srcH = cropVpH/scale;
+    const OUT_W = 960, OUT_H = 640;
+    const canvas = document.createElement('canvas');
+    canvas.width = OUT_W; canvas.height = OUT_H;
+    canvas.getContext('2d').drawImage(coverCropImg, srcX, srcY, srcW, srcH, 0, 0, OUT_W, OUT_H);
+    pendingCoverUrl = canvas.toDataURL('image/jpeg', 0.85);
+    updateNotebookPreview();
+    closeCoverCrop();
+  });
   async function saveNotebookModal(){
     const name = notebookNameInput.value.trim();
     if(!name){ alert(t('notebookNameAlertEmpty')); return; }
-    const fields = { name, description: notebookDescInput.value.trim(), coverGradient: pendingGradient, coverEmoji: pendingEmoji, coverUrl: '' };
+    const fields = { name, description: notebookDescInput.value.trim(), coverGradient: pendingGradient, coverEmoji: pendingEmoji, coverUrl: pendingCoverUrl };
     if(editingNotebookId!=null){
       const nb = currentNotebooks().find(n=>n.id===editingNotebookId);
       if(nb){
