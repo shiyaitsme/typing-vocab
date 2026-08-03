@@ -1662,12 +1662,14 @@ md文件内容如下（或已上传）：
     wdScrubber.classList.add('wd-scrubber--active');
     const ratio = ratioFromClientY(clientY);
     scrollWdScrollToRatio(ratio);
+    updateScrubber();
     showScrubberBubble(ratio);
   }
   function moveScrubberDrag(clientY){
     if(!scrubberDragging) return;
     const ratio = ratioFromClientY(clientY);
     scrollWdScrollToRatio(ratio);
+    updateScrubber();
     showScrubberBubble(ratio);
   }
   function endScrubberDrag(){
@@ -1675,6 +1677,7 @@ md文件内容如下（或已上传）：
     scrubberDragging=false;
     wdScrubber.classList.remove('wd-scrubber--active');
     hideScrubberBubble();
+    updateScrubber();
   }
 
   wdScrubber.addEventListener('pointerdown',(e)=>{
