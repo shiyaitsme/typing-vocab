@@ -17,8 +17,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;}
-  html{overflow-x:hidden;}
-  body{margin:0;background:#0a0a0a;overflow-anchor:none;}
+  html{overflow-x:hidden;scrollbar-width:none;}
+  html::-webkit-scrollbar{display:none;}
+  body{margin:0;background:#0a0a0a;overflow-anchor:none;scrollbar-width:none;}
+  body::-webkit-scrollbar{display:none;}
   ::selection{background:var(--accent);color:var(--accent-ink);}
   input::placeholder, textarea::placeholder{color:rgba(var(--ink-rgb),.35);}
   a{color:var(--accent);}
@@ -35,7 +37,8 @@
   .wb-card-open:hover{background:#000 !important;}
   .wb-card{position:relative;box-sizing:border-box;border-radius:30px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.22);transition:transform .34s cubic-bezier(.4,0,.2,1),margin-top .34s cubic-bezier(.4,0,.2,1),box-shadow .34s ease,filter .25s ease;transform-origin:center center;z-index:1;}
   .wb-card--peak{box-shadow:0 26px 50px rgba(0,0,0,.45) !important;filter:brightness(1.05);}
-  .wd-scroll{scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
+  .wd-scroll{-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;}
+  .wd-scroll::-webkit-scrollbar{display:none;}
   .wd-scroll--snap{scroll-snap-type:y mandatory;}
   #wdScrubber{position:absolute;top:6px;bottom:6px;right:0;width:26px;display:none;align-items:center;justify-content:center;z-index:5;touch-action:none;}
   #wdScrubberTrack{position:relative;width:4px;height:100%;border-radius:2px;background:rgba(var(--ink-rgb),.1);}
