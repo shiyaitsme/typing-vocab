@@ -58,6 +58,7 @@
   @media (max-width: 899.98px){
     .side-card{flex:1 1 100% !important;max-width:620px !important;width:100%;}
   }
+  #notesPanelTextarea::placeholder{color:rgba(10,10,10,.35);}
 </style>
 </head>
 <body>
@@ -154,12 +155,12 @@
       </div>
 
       <!-- NOTES PANEL (항상 보이는 노트 — 타이핑 카드 옆에 상주, 모바일에서는 바로 아래로) -->
-      <div id="notesPanel" class="side-card" style="flex:1 1 280px;max-width:340px;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.16);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
+      <div id="notesPanel" class="side-card" style="flex:1 1 280px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;">📝 <span data-i18n="notesTitle">노트</span></div>
-          <div id="notesPanelWordLabel" style="font-size:11px;color:rgba(var(--ink-rgb),.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;"></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(10,10,10,.4);text-transform:uppercase;">📝 <span data-i18n="notesTitle">노트</span></div>
+          <div id="notesPanelWordLabel" style="font-size:11px;color:rgba(10,10,10,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;"></div>
         </div>
-        <textarea id="notesPanelTextarea" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:150px;width:100%;background:transparent;border:1px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:12px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;line-height:1.6;border-radius:12px;resize:none;box-sizing:border-box;outline:none;"></textarea>
+        <textarea id="notesPanelTextarea" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:150px;width:100%;background:#fff;border:1.5px solid #0a0a0a;color:#0a0a0a;padding:12px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;line-height:1.6;border-radius:2px;resize:none;box-sizing:border-box;outline:none;"></textarea>
         <button id="notesPanelSaveBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:var(--accent);color:var(--accent-ink);padding:9px;font-weight:700;font-size:12.5px;border-radius:100px;box-sizing:border-box;">저장</button>
       </div>
     </div>
