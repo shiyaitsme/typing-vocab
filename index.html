@@ -130,7 +130,7 @@
 
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:stretch;margin-top:-18px;position:relative;">
       <!-- PRACTICE CARD -->
-      <div style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
+      <div id="practiceCard" style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
           <div>
             <div style="display:flex;align-items:baseline;gap:10px;">
@@ -163,7 +163,7 @@
       </div>
 
       <!-- NOTES PANEL (항상 보이는 노트 — 타이핑 카드 옆에 상주, 모바일에서는 바로 아래로) -->
-      <div id="notesPanel" class="side-card" style="flex:1 1 280px;background:#f2ede2;color:#0a0a0a;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
+      <div id="notesPanel" class="side-card" style="flex:1 1 280px;min-height:0;background:#f2ede2;color:#0a0a0a;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;overflow:hidden;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(10,10,10,.4);text-transform:uppercase;">📝 <span data-i18n="notesTitle">노트</span></div>
           <div id="notesPanelWordLabel" style="font-size:11px;color:rgba(10,10,10,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;"></div>
@@ -192,7 +192,7 @@
           <div style="flex:1;"></div>
           <button id="notesClearFormatBtn" title="서식 지우기" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;background:#0a0a0a;color:#f2ede2;border-radius:999px;padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.06em;box-sizing:border-box;transition:opacity .12s ease;"><span style="font-size:12px;">⟲</span><span data-i18n="notesClearFormat">서식 지우기</span></button>
         </div>
-        <div id="notesPanelTextarea" contenteditable="true" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:220px;width:100%;background:#fff;color:#1a1a1a;padding:20px 22px;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.85;border-radius:16px;box-sizing:border-box;outline:none;overflow-y:auto;box-shadow:inset 0 0 0 1px rgba(10,10,10,.05);"></div>
+        <div id="notesPanelTextarea" contenteditable="true" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:0;width:100%;background:#fff;color:#1a1a1a;padding:20px 22px;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.85;border-radius:16px;box-sizing:border-box;outline:none;overflow-y:auto;box-shadow:inset 0 0 0 1px rgba(10,10,10,.05);"></div>
         <button id="notesPanelSaveBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:#0a0a0a;color:#f2ede2;padding:13px;font-weight:700;font-size:14px;letter-spacing:.02em;border-radius:16px;box-sizing:border-box;">저장</button>
       </div>
     </div>
@@ -981,6 +981,16 @@ md文件内容如下（或已上传）：
   let lastRenderedEntries=[];
   const notesBtn=$('notesBtn'), notesPanelTextarea=$('notesPanelTextarea'), notesPanelSaveBtn=$('notesPanelSaveBtn'), notesPanelWordLabel=$('notesPanelWordLabel');
   const notesClearFormatBtn=$('notesClearFormatBtn');
+  const notesPanel=$('notesPanel'), practiceCard=$('practiceCard');
+  // notes panel must never grow/shrink the row on its own (long notes just scroll internally) —
+  // it always mirrors the practice card's actual rendered height, side-by-side layout only.
+  function syncNotesPanelHeight(){
+    if(window.innerWidth < 900){ notesPanel.style.height=''; return; }
+    const h = practiceCard.getBoundingClientRect().height;
+    if(h>0) notesPanel.style.height = h+'px';
+  }
+  window.addEventListener('resize', syncNotesPanelHeight);
+  new ResizeObserver(syncNotesPanelHeight).observe(practiceCard);
   const editWordModalOverlay=$('editWordModalOverlay'), editWordInput=$('editWordInput'), editMeaningInput=$('editMeaningInput');
   const whoAmIOverlay=$('whoAmIOverlay'), whoAmIInput=$('whoAmIInput'), whoAmISubmitBtn=$('whoAmISubmitBtn');
   const loadingOverlay=$('loadingOverlay'), cloudStatusEl=$('cloudStatus');
