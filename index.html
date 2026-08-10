@@ -62,8 +62,11 @@
     .side-card{flex:1 1 100% !important;max-width:620px !important;width:100%;}
   }
   #notesPanelTextarea:empty:before{content:attr(placeholder);color:rgba(10,10,10,.35);}
-  .note-swatch{all:unset;cursor:pointer;width:16px;height:16px;border-radius:50%;border:1px solid rgba(10,10,10,.25);box-sizing:border-box;flex-shrink:0;}
-  .note-swatch:hover{transform:scale(1.15);}
+  .note-swatch-hl{all:unset;cursor:pointer;width:20px;height:20px;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(10,10,10,.08);transition:transform .12s ease,box-shadow .12s ease;box-sizing:border-box;flex-shrink:0;}
+  .note-swatch-hl:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgba(10,10,10,.08),0 4px 8px rgba(10,10,10,.18);}
+  .note-swatch-fg{all:unset;cursor:pointer;width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 2px #f2ede2,0 0 0 3px rgba(10,10,10,.08);transition:transform .12s ease;box-sizing:border-box;flex-shrink:0;}
+  .note-swatch-fg:hover{transform:translateY(-2px);}
+  #notesClearFormatBtn:hover{opacity:.75;}
 </style>
 </head>
 <body>
@@ -165,22 +168,32 @@
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(10,10,10,.4);text-transform:uppercase;">📝 <span data-i18n="notesTitle">노트</span></div>
           <div id="notesPanelWordLabel" style="font-size:11px;color:rgba(10,10,10,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;"></div>
         </div>
-        <div id="notesToolbar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span style="font-size:9px;color:rgba(10,10,10,.4);text-transform:uppercase;letter-spacing:.06em;">HL</span>
-          <button class="note-swatch" data-hl="#fff59d" style="background:#fff59d;" title="노란 형광펜"></button>
-          <button class="note-swatch" data-hl="#c8f7c5" style="background:#c8f7c5;" title="초록 형광펜"></button>
-          <button class="note-swatch" data-hl="#ffd0e0" style="background:#ffd0e0;" title="분홍 형광펜"></button>
-          <button class="note-swatch" data-hl="#c9e4ff" style="background:#c9e4ff;" title="파란 형광펜"></button>
-          <span style="width:1px;height:14px;background:rgba(10,10,10,.15);margin:0 2px;"></span>
-          <span style="font-size:9px;color:rgba(10,10,10,.4);text-transform:uppercase;letter-spacing:.06em;">A</span>
-          <button class="note-swatch" data-fg="#e11d48" style="background:#e11d48;" title="빨간 글자"></button>
-          <button class="note-swatch" data-fg="#2563eb" style="background:#2563eb;" title="파란 글자"></button>
-          <button class="note-swatch" data-fg="#16a34a" style="background:#16a34a;" title="초록 글자"></button>
-          <button class="note-swatch" data-fg="#0a0a0a" style="background:#0a0a0a;" title="검정 글자"></button>
-          <button id="notesClearFormatBtn" title="서식 지우기" style="all:unset;cursor:pointer;font-size:9px;color:rgba(10,10,10,.45);margin-left:auto;padding:2px 7px;border:1px solid rgba(10,10,10,.25);border-radius:100px;">✕</button>
+        <div id="notesToolbar" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fff;border:1px solid rgba(10,10,10,.06);border-radius:18px;padding:10px 14px;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#8f8878;text-transform:uppercase;">Hl</span>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <button class="note-swatch-hl" data-hl="#EDCEA6" style="background:#EDCEA6;" title="하이라이트 옐로"></button>
+              <button class="note-swatch-hl" data-hl="#b9cf9c" style="background:#b9cf9c;" title="세이지 그린"></button>
+              <button class="note-swatch-hl" data-hl="#FFD6F4" style="background:#FFD6F4;" title="브랜드 핑크"></button>
+              <button class="note-swatch-hl" data-hl="#a9c6db" style="background:#a9c6db;" title="미스트 블루"></button>
+              <button class="note-swatch-hl" data-hl="#C0B9DD" style="background:#C0B9DD;" title="라벤더"></button>
+            </div>
+          </div>
+          <div style="width:1px;height:22px;background:rgba(10,10,10,.12);"></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:800;letter-spacing:.02em;color:#8f8878;font-style:italic;">Aa</span>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <button class="note-swatch-fg" data-fg="#b5533c" style="background:#b5533c;" title="테라코타 레드"></button>
+              <button class="note-swatch-fg" data-fg="#33587a" style="background:#33587a;" title="딥 블루"></button>
+              <button class="note-swatch-fg" data-fg="#3d5c3a" style="background:#3d5c3a;" title="포레스트 그린"></button>
+              <button class="note-swatch-fg" data-fg="#1a1a1a" style="background:#1a1a1a;" title="잉크 블랙"></button>
+            </div>
+          </div>
+          <div style="flex:1;"></div>
+          <button id="notesClearFormatBtn" title="서식 지우기" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;background:#0a0a0a;color:#f2ede2;border-radius:999px;padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.06em;box-sizing:border-box;transition:opacity .12s ease;"><span style="font-size:12px;">⟲</span><span data-i18n="notesClearFormat">서식 지우기</span></button>
         </div>
-        <div id="notesPanelTextarea" contenteditable="true" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:150px;width:100%;background:#fff;border:1.5px solid #0a0a0a;color:#0a0a0a;padding:12px;font-family:'Space Grotesk',sans-serif;font-size:12.5px;line-height:1.6;border-radius:2px;box-sizing:border-box;outline:none;overflow-y:auto;"></div>
-        <button id="notesPanelSaveBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:#0a0a0a;color:#f2ede2;padding:9px;font-weight:700;font-size:12.5px;border-radius:100px;box-sizing:border-box;">저장</button>
+        <div id="notesPanelTextarea" contenteditable="true" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:220px;width:100%;background:#fff;color:#1a1a1a;padding:20px 22px;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.85;border-radius:16px;box-sizing:border-box;outline:none;overflow-y:auto;box-shadow:inset 0 0 0 1px rgba(10,10,10,.05);"></div>
+        <button id="notesPanelSaveBtn" data-i18n="saveBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:#0a0a0a;color:#f2ede2;padding:13px;font-weight:700;font-size:14px;letter-spacing:.02em;border-radius:16px;box-sizing:border-box;">저장</button>
       </div>
     </div>
 
@@ -696,7 +709,7 @@ md文件内容如下（或已上传）：
       importAlertEmpty: '가져올 내용을 입력해 주세요!',
       importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
       importSuccessMerged: ' 이미 있던 단어 {{merged}}개는 뜻을 합쳤습니다.',
-      notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장',
+      notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장', notesClearFormat: '서식 지우기',
       whoAmITitle: '👋 이름을 알려주세요',
       whoAmIDesc: '이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.',
       namePlaceholder: '예: shiya', startBtn: '시작하기',
@@ -773,7 +786,7 @@ md文件内容如下（或已上传）：
       importAlertEmpty: 'Please enter content to import!',
       importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
       importSuccessMerged: ' {{merged}} existing word(s) had their meanings merged.',
-      notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save',
+      notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save', notesClearFormat: 'Clear formatting',
       whoAmITitle: "👋 What's your name?",
       whoAmIDesc: "Your word list will be saved to the cloud under this name. It'll be remembered automatically next time on this device.",
       namePlaceholder: 'e.g. shiya', startBtn: 'Get Started',
@@ -1298,7 +1311,8 @@ md文件内容如下（或已上传）：
     const sel = window.getSelection();
     if(!sel || sel.rangeCount===0 || sel.isCollapsed) return;
     if(!notesPanelTextarea.contains(sel.anchorNode)) return;
-    document.execCommand('styleWithCSS', false, true);
+    notesPanelTextarea.focus();
+    try{ document.execCommand('styleWithCSS', false, true); }catch(e){}
     document.execCommand(cmd, false, value || null);
   }
 
@@ -2657,11 +2671,11 @@ md文件内容如下（或已上传）：
     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
     document.execCommand('insertText', false, text);
   });
-  document.querySelectorAll('#notesToolbar .note-swatch[data-hl]').forEach(btn=>{
+  document.querySelectorAll('#notesToolbar .note-swatch-hl[data-hl]').forEach(btn=>{
     btn.addEventListener('mousedown', e=>e.preventDefault());
-    btn.addEventListener('click', ()=> applyNoteFormat('hiliteColor', btn.dataset.hl));
+    btn.addEventListener('click', ()=> applyNoteFormat('backColor', btn.dataset.hl));
   });
-  document.querySelectorAll('#notesToolbar .note-swatch[data-fg]').forEach(btn=>{
+  document.querySelectorAll('#notesToolbar .note-swatch-fg[data-fg]').forEach(btn=>{
     btn.addEventListener('mousedown', e=>e.preventDefault());
     btn.addEventListener('click', ()=> applyNoteFormat('foreColor', btn.dataset.fg));
   });
