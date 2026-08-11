@@ -276,11 +276,13 @@
         </label>
       </div>
       <div style="height:1px;background:rgba(var(--ink-rgb),.08);"></div>
-      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;position:relative;">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 4px;">
         <button id="wordOrderDefaultBtn" class="word-order-btn" data-i18n="orderDefaultLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;">기본순</button>
         <button id="wordOrderReverseBtn" class="word-order-btn" data-i18n="orderReverseLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;">↕ 역순</button>
-        <button id="wordOrderShuffleBtn" class="word-order-btn" title="다시 클릭하면 다시 섞입니다" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;"><span id="wordOrderShuffleIcon" style="display:inline-block;transition:transform .55s cubic-bezier(.3,1.4,.4,1);">🔀</span> <span data-i18n="orderShuffleLabel">랜덤</span></button>
-        <span id="shuffleHintLabel" data-i18n="shuffleHintLabel" style="display:none;position:absolute;top:-8px;right:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.03em;color:var(--accent);background:var(--input-bg);padding:2px 7px;border:1px solid var(--accent);border-radius:100px;white-space:nowrap;pointer-events:none;">매번 새로 섞임</span>
+        <button id="wordOrderShuffleBtn" class="word-order-btn" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;"><span id="wordOrderShuffleIcon" style="display:inline-block;transition:transform .55s cubic-bezier(.3,1.4,.4,1);">🔀</span> <span data-i18n="orderShuffleLabel">랜덤</span></button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;padding:0 12px 10px;">
+        <span id="wordOrderStatusLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(var(--ink-rgb),.4);white-space:nowrap;"></span>
       </div>
       <div id="selectModeBar" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid rgba(var(--ink-rgb),.08);">
         <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
@@ -684,7 +686,8 @@ md文件内容如下（或已上传）：
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
       selectModeBtn: '선택', cancelSelectBtn: '취소', selectAllLabel: '전체 선택',
-      orderDefaultLabel: '기본순', orderReverseLabel: '↕ 역순', orderShuffleLabel: '랜덤', shuffleHintLabel: '매번 새로 섞임',
+      orderDefaultLabel: '기본순', orderReverseLabel: '↕ 역순', orderShuffleLabel: '랜덤',
+      orderStatusDefault: '기본순', orderStatusReverse: '역순', orderStatusShuffle: '랜덤 (매번 새로 섞임)',
       bulkDeleteBtn: '삭제', selectedCountLabel: '{{n}}개 선택됨', bulkDeleteConfirm: '선택한 단어 {{n}}개를 삭제할까요?',
       switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', addWordSectionTitle: '단어 추가', toolsSectionTitle: '🛠 도구', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
       dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
@@ -762,7 +765,8 @@ md文件内容如下（或已上传）：
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
       selectModeBtn: 'Select', cancelSelectBtn: 'Cancel', selectAllLabel: 'Select all',
-      orderDefaultLabel: 'Default', orderReverseLabel: '↕ Reverse', orderShuffleLabel: 'Shuffle', shuffleHintLabel: 'Reshuffles every click',
+      orderDefaultLabel: 'Default', orderReverseLabel: '↕ Reverse', orderShuffleLabel: 'Shuffle',
+      orderStatusDefault: 'Default order', orderStatusReverse: 'Reversed', orderStatusShuffle: 'Shuffled (reshuffles every click)',
       bulkDeleteBtn: 'Delete', selectedCountLabel: '{{n}} selected', bulkDeleteConfirm: 'Delete {{n}} selected words?',
       switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', addWordSectionTitle: 'Add word', toolsSectionTitle: '🛠 Tools', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
       dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
@@ -988,7 +992,7 @@ md文件内容如下（或已上传）：
   const selectModeBtn=$('selectModeBtn'), selectModeBar=$('selectModeBar'), selectAllChk=$('selectAllChk');
   const selectedCountLabel=$('selectedCountLabel'), bulkDeleteBtn=$('bulkDeleteBtn');
   const wordOrderDefaultBtn=$('wordOrderDefaultBtn'), wordOrderReverseBtn=$('wordOrderReverseBtn'), wordOrderShuffleBtn=$('wordOrderShuffleBtn');
-  const wordOrderShuffleIcon=$('wordOrderShuffleIcon'), shuffleHintLabel=$('shuffleHintLabel');
+  const wordOrderShuffleIcon=$('wordOrderShuffleIcon'), wordOrderStatusLabel=$('wordOrderStatusLabel');
   let wordListOrder='default'; // 'default' | 'reverse' | 'shuffle'
   let shuffleOrderIds=[];
   let shuffleSpinDeg=0;
@@ -1006,7 +1010,8 @@ md文件内容如下（或已上传）：
     wordOrderDefaultBtn.classList.toggle('active', wordListOrder==='default');
     wordOrderReverseBtn.classList.toggle('active', wordListOrder==='reverse');
     wordOrderShuffleBtn.classList.toggle('active', wordListOrder==='shuffle');
-    shuffleHintLabel.style.display = wordListOrder==='shuffle' ? '' : 'none';
+    const statusKey = wordListOrder==='shuffle' ? 'orderStatusShuffle' : wordListOrder==='reverse' ? 'orderStatusReverse' : 'orderStatusDefault';
+    wordOrderStatusLabel.textContent = t(statusKey);
   }
   let selectMode=false;
   const selectedWordIds=new Set();
@@ -3116,6 +3121,7 @@ md文件内容如下（或已上传）：
     renderActiveDrawerView();
     updateFavoriteBtn();
     updateNotesBtn();
+    updateWordOrderButtons();
   }
 
   document.querySelectorAll('.ui-lang-btn').forEach(btn=>{
