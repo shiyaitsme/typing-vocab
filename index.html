@@ -32,7 +32,7 @@
   .arrow-btn{transition:background .18s ease,color .18s ease,letter-spacing .18s ease;}
   .arrow-btn:hover{background:#0a0a0a !important;color:rgb(var(--ink-rgb)) !important;letter-spacing:.1em;}
   .filter-seg-chk:checked + .filter-seg{background:rgb(var(--ink-rgb));color:var(--bg) !important;}
-  .word-order-btn.active{background:rgb(var(--ink-rgb));color:var(--bg) !important;}
+  .word-order-btn.active{background:rgba(var(--accent-rgb),.12) !important;color:var(--accent) !important;border-color:var(--accent) !important;font-weight:700;}
   #newNotebookBtn:hover{border-color:rgba(var(--ink-rgb),.5);color:rgb(var(--ink-rgb));}
   .wb-card-edit:hover{background:rgba(10,10,10,.2) !important;}
   .wb-card-open:hover{background:#000 !important;}
@@ -261,7 +261,7 @@
         <button id="selectModeBtn" data-i18n="selectModeBtn" style="all:unset;cursor:pointer;flex-shrink:0;font-size:10.5px;font-weight:700;color:rgb(var(--ink-rgb));padding:6px 12px;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;white-space:nowrap;box-sizing:border-box;">선택</button>
       </div>
       <div style="height:1px;background:rgba(var(--ink-rgb),.08);"></div>
-      <div style="display:flex;padding:6px;">
+      <div style="display:flex;gap:8px;padding:10px 12px;">
         <label style="flex:1;display:flex;cursor:pointer;">
           <input type="checkbox" id="favoritesOnlyToggle" class="filter-seg-chk" style="display:none;">
           <span class="filter-seg" data-i18n="favOnlyLabel" style="padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;width:100%;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">★ 즐겨찾기만</span>
@@ -276,10 +276,11 @@
         </label>
       </div>
       <div style="height:1px;background:rgba(var(--ink-rgb),.08);"></div>
-      <div style="display:flex;padding:6px;gap:0;">
-        <button id="wordOrderDefaultBtn" class="word-order-btn" data-i18n="orderDefaultLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">기본순</button>
-        <button id="wordOrderReverseBtn" class="word-order-btn" data-i18n="orderReverseLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">↕ 역순</button>
-        <button id="wordOrderShuffleBtn" class="word-order-btn" data-i18n="orderShuffleLabel" title="다시 클릭하면 다시 섞입니다" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease;">🔀 랜덤</button>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;position:relative;">
+        <button id="wordOrderDefaultBtn" class="word-order-btn" data-i18n="orderDefaultLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;">기본순</button>
+        <button id="wordOrderReverseBtn" class="word-order-btn" data-i18n="orderReverseLabel" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;">↕ 역순</button>
+        <button id="wordOrderShuffleBtn" class="word-order-btn" title="다시 클릭하면 다시 섞입니다" style="all:unset;cursor:pointer;flex:1;padding:9px 4px;border:1px solid transparent;border-radius:16px;font-size:11.5px;font-weight:600;color:rgba(var(--ink-rgb),.5);text-align:center;box-sizing:border-box;white-space:nowrap;transition:background .15s ease,color .15s ease,border-color .15s ease;"><span id="wordOrderShuffleIcon" style="display:inline-block;transition:transform .55s cubic-bezier(.3,1.4,.4,1);">🔀</span> <span data-i18n="orderShuffleLabel">랜덤</span></button>
+        <span id="shuffleHintLabel" data-i18n="shuffleHintLabel" style="display:none;position:absolute;top:-8px;right:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.03em;color:var(--accent);background:var(--input-bg);padding:2px 7px;border:1px solid var(--accent);border-radius:100px;white-space:nowrap;pointer-events:none;">매번 새로 섞임</span>
       </div>
       <div id="selectModeBar" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid rgba(var(--ink-rgb),.08);">
         <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:rgba(var(--ink-rgb),.65);cursor:pointer;">
@@ -683,7 +684,7 @@ md文件内容如下（或已上传）：
       noWrongWords: '오답 단어가 없습니다.', noFavWords: '즐겨찾기한 단어가 없습니다.',
       deleteConfirm: "'{{word}}' 단어를 삭제할까요?",
       selectModeBtn: '선택', cancelSelectBtn: '취소', selectAllLabel: '전체 선택',
-      orderDefaultLabel: '기본순', orderReverseLabel: '↕ 역순', orderShuffleLabel: '🔀 랜덤',
+      orderDefaultLabel: '기본순', orderReverseLabel: '↕ 역순', orderShuffleLabel: '랜덤', shuffleHintLabel: '매번 새로 섞임',
       bulkDeleteBtn: '삭제', selectedCountLabel: '{{n}}개 선택됨', bulkDeleteConfirm: '선택한 단어 {{n}}개를 삭제할까요?',
       switchNotebookBtn: '⇄ 전환', dateFilterTitle: '날짜별 필터', addWordSectionTitle: '단어 추가', toolsSectionTitle: '🛠 도구', allDatesLabel: '전체', last7DaysLabel: '최근 7일',
       dateFilterMore: '더보기', dateFilterLess: '접기', practicingBadge: '연습 중',
@@ -761,7 +762,7 @@ md文件内容如下（或已上传）：
       noWrongWords: 'No mistaken words.', noFavWords: 'No favorited words.',
       deleteConfirm: "Delete '{{word}}'?",
       selectModeBtn: 'Select', cancelSelectBtn: 'Cancel', selectAllLabel: 'Select all',
-      orderDefaultLabel: 'Default', orderReverseLabel: '↕ Reverse', orderShuffleLabel: '🔀 Shuffle',
+      orderDefaultLabel: 'Default', orderReverseLabel: '↕ Reverse', orderShuffleLabel: 'Shuffle', shuffleHintLabel: 'Reshuffles every click',
       bulkDeleteBtn: 'Delete', selectedCountLabel: '{{n}} selected', bulkDeleteConfirm: 'Delete {{n}} selected words?',
       switchNotebookBtn: '⇄ Switch', dateFilterTitle: 'Filter by date', addWordSectionTitle: 'Add word', toolsSectionTitle: '🛠 Tools', allDatesLabel: 'All', last7DaysLabel: 'Last 7 days',
       dateFilterMore: 'More', dateFilterLess: 'Less', practicingBadge: 'Practicing',
@@ -987,8 +988,10 @@ md文件内容如下（或已上传）：
   const selectModeBtn=$('selectModeBtn'), selectModeBar=$('selectModeBar'), selectAllChk=$('selectAllChk');
   const selectedCountLabel=$('selectedCountLabel'), bulkDeleteBtn=$('bulkDeleteBtn');
   const wordOrderDefaultBtn=$('wordOrderDefaultBtn'), wordOrderReverseBtn=$('wordOrderReverseBtn'), wordOrderShuffleBtn=$('wordOrderShuffleBtn');
+  const wordOrderShuffleIcon=$('wordOrderShuffleIcon'), shuffleHintLabel=$('shuffleHintLabel');
   let wordListOrder='default'; // 'default' | 'reverse' | 'shuffle'
   let shuffleOrderIds=[];
+  let shuffleSpinDeg=0;
   function reshuffleWordOrder(){
     const ids = currentWordList().map(w=>w.id);
     for(let i=ids.length-1;i>0;i--){
@@ -996,11 +999,14 @@ md文件内容如下（或已上传）：
       [ids[i],ids[j]] = [ids[j],ids[i]];
     }
     shuffleOrderIds = ids;
+    shuffleSpinDeg += 360;
+    wordOrderShuffleIcon.style.transform = `rotate(${shuffleSpinDeg}deg)`;
   }
   function updateWordOrderButtons(){
     wordOrderDefaultBtn.classList.toggle('active', wordListOrder==='default');
     wordOrderReverseBtn.classList.toggle('active', wordListOrder==='reverse');
     wordOrderShuffleBtn.classList.toggle('active', wordListOrder==='shuffle');
+    shuffleHintLabel.style.display = wordListOrder==='shuffle' ? '' : 'none';
   }
   let selectMode=false;
   const selectedWordIds=new Set();
