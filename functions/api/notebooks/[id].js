@@ -46,6 +46,9 @@ export async function onRequestDelete({ request, env, params }) {
     env.DB.prepare(
       'DELETE FROM practice_log WHERE user_id=? AND word_id IN (SELECT id FROM words WHERE notebook_id=? AND user_id=?)'
     ).bind(user, id, user),
+    env.DB.prepare(
+      'DELETE FROM word_images WHERE user_id=? AND word_id IN (SELECT id FROM words WHERE notebook_id=? AND user_id=?)'
+    ).bind(user, id, user),
     env.DB.prepare('DELETE FROM words WHERE notebook_id=? AND user_id=?').bind(id, user),
     env.DB.prepare('DELETE FROM notebooks WHERE id=? AND user_id=?').bind(id, user),
   ]);

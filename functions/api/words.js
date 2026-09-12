@@ -70,6 +70,9 @@ export async function onRequestDelete({ request, env }) {
     env.DB.prepare(
       'DELETE FROM practice_log WHERE user_id=? AND mode=? AND word_id IN (SELECT id FROM words WHERE user_id=? AND mode=? AND notebook_id=?)'
     ).bind(user, mode, user, mode, notebookId),
+    env.DB.prepare(
+      'DELETE FROM word_images WHERE user_id=? AND mode=? AND word_id IN (SELECT id FROM words WHERE user_id=? AND mode=? AND notebook_id=?)'
+    ).bind(user, mode, user, mode, notebookId),
     env.DB.prepare('DELETE FROM words WHERE user_id=? AND mode=? AND notebook_id=?').bind(user, mode, notebookId),
   ]);
   return Response.json({ ok: true });

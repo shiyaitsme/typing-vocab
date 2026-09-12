@@ -55,6 +55,7 @@ export async function onRequestDelete({ request, env, params }) {
 
   await env.DB.batch([
     env.DB.prepare('DELETE FROM practice_log WHERE word_id=? AND user_id=? AND mode=?').bind(id, user, mode),
+    env.DB.prepare('DELETE FROM word_images WHERE word_id=? AND user_id=? AND mode=?').bind(id, user, mode),
     env.DB.prepare('DELETE FROM words WHERE id=? AND user_id=? AND mode=?').bind(id, user, mode),
   ]);
   return Response.json({ ok: true });

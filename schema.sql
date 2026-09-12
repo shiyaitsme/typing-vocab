@@ -72,3 +72,21 @@ CREATE TABLE IF NOT EXISTS history_batches (
   UNIQUE(user_id, mode, date)
 );
 CREATE INDEX IF NOT EXISTS idx_history_user_mode ON history_batches(user_id, mode, date);
+
+-- One row per image embedded in a word's note. Images are NOT stored inline in
+-- words.notes: the note HTML only ever holds <img data-img-id="123"> and the bytes live
+-- here, fetched on demand via GET /api/images/:id. That keeps GET /api/words (which
+-- returns every word of a notebook, notes included) small no matter how many photos the
+-- user attaches — inlining base64 there would make the whole word list download every
+-- image up front. `data` is standard base64 (no "data:" prefix); D1 caps a single row at
+-- ~2MB, and the client downscales/compresses before upload, so one image stays well under.
+CREATE TABLE IF NOT EXISTS word_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL,
+  mode TEXT NOT NULL CHECK(mode IN ('ko','en')),
+  word_id INTEGER NOT NULL,
+  mime TEXT NOT NULL DEFAULT 'image/jpeg',
+  data TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_word_images_word ON word_images(user_id, mode, word_id);

@@ -70,6 +70,12 @@
   .note-swatch-fg{all:unset;cursor:pointer;width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 2px #f2ede2,0 0 0 3px rgba(10,10,10,.08);transition:transform .12s ease;box-sizing:border-box;flex-shrink:0;}
   .note-swatch-fg:hover{transform:translateY(-2px);}
   #notesClearFormatBtn:hover{opacity:.75;}
+  #notesImageBtn:hover{opacity:.75;}
+  #notesImageBtn[disabled]{opacity:.35;cursor:not-allowed;}
+  /* Note images are block-level so a caret can always be placed above/below one — an
+     inline image at the very start or end of a contenteditable is otherwise impossible
+     to type past. max-width keeps a 1280px upload inside the panel on any screen. */
+  #notesPanelTextarea img{display:block;max-width:100%;height:auto;border-radius:12px;margin:10px 0;box-shadow:0 1px 4px rgba(10,10,10,.12);}
 </style>
 </head>
 <body>
@@ -193,6 +199,8 @@
             </div>
           </div>
           <div style="flex:1;"></div>
+          <button id="notesImageBtn" data-i18n-title="notesImageBtn" title="사진 추가" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;border:1.5px solid rgba(10,10,10,.15);color:#0a0a0a;border-radius:999px;padding:5.5px 13px;font-size:11px;font-weight:700;letter-spacing:.06em;box-sizing:border-box;transition:opacity .12s ease;"><span style="font-size:12px;">📷</span><span data-i18n="notesImageBtn">사진</span></button>
+          <input type="file" id="notesImageFileInput" accept="image/*" style="display:none;">
           <button id="notesClearFormatBtn" title="서식 지우기" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;background:#0a0a0a;color:#f2ede2;border-radius:999px;padding:7px 13px;font-size:11px;font-weight:700;letter-spacing:.06em;box-sizing:border-box;transition:opacity .12s ease;"><span style="font-size:12px;">⟲</span><span data-i18n="notesClearFormat">서식 지우기</span></button>
         </div>
         <div id="notesPanelTextarea" contenteditable="true" data-i18n-placeholder="notesPlaceholder" placeholder="여기에 메모를 입력하세요..." style="flex:1;min-height:0;width:100%;background:#fff;color:#1a1a1a;padding:20px 22px;font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.85;border-radius:16px;box-sizing:border-box;outline:none;overflow-y:auto;box-shadow:inset 0 0 0 1px rgba(10,10,10,.05);"></div>
@@ -724,6 +732,10 @@ md文件内容如下（或已上传）：
       importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
       importSuccessMerged: ' 이미 있던 단어 {{merged}}개는 뜻을 합쳤습니다.',
       notesDesc: '예문, 관련 지식 등을 자유롭게 적어두세요.', notesPlaceholder: '여기에 메모를 입력하세요...', saveBtn: '저장', notesClearFormat: '서식 지우기',
+      notesImageBtn: '사진', notesImagePreview: '📷 사진',
+      notesImageOffline: '오프라인 상태에서는 사진을 추가할 수 없습니다. 연결이 복구된 뒤에 다시 시도해 주세요.',
+      notesImageTooLarge: '사진이 너무 큽니다. 더 작은 사진을 선택해 주세요.',
+      notesImageFailed: '사진 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.',
       whoAmITitle: '👋 이름을 알려주세요',
       whoAmIDesc: '이 이름으로 당신의 단어장을 클라우드에 저장합니다. 다음에 같은 기기에서 열면 자동으로 기억됩니다.',
       namePlaceholder: '예: shiya', startBtn: '시작하기',
@@ -803,6 +815,10 @@ md文件内容如下（或已上传）：
       importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
       importSuccessMerged: ' {{merged}} existing word(s) had their meanings merged.',
       notesDesc: 'Feel free to jot down example sentences or related notes.', notesPlaceholder: 'Type your notes here...', saveBtn: 'Save', notesClearFormat: 'Clear formatting',
+      notesImageBtn: 'Photo', notesImagePreview: '📷 Photo',
+      notesImageOffline: "Can't add photos while offline. Try again once the connection is back.",
+      notesImageTooLarge: 'That photo is too large. Please pick a smaller one.',
+      notesImageFailed: 'Photo upload failed. Please try again in a moment.',
       whoAmITitle: "👋 What's your name?",
       whoAmIDesc: "Your word list will be saved to the cloud under this name. It'll be remembered automatically next time on this device.",
       namePlaceholder: 'e.g. shiya', startBtn: 'Get Started',
@@ -1018,6 +1034,7 @@ md文件内容如下（或已上传）：
   let visibleWordIds=[];
   let lastRenderedEntries=[];
   const notesBtn=$('notesBtn'), notesPanelTextarea=$('notesPanelTextarea'), notesPanelSaveBtn=$('notesPanelSaveBtn'), notesPanelWordLabel=$('notesPanelWordLabel');
+  const notesImageBtn=$('notesImageBtn'), notesImageFileInput=$('notesImageFileInput');
   const notesClearFormatBtn=$('notesClearFormatBtn');
   const notesPanel=$('notesPanel'), practiceCard=$('practiceCard');
   // notes panel must never grow/shrink the row on its own (long notes just scroll internally) —
@@ -1051,6 +1068,8 @@ md文件内容如下（或已上传）：
   function apiNotebooksUrl(m){ return `/api/notebooks?user=${encodeURIComponent(userId)}&mode=${m}`; }
   function apiNotebookUrl(id){ return `/api/notebooks/${id}?user=${encodeURIComponent(userId)}`; }
   function apiPracticeLogUrl(m){ return `/api/practice-log?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiImagesUrl(m){ return `/api/images?user=${encodeURIComponent(userId)}&mode=${m}`; }
+  function apiImageUrl(id, m){ return `/api/images/${id}?user=${encodeURIComponent(userId)}&mode=${m}`; }
 
   let cloudWarningKey = null;
   function showCloudWarning(key){
@@ -1141,6 +1160,22 @@ md文件内容如下（或已上传）：
       fetch(apiPracticeLogUrl(m), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ wordId, date: d }) })
         .catch(err=>{ console.error('cloud practice log failed', err); });
     }
+  }
+  // Note images live in their own table, so they are uploaded once (returning the id that
+  // goes into the note HTML) and deleted only when the note that referenced them is saved
+  // without them — see saveCurrentNotes().
+  async function uploadNoteImageRemote(m, wordId, mime, base64){
+    const res = await fetch(apiImagesUrl(m), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ wordId, mime, data: base64 })
+    });
+    if(!res.ok) throw new Error('image upload failed: '+res.status);
+    return res.json();
+  }
+  function deleteNoteImageRemote(id, m){
+    if(!cloudOk || !(id>0)) return;
+    fetch(apiImageUrl(id, m), { method:'DELETE' })
+      .catch(err=>{ console.error('cloud delete image failed', err); });
   }
   function deleteWordRemote(id, m){
     if(!cloudOk || id<0) return;
@@ -1302,13 +1337,25 @@ md文件内容如下（或已上传）：
   // notes are stored as sanitized HTML (only span/b/i/u/br/div with color/background-color styles survive)
   // so selected text can carry a highlight color or font color; noteHtmlToText() strips markup back
   // down to plain text for search/preview/hasNotes checks that only care about the words themselves.
-  const NOTE_ALLOWED_TAGS = new Set(['SPAN','B','STRONG','I','EM','U','BR','DIV']);
+  // <img> survives too, but ONLY as <img data-img-id="123"> — the src is stripped on save and
+  // rebuilt at render time by hydrateNoteImages(), so no image bytes are ever stored in
+  // words.notes (which every /api/words load pulls down in full). See schema.sql's word_images.
+  const NOTE_ALLOWED_TAGS = new Set(['SPAN','B','STRONG','I','EM','U','BR','DIV','IMG']);
   function sanitizeNoteHtml(html){
     const tmp = document.createElement('div');
     tmp.innerHTML = html || '';
     (function walk(node){
       Array.from(node.childNodes).forEach(child=>{
         if(child.nodeType===1){
+          if(child.tagName==='IMG'){
+            // An <img> carries no text, so a bad one is removed outright rather than
+            // unwrapped the way a disallowed <a> or <table> is.
+            const imgId = parseInt(child.getAttribute('data-img-id'), 10);
+            if(!Number.isFinite(imgId) || imgId<=0){ node.removeChild(child); return; }
+            Array.from(child.attributes).forEach(attr=>child.removeAttribute(attr.name));
+            child.setAttribute('data-img-id', String(imgId));
+            return;
+          }
           if(!NOTE_ALLOWED_TAGS.has(child.tagName)){
             while(child.firstChild) node.insertBefore(child.firstChild, child);
             node.removeChild(child);
@@ -1338,16 +1385,43 @@ md文件内容如下（或已上传）：
     tmp.innerHTML = html;
     return tmp.textContent || '';
   }
+  function noteImageIds(html){
+    if(!html) return [];
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return Array.from(tmp.querySelectorAll('img[data-img-id]'))
+      .map(img=>parseInt(img.getAttribute('data-img-id'), 10))
+      .filter(id=>Number.isFinite(id) && id>0);
+  }
+  // A note with only a photo in it still counts as a note — checking noteHtmlToText()
+  // alone would read it as blank, and saveCurrentNotes() would then erase it.
+  function noteHasContent(html){
+    return !!(html && (noteHtmlToText(html).trim() || noteImageIds(html).length));
+  }
+  // Turns the stored <img data-img-id="N"> back into something the browser can display.
+  // The response is immutably cached, so re-opening a word doesn't re-download its photos.
+  function hydrateNoteImages(root, m){
+    root.querySelectorAll('img[data-img-id]').forEach(img=>{
+      img.src = apiImageUrl(img.getAttribute('data-img-id'), m || mode);
+      img.loading = 'lazy';
+      img.alt = '';
+      img.draggable = false;
+    });
+  }
 
   function updateNotesBtn(){
     const w = currentWordObj();
-    const hasNotes = !!(w && w.notes && noteHtmlToText(w.notes).trim());
+    const hasNotes = !!(w && noteHasContent(w.notes));
     notesBtn.style.background = hasNotes ? '#0a0a0a' : 'transparent';
     notesBtn.style.color = hasNotes ? '#e3b8d6' : '#0a0a0a';
     notesPanelWordLabel.textContent = w ? w.word : '';
     notesPanelTextarea.innerHTML = w ? (w.notes || '') : '';
+    hydrateNoteImages(notesPanelTextarea);
     notesPanelTextarea.contentEditable = w ? 'true' : 'false';
     notesPanelTextarea.style.opacity = w ? '1' : '.5';
+    // A photo has to be uploaded against a real cloud row, so the button is off for
+    // local-only words (negative ids) and while the cloud is unreachable.
+    notesImageBtn.disabled = !(w && cloudOk && w.id>0) || noteImageUploading;
   }
 
   function focusNotesPanel(){
@@ -1362,6 +1436,97 @@ md文件内容如下（或已上传）：
     notesPanelTextarea.focus();
     try{ document.execCommand('styleWithCSS', false, true); }catch(e){}
     document.execCommand(cmd, false, value || null);
+  }
+
+  // Photos in notes: downscale + re-encode in the browser (the same trick the notebook
+  // cover crop uses), upload the bytes to word_images, then drop only the returned id into
+  // the note HTML. 1280px at q0.82 lands around 100-300KB for a phone photo.
+  const NOTE_IMAGE_MAX_DIM = 1280;
+  // Keep in step with MAX_IMAGE_B64_LENGTH in functions/api/images.js — ~1MB of image,
+  // comfortably inside D1's ~2MB per-row ceiling.
+  const NOTE_IMAGE_MAX_B64 = 1400000;
+  let noteImageUploading = false;
+  let savedNoteRange = null;
+
+  function rememberNoteCaret(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0) return;
+    const range = sel.getRangeAt(0);
+    if(notesPanelTextarea.contains(range.commonAncestorContainer)) savedNoteRange = range.cloneRange();
+  }
+
+  function compressNoteImage(file){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onerror = ()=>reject(new Error('image read failed'));
+      reader.onload = ()=>{
+        const img = new Image();
+        img.onerror = ()=>reject(new Error('image decode failed'));
+        img.onload = ()=>{
+          const scale = Math.min(1, NOTE_IMAGE_MAX_DIM/Math.max(img.naturalWidth, img.naturalHeight));
+          const w = Math.max(1, Math.round(img.naturalWidth*scale));
+          const h = Math.max(1, Math.round(img.naturalHeight*scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          // JPEG has no alpha channel — without this a transparent PNG comes out black.
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          let quality = 0.82;
+          let dataUrl = canvas.toDataURL('image/jpeg', quality);
+          while(dataUrl.length > NOTE_IMAGE_MAX_B64 && quality > 0.4){
+            quality -= 0.15;
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+          }
+          resolve(dataUrl);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function insertNoteImage(id){
+    notesPanelTextarea.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    if(savedNoteRange && notesPanelTextarea.contains(savedNoteRange.commonAncestorContainer)){
+      range.setStart(savedNoteRange.startContainer, savedNoteRange.startOffset);
+      range.collapse(true);
+    } else {
+      range.selectNodeContents(notesPanelTextarea);
+      range.collapse(false);
+    }
+    sel.removeAllRanges();
+    sel.addRange(range);
+    savedNoteRange = null;
+    // The trailing <br> leaves somewhere to type once the image is in — a block image at
+    // the very end of a contenteditable is otherwise impossible to get a caret past.
+    document.execCommand('insertHTML', false, `<img data-img-id="${id}" src="${apiImageUrl(id, mode)}"><br>`);
+  }
+
+  async function addNoteImage(file){
+    const w = currentWordObj();
+    if(!w || noteImageUploading) return;
+    if(!cloudOk || !(w.id>0)){ alert(t('notesImageOffline')); return; }
+    noteImageUploading = true;
+    notesImageBtn.disabled = true;
+    try{
+      const dataUrl = await compressNoteImage(file);
+      if(dataUrl.length > NOTE_IMAGE_MAX_B64){ alert(t('notesImageTooLarge')); return; }
+      const base64 = dataUrl.slice(dataUrl.indexOf(',')+1);
+      const saved = await uploadNoteImageRemote(mode, w.id, 'image/jpeg', base64);
+      insertNoteImage(saved.id);
+      // Save straight away: the bytes are already in word_images, so leaving the note
+      // unsaved would strand a row nothing references.
+      saveCurrentNotes();
+    }catch(err){
+      console.error('note image upload failed', err);
+      alert(t('notesImageFailed'));
+    }finally{
+      noteImageUploading = false;
+      notesImageBtn.disabled = !(currentWordObj() && cloudOk && currentWordObj().id>0);
+    }
   }
 
   let editingWordId = null;
@@ -1399,7 +1564,10 @@ md文件内容如下（或已上传）：
     const w = currentWordObj();
     if(!w) return;
     const clean = sanitizeNoteHtml(notesPanelTextarea.innerHTML).trim();
-    w.notes = noteHtmlToText(clean).trim() ? clean : '';
+    const idsBefore = noteImageIds(w.notes);
+    w.notes = noteHasContent(clean) ? clean : '';
+    const idsAfter = new Set(noteImageIds(w.notes));
+    idsBefore.forEach(id=>{ if(!idsAfter.has(id)) deleteNoteImageRemote(id, mode); });
     patchWordRemote(w.id, mode, {notes:w.notes});
     updateNotesBtn();
     renderActiveDrawerView();
@@ -1581,7 +1749,7 @@ md文件内容如下（或已上传）：
     list.forEach((item,index)=>{
       if(favoritesOnly && !item.favorite) return;
       const notesPlain = noteHtmlToText(item.notes).trim();
-      const hasNotes = !!notesPlain;
+      const hasNotes = noteHasContent(item.notes);
       if(notesOnly && !hasNotes) return;
       if(wrongOnly && !(item.wrongCount>0)) return;
       const sub = mode==='ko' ? item.roman : item.meaning;
@@ -1685,10 +1853,10 @@ md文件内容如下（或已上传）：
     mainSpan.textContent = mainText;
     textStack.appendChild(mainSpan);
     if(subText){ const subSpan=document.createElement('span'); subSpan.style.cssText='font-size:13px;color:rgba(var(--ink-rgb),.5);'; subSpan.textContent=subText; textStack.appendChild(subSpan); }
-    if(hasNotes && notesText){
+    if(hasNotes){
       const notePreview=document.createElement('span');
       notePreview.style.cssText='font-size:11px;color:rgba(var(--ink-rgb),.4);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-      const flat = notesText.trim().replace(/\s+/g,' ');
+      const flat = (notesText||'').trim().replace(/\s+/g,' ') || t('notesImagePreview');
       notePreview.textContent = flat.length>36 ? flat.slice(0,36)+'…' : flat;
       textStack.appendChild(notePreview);
     }
@@ -2726,8 +2894,25 @@ md文件内容如下（或已上传）：
   notesPanelSaveBtn.addEventListener('click', saveCurrentNotes);
   notesPanelTextarea.addEventListener('paste', (e)=>{
     e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    const clip = e.clipboardData || window.clipboardData;
+    // A screenshot on the clipboard arrives as a file — send it through the same upload
+    // path instead of pasting nothing, which is what the plain-text branch would do.
+    const imageFile = clip && clip.files && Array.from(clip.files).find(f=>f.type.startsWith('image/'));
+    if(imageFile){ rememberNoteCaret(); addNoteImage(imageFile); return; }
+    const text = clip.getData('text/plain');
     document.execCommand('insertText', false, text);
+  });
+  notesPanelTextarea.addEventListener('keyup', rememberNoteCaret);
+  notesPanelTextarea.addEventListener('mouseup', rememberNoteCaret);
+  notesImageBtn.addEventListener('mousedown', e=>e.preventDefault());
+  notesImageBtn.addEventListener('click', ()=>{
+    rememberNoteCaret();
+    notesImageFileInput.click();
+  });
+  notesImageFileInput.addEventListener('change', ()=>{
+    const file = notesImageFileInput.files && notesImageFileInput.files[0];
+    notesImageFileInput.value='';
+    if(file) addNoteImage(file);
   });
   document.querySelectorAll('#notesToolbar .note-swatch-hl[data-hl]').forEach(btn=>{
     btn.addEventListener('mousedown', e=>e.preventDefault());
