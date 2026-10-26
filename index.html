@@ -62,6 +62,7 @@
   @media (max-width: 899.98px){
     .side-card{flex:1 1 100% !important;max-width:620px !important;width:100%;}
   }
+  #heroSearchForm:focus-within{border-color:var(--accent);}
   #notesPanelTextarea:empty:before{content:attr(placeholder);color:rgba(10,10,10,.35);}
   #notesPanelTextarea{scrollbar-width:none;}
   #notesPanelTextarea::-webkit-scrollbar{display:none;}
@@ -121,9 +122,10 @@
       <h1 id="heroTitle" data-i18n="heroTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
       <p id="heroDesc" data-i18n="heroDesc" style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(var(--ink-rgb),.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
     </div>
-    <form id="heroSearchForm" style="display:flex;gap:8px;margin:26px 0 0;max-width:520px;">
-      <input type="text" id="heroSearchInput" data-i18n-placeholder="heroSearchPlaceholder" placeholder="사전에서 단어 검색 → 단어장에 추가" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:12px 18px;font-size:14px;border-radius:100px;font-family:inherit;box-sizing:border-box;outline:none;">
-      <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;flex:none;padding:12px 22px;background:var(--accent);color:var(--accent-ink);font-size:12px;letter-spacing:.03em;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
+    <form id="heroSearchForm" style="display:flex;align-items:center;gap:8px;margin:28px 0 0;width:100%;padding:6px 6px 6px 22px;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.2);border-radius:100px;">
+      <span aria-hidden="true" style="flex:none;font-size:15px;color:rgba(var(--ink-rgb),.4);">⌕</span>
+      <input type="text" id="heroSearchInput" data-i18n-placeholder="heroSearchPlaceholder" placeholder="사전에서 단어 검색 → 단어장에 추가" autocomplete="off" style="flex:1;min-width:0;background:transparent;border:none;color:rgb(var(--ink-rgb));padding:10px 0;font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;">
+      <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;flex:none;padding:12px 28px;background:var(--accent);color:var(--accent-ink);font-size:12px;letter-spacing:.03em;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
     </form>
     <div aria-hidden="true" style="position:relative;height:clamp(120px,16vw,190px);margin-top:32px;overflow:hidden;">
       <div style="position:absolute;top:9px;left:9px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(var(--accent-rgb),.22);">HANGUL</div>
@@ -143,16 +145,16 @@
 
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:stretch;margin-top:-18px;position:relative;">
       <!-- PRACTICE CARD -->
-      <div id="practiceCard" style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
-          <div>
+      <div id="practiceCard" style="flex:1 1 520px;min-width:0;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px 12px;flex-wrap:wrap;margin-bottom:22px;">
+          <div style="min-width:0;">
             <div style="display:flex;align-items:baseline;gap:10px;">
               <div id="pageCounter" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;letter-spacing:-.01em;"></div>
               <div id="pageBadge" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:9.5px;letter-spacing:.06em;color:rgba(10,10,10,.45);border:1px solid rgba(10,10,10,.2);padding:2px 6px;border-radius:2px;"></div>
             </div>
             <div id="masteryDots" style="display:flex;gap:4px;margin-top:6px;"></div>
           </div>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
             <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📝</button>
             <button id="editWordBtn" data-i18n-title="editWordTitle" title="단어 수정" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
