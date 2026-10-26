@@ -62,7 +62,10 @@
   @media (max-width: 899.98px){
     .side-card{flex:1 1 100% !important;max-width:620px !important;width:100%;}
   }
-  #heroSearchForm:focus-within{border-color:var(--accent);}
+  @media (max-width:560px){.hero-enter-hint{display:none;}
+    #heroSearchForm{padding-left:18px !important;gap:8px !important;}
+    #heroSearchForm button{padding:14px 20px !important;}
+    #heroSearchInput{font-size:15px !important;}}
   #notesPanelTextarea:empty:before{content:attr(placeholder);color:rgba(10,10,10,.35);}
   #notesPanelTextarea{scrollbar-width:none;}
   #notesPanelTextarea::-webkit-scrollbar{display:none;}
@@ -122,11 +125,20 @@
       <h1 id="heroTitle" data-i18n="heroTitle" style="margin:0;font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(28px,4vw,48px);line-height:1.05;letter-spacing:-.02em;max-width:600px;">타자로 배우는<br>한글 &amp; 영어</h1>
       <p id="heroDesc" data-i18n="heroDesc" style="margin:0 0 6px;max-width:320px;font-size:12.5px;line-height:1.7;color:rgba(var(--ink-rgb),.55);font-weight:500;">매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.</p>
     </div>
-    <form id="heroSearchForm" style="display:flex;align-items:center;gap:8px;margin:28px 0 0;width:100%;padding:6px 6px 6px 22px;background:var(--input-bg);border:1.5px solid rgba(var(--ink-rgb),.2);border-radius:100px;">
-      <span aria-hidden="true" style="flex:none;font-size:15px;color:rgba(var(--ink-rgb),.4);">⌕</span>
-      <input type="text" id="heroSearchInput" data-i18n-placeholder="heroSearchPlaceholder" placeholder="사전에서 단어 검색 → 단어장에 추가" autocomplete="off" style="flex:1;min-width:0;background:transparent;border:none;color:rgb(var(--ink-rgb));padding:10px 0;font-size:15px;font-family:inherit;box-sizing:border-box;outline:none;">
-      <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;flex:none;padding:12px 28px;background:var(--accent);color:var(--accent-ink);font-size:12px;letter-spacing:.03em;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
+    <!-- 搜索框通栏、加高、带强调色描边，右缘与下方练习卡/笔记面板的内容宽度对齐；下面一行放最近搜索和来源提示，填掉原来右侧的空位。 -->
+    <form id="heroSearchForm" style="display:flex;align-items:center;gap:12px;margin:30px 0 0;width:100%;padding:8px 8px 8px 26px;background:var(--input-bg);border:2px solid var(--accent);border-radius:100px;box-sizing:border-box;">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+      <input type="text" id="heroSearchInput" data-i18n-placeholder="heroSearchPlaceholder" placeholder="사전에서 단어 검색 → 단어장에 추가" autocomplete="off" style="flex:1;min-width:0;background:transparent;border:none;color:rgb(var(--ink-rgb));padding:14px 0;font-size:18px;font-weight:500;font-family:inherit;box-sizing:border-box;outline:none;">
+      <span class="hero-enter-hint" aria-hidden="true" style="flex:none;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(var(--ink-rgb),.55);border:1px solid rgba(var(--ink-rgb),.25);border-radius:6px;padding:4px 8px;">Enter</span>
+      <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;flex:none;padding:16px 34px;background:var(--accent);color:var(--accent-ink);font-size:13.5px;letter-spacing:.03em;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
     </form>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;margin-top:14px;padding:0 6px;">
+      <div id="heroRecent" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span data-i18n="heroRecentLabel" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.5);margin-right:4px;">최근</span>
+        <span id="heroRecentChips" style="display:contents;"></span>
+      </div>
+      <span data-i18n="heroSearchHint" style="font-size:11.5px;color:rgba(var(--ink-rgb),.5);">한국어기초사전 · 결과에서 단어장을 골라 추가</span>
+    </div>
     <div aria-hidden="true" style="position:relative;height:clamp(120px,16vw,190px);margin-top:32px;overflow:hidden;">
       <div style="position:absolute;top:9px;left:9px;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1px rgba(var(--accent-rgb),.22);">HANGUL</div>
       <div style="position:absolute;top:0;left:0;white-space:nowrap;font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(56px,10vw,140px);line-height:1;letter-spacing:-.02em;color:transparent;-webkit-text-stroke:1.5px rgba(var(--ink-rgb),.16);">HANGUL</div>
@@ -792,7 +804,7 @@ md文件内容如下（或已上传）：
       dictTitle: '사전', dictLookupNewWord: '사전에서 뜻 찾기', dictModalTitle: '📖 한국어 사전',
       dictSearchPlaceholder: '찾을 단어', dictSearchBtn: '검색', dictCloseBtn: '닫기',
       dictLoading: '검색 중...', dictNoResult: '검색 결과가 없습니다.', dictFailed: '사전에 연결할 수 없습니다.',
-      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictAddBtn: '+ 단어장에 추가', dictAdded: '✓ 추가됨', dictPickNotebook: '추가할 단어장', heroSearchPlaceholder: '사전에서 단어 검색 → 단어장에 추가', dictSourceKrdict: '출처: 국립국어원 한국어기초사전', dictSourceFallback: '출처: Wiktionary (한국어기초사전에 없는 단어 — 영어 뜻만 제공)',
+      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictAddBtn: '+ 단어장에 추가', dictAdded: '✓ 추가됨', dictPickNotebook: '추가할 단어장', heroSearchPlaceholder: '사전에서 단어 검색 → 단어장에 추가', heroRecentLabel: '최근', heroSearchHint: '한국어기초사전 · 결과에서 단어장을 골라 추가', dictSourceKrdict: '출처: 국립국어원 한국어기초사전', dictSourceFallback: '출처: Wiktionary (한국어기초사전에 없는 단어 — 영어 뜻만 제공)',
       dictSourceWiktionary: '출처: Wiktionary (영어 뜻만 제공 — 한국어기초사전 키를 설정하면 중국어 뜻도 나옵니다)',
       footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
     },
@@ -880,7 +892,7 @@ md文件内容如下（或已上传）：
       dictTitle: 'Dictionary', dictLookupNewWord: 'Look up in dictionary', dictModalTitle: '📖 Korean Dictionary',
       dictSearchPlaceholder: 'Word to look up', dictSearchBtn: 'Search', dictCloseBtn: 'Close',
       dictLoading: 'Searching...', dictNoResult: 'No results.', dictFailed: "Can't reach the dictionary.",
-      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictAddBtn: '+ Add to notebook', dictAdded: '✓ Added', dictPickNotebook: 'Add to notebook', heroSearchPlaceholder: 'Search the dictionary → add to a notebook', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)', dictSourceFallback: 'Source: Wiktionary (not in KRDict — English only)',
+      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictAddBtn: '+ Add to notebook', dictAdded: '✓ Added', dictPickNotebook: 'Add to notebook', heroSearchPlaceholder: 'Search the dictionary → add to a notebook', heroRecentLabel: 'Recent', heroSearchHint: 'KRDict · pick a notebook from the results to add', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)', dictSourceFallback: 'Source: Wiktionary (not in KRDict — English only)',
       dictSourceWiktionary: 'Source: Wiktionary (English only — set a KRDict key to also get Chinese meanings)',
       footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
     }
@@ -3156,7 +3168,24 @@ md文件内容如下（或已上传）：
   $('dictSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); runDictLookup(dictInput.value); });
   $('closeDictModalBtn').addEventListener('click', closeDict);
   dictOverlay.addEventListener('click',(e)=>{ if(e.target===dictOverlay) closeDict(); });
-  $('heroSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); const q=$('heroSearchInput').value.trim(); if(q) openDict('global', q); });
+  // 최근 검색은 기기 로컬에만 저장(계정 데이터 아님). localStorage가 막힌 환경에서도 검색 자체는 동작해야 하므로 전부 try/catch.
+  const HERO_RECENT_KEY='typingVocab.heroRecent';
+  function loadHeroRecent(){ try{ const a=JSON.parse(localStorage.getItem(HERO_RECENT_KEY)||'[]'); return Array.isArray(a)?a.filter(x=>typeof x==='string').slice(0,5):[]; }catch(_){ return []; } }
+  function pushHeroRecent(q){ try{ const a=[q,...loadHeroRecent().filter(x=>x!==q)].slice(0,5); localStorage.setItem(HERO_RECENT_KEY, JSON.stringify(a)); }catch(_){} }
+  function renderHeroRecent(){
+    const wrap=$('heroRecent'), box=$('heroRecentChips'), list=loadHeroRecent();
+    wrap.style.display=list.length?'flex':'none';
+    box.textContent='';
+    list.forEach(q=>{
+      const b=document.createElement('button'); b.type='button'; b.textContent=q;
+      b.style.cssText='all:unset;cursor:pointer;font-size:12.5px;padding:5px 12px;border:1px solid rgba(var(--ink-rgb),.22);border-radius:100px;box-sizing:border-box;';
+      b.addEventListener('click',()=>{ $('heroSearchInput').value=q; runHeroSearch(q); });
+      box.appendChild(b);
+    });
+  }
+  function runHeroSearch(q){ q=q.trim(); if(!q) return; pushHeroRecent(q); renderHeroRecent(); openDict('global', q); }
+  $('heroSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); runHeroSearch($('heroSearchInput').value); });
+  renderHeroRecent();
   $('dictBtn').addEventListener('click', ()=>{ const w=currentWordObj(); openDict('current', w?w.word:''); });
   $('newWordDictBtn').addEventListener('click', ()=>{ openDict('new', $('newWord').value.trim()); });
 
