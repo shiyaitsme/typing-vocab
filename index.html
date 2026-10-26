@@ -151,6 +151,7 @@
           <div style="display:flex;gap:8px;">
             <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
             <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
+            <button id="dictBtn" data-i18n-title="dictTitle" title="사전" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📖</button>
             <button id="restartBtn" data-i18n-title="restartTitle" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
           </div>
         </div>
@@ -232,7 +233,10 @@
         <span style="position:absolute;top:-10px;right:14px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:100px;background:var(--accent);color:var(--accent-ink);">NEW</span>
         <div data-i18n="addWordSectionTitle" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;color:rgba(var(--ink-rgb),.4);text-transform:uppercase;margin-bottom:10px;">단어 추가</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="width:100%;background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+          <div style="display:flex;gap:6px;">
+          <input type="text" id="newWord" data-i18n-placeholder="newWordPlaceholder" placeholder="단어 (한국어/english)" autocomplete="off" style="flex:1;min-width:0;background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
+          <button id="newWordDictBtn" data-i18n-title="dictLookupNewWord" title="사전에서 뜻 찾기" style="all:unset;cursor:pointer;flex:none;width:38px;text-align:center;border:1px solid rgba(var(--ink-rgb),.2);border-radius:2px;font-size:14px;box-sizing:border-box;">📖</button>
+          </div>
           <input type="text" id="newMeaning" data-i18n-placeholder="newMeaningPlaceholder" placeholder="뜻/로마자" autocomplete="off" style="width:100%;background:var(--bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 12px;font-size:12.5px;border-radius:2px;font-family:inherit;box-sizing:border-box;">
           <button id="addWordBtn" style="all:unset;cursor:pointer;width:100%;text-align:center;background:var(--accent);color:var(--accent-ink);padding:9px;font-weight:700;font-size:14px;border-radius:2px;box-sizing:border-box;">+ 추가</button>
         </div>
@@ -333,6 +337,22 @@
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="closeAiPromptModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">취소</button>
         <button id="copyAiPromptBtn" data-i18n="copyBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">복사하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICTIONARY MODAL -->
+  <div id="dictModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
+    <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:28px;width:100%;max-width:560px;max-height:min(720px,calc(100vh - 40px));border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:12px;box-sizing:border-box;">
+      <div data-i18n="dictModalTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">📖 한국어 사전</div>
+      <form id="dictSearchForm" style="display:flex;gap:8px;margin:0;">
+        <input type="text" id="dictSearchInput" data-i18n-placeholder="dictSearchPlaceholder" placeholder="찾을 단어" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 14px;font-size:14px;border-radius:100px;font-family:inherit;box-sizing:border-box;outline:none;">
+        <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
+      </form>
+      <div id="dictResults" style="flex:1;min-height:80px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;">
+        <div id="dictSource" style="font-size:10px;color:rgba(var(--ink-rgb),.45);line-height:1.5;"></div>
+        <button id="closeDictModalBtn" data-i18n="dictCloseBtn" style="all:unset;cursor:pointer;flex:none;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">닫기</button>
       </div>
     </div>
   </div>
@@ -753,6 +773,11 @@ md文件内容如下（或已上传）：
       reviewCategoryDone: '선택한 항목을 모두 학습했습니다! 🎉',
       cloudUnavailable: '클라우드에 연결할 수 없습니다 — 이번 세션의 변경사항은 저장되지 않습니다.',
       cloudSaveFailed: '클라우드 저장 실패 — 새로고침하면 방금 한 변경사항이 사라질 수 있습니다.',
+      dictTitle: '사전', dictLookupNewWord: '사전에서 뜻 찾기', dictModalTitle: '📖 한국어 사전',
+      dictSearchPlaceholder: '찾을 단어', dictSearchBtn: '검색', dictCloseBtn: '닫기',
+      dictLoading: '검색 중...', dictNoResult: '검색 결과가 없습니다.', dictFailed: '사전에 연결할 수 없습니다.',
+      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictSourceKrdict: '출처: 국립국어원 한국어기초사전',
+      dictSourceWiktionary: '출처: Wiktionary (영어 뜻만 제공 — 한국어기초사전 키를 설정하면 중국어 뜻도 나옵니다)',
       footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
     },
     en: {
@@ -836,6 +861,11 @@ md文件内容如下（或已上传）：
       reviewCategoryDone: "You've finished everything in this category! 🎉",
       cloudUnavailable: "Can't connect to the cloud — changes made this session won't be saved.",
       cloudSaveFailed: 'Cloud save failed — refreshing may lose your latest changes.',
+      dictTitle: 'Dictionary', dictLookupNewWord: 'Look up in dictionary', dictModalTitle: '📖 Korean Dictionary',
+      dictSearchPlaceholder: 'Word to look up', dictSearchBtn: 'Search', dictCloseBtn: 'Close',
+      dictLoading: 'Searching...', dictNoResult: 'No results.', dictFailed: "Can't reach the dictionary.",
+      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)',
+      dictSourceWiktionary: 'Source: Wiktionary (English only — set a KRDict key to also get Chinese meanings)',
       footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
     }
   };
@@ -2981,6 +3011,89 @@ md文件内容如下（或已上传）：
     wordIndex=currentWordCount()-1;
     loadWord();
   });
+
+
+  /* =========================================================
+   * Dictionary lookup (GET /api/dict, see functions/api/dict.js)
+   * Read-only: it never writes a word by itself. "뜻 사용" either fills the 단어 추가
+   * meaning box, or merges into the current word's meaning via the same per-id PATCH
+   * as every other edit.
+   * ======================================================= */
+  const dictOverlay=$('dictModalOverlay'), dictInput=$('dictSearchInput'), dictResultsEl=$('dictResults'), dictSourceEl=$('dictSource');
+  // 'new' = opened from the 단어 추가 box (fill its meaning input); 'current' = from the
+  // practice card (merge into the word being practiced).
+  let dictTarget = 'current', dictReqSeq = 0;
+  function dictEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function openDict(target, q){
+    dictTarget = target;
+    dictOverlay.style.opacity='1'; dictOverlay.style.pointerEvents='auto';
+    dictInput.value = q || '';
+    dictResultsEl.innerHTML=''; dictSourceEl.textContent='';
+    if(q) runDictLookup(q); else dictInput.focus();
+  }
+  function closeDict(){ dictOverlay.style.opacity='0'; dictOverlay.style.pointerEvents='none'; }
+  async function runDictLookup(q){
+    q=q.trim(); if(!q) return;
+    const seq=++dictReqSeq; // a slow earlier answer must not overwrite a newer search
+    dictResultsEl.innerHTML=`<div style="font-size:12px;color:rgba(var(--ink-rgb),.5);">${dictEsc(t('dictLoading'))}</div>`;
+    dictSourceEl.textContent='';
+    let data;
+    try{
+      const res = await fetch(`/api/dict?q=${encodeURIComponent(q)}`);
+      if(!res.ok) throw new Error('dict '+res.status);
+      data = await res.json();
+    } catch(err){
+      if(seq!==dictReqSeq) return;
+      dictResultsEl.innerHTML=`<div style="font-size:12px;color:var(--warn);">${dictEsc(t('dictFailed'))}</div>`;
+      return;
+    }
+    if(seq!==dictReqSeq) return;
+    dictSourceEl.textContent = t(data.source==='krdict' ? 'dictSourceKrdict' : 'dictSourceWiktionary');
+    if(!data.entries.length){
+      dictResultsEl.innerHTML=`<div style="font-size:12px;color:rgba(var(--ink-rgb),.5);">${dictEsc(t('dictNoResult'))}</div>`;
+      return;
+    }
+    // Chinese first for a Chinese UI user is not knowable here; show both, zh then en.
+    dictResultsEl.innerHTML = data.entries.map(e=>{
+      const head = `<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+        <span style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:16px;">${dictEsc(e.word)}${e.supNo?`<sup style="font-size:10px;">${e.supNo}</sup>`:''}</span>
+        ${e.pronunciation?`<span style="font-size:11px;color:rgba(var(--ink-rgb),.5);">[${dictEsc(e.pronunciation)}]</span>`:''}
+        ${e.pos?`<span style="font-size:10px;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;padding:1px 8px;">${dictEsc(e.pos)}</span>`:''}
+        ${e.grade&&e.grade!=='없음'?`<span style="font-size:10px;background:var(--accent);color:var(--accent-ink);border-radius:100px;padding:1px 8px;">${dictEsc(e.grade)}</span>`:''}</div>`;
+      const senses = e.senses.map((sn,i)=>{
+        const gloss = [sn.zh, sn.en].filter(Boolean).join(' / ');
+        return `<div style="display:flex;gap:10px;align-items:flex-start;padding-top:8px;">
+          <div style="flex:1;min-width:0;font-size:12.5px;line-height:1.6;">
+            <span style="color:rgba(var(--ink-rgb),.4);">${i+1}.</span> ${sn.definition?dictEsc(sn.definition):''}
+            ${gloss?`<div style="font-weight:700;">${dictEsc(gloss)}</div>`:''}
+            ${sn.zhDfn?`<div style="font-size:11px;color:rgba(var(--ink-rgb),.55);">${dictEsc(sn.zhDfn)}</div>`:''}
+          </div>
+          ${gloss?`<button class="dict-use-btn" data-gloss="${dictEsc(gloss)}" style="all:unset;cursor:pointer;flex:none;font-size:10.5px;font-weight:700;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;padding:6px 10px;box-sizing:border-box;">${dictEsc(t('dictUseBtn'))}</button>`:''}
+        </div>`;
+      }).join('');
+      return `<div style="border:1px solid rgba(var(--ink-rgb),.14);border-radius:16px;padding:14px 16px;background:var(--input-bg);">${head}${senses}</div>`;
+    }).join('');
+  }
+  function applyDictMeaning(gloss, btn){
+    if(dictTarget==='new'){
+      const inp=$('newMeaning');
+      inp.value = inp.value ? mergeMeaningLocal(inp.value, gloss) : gloss;
+    } else {
+      const w=currentWordObj(); if(!w) return;
+      const field=meaningField(mode);
+      const merged=mergeMeaningLocal(w[field], gloss);
+      if(merged!==w[field]){ w[field]=merged; patchWordRemote(w.id, mode, {[field]:merged}); render(); renderActiveDrawerView(); }
+    }
+    btn.textContent=t('dictUsed');
+  }
+  dictResultsEl.addEventListener('click',(e)=>{
+    const b=e.target.closest('.dict-use-btn'); if(b) applyDictMeaning(b.dataset.gloss, b);
+  });
+  $('dictSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); runDictLookup(dictInput.value); });
+  $('closeDictModalBtn').addEventListener('click', closeDict);
+  dictOverlay.addEventListener('click',(e)=>{ if(e.target===dictOverlay) closeDict(); });
+  $('dictBtn').addEventListener('click', ()=>{ const w=currentWordObj(); openDict('current', w?w.word:''); });
+  $('newWordDictBtn').addEventListener('click', ()=>{ openDict('new', $('newWord').value.trim()); });
 
   $('clearWordsBtn').addEventListener('click', ()=>{
     if(!confirm(t('clearConfirm'))) return;
