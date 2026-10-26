@@ -156,10 +156,7 @@
             <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
             <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📝</button>
             <button id="editWordBtn" data-i18n-title="editWordTitle" title="단어 수정" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
-<<<<<<< HEAD
             <button id="deleteWordBtn" data-i18n-title="deleteWordTitle" title="단어 삭제" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">🗑</button>
-=======
->>>>>>> origin/main
             <button id="dictBtn" data-i18n-title="dictTitle" title="사전" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📖</button>
             <button id="restartBtn" data-i18n-title="restartTitle" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
           </div>
@@ -358,13 +355,10 @@
         <input type="text" id="dictSearchInput" data-i18n-placeholder="dictSearchPlaceholder" placeholder="찾을 단어" autocomplete="off" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:10px 14px;font-size:14px;border-radius:100px;font-family:inherit;box-sizing:border-box;outline:none;">
         <button type="submit" data-i18n="dictSearchBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">검색</button>
       </form>
-<<<<<<< HEAD
-=======
       <label id="dictNotebookRow" style="display:none;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.03em;">
         <span data-i18n="dictPickNotebook" style="flex:none;color:rgba(var(--ink-rgb),.55);">추가할 단어장</span>
         <select id="dictNotebookSelect" style="flex:1;min-width:0;background:var(--input-bg);border:1px solid rgba(var(--ink-rgb),.2);color:rgb(var(--ink-rgb));padding:8px 12px;font-size:12.5px;border-radius:100px;font-family:inherit;box-sizing:border-box;outline:none;"></select>
       </label>
->>>>>>> origin/main
       <div id="dictResults" style="flex:1;min-height:80px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;"></div>
       <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;">
         <div id="dictSource" style="font-size:10px;color:rgba(var(--ink-rgb),.45);line-height:1.5;"></div>
@@ -715,11 +709,7 @@ md文件内容如下（或已上传）：
       renameTitle: '이름 변경',
       heroTitle: '타자로 배우는<br>한글 &amp; 영어',
       heroDesc: '매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.',
-<<<<<<< HEAD
       favTitle: '즐겨찾기', notesTitle: '노트', editWordTitle: '단어 수정', deleteWordTitle: '단어 삭제', restartTitle: '다시 시작',
-=======
-      favTitle: '즐겨찾기', notesTitle: '노트', editWordTitle: '단어 수정', restartTitle: '다시 시작',
->>>>>>> origin/main
       mobilePlaceholderStart: '여기를 눌러 입력을 시작하세요',
       mobilePlaceholderKo: '한국어 키보드로 입력하세요',
       mobileTipKo: '※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.',
@@ -797,11 +787,7 @@ md文件内容如下（或已上传）：
       dictTitle: '사전', dictLookupNewWord: '사전에서 뜻 찾기', dictModalTitle: '📖 한국어 사전',
       dictSearchPlaceholder: '찾을 단어', dictSearchBtn: '검색', dictCloseBtn: '닫기',
       dictLoading: '검색 중...', dictNoResult: '검색 결과가 없습니다.', dictFailed: '사전에 연결할 수 없습니다.',
-<<<<<<< HEAD
-      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictSourceKrdict: '출처: 국립국어원 한국어기초사전', dictSourceFallback: '출처: Wiktionary (한국어기초사전에 없는 단어 — 영어 뜻만 제공)',
-=======
       dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictAddBtn: '+ 단어장에 추가', dictAdded: '✓ 추가됨', dictPickNotebook: '추가할 단어장', heroSearchPlaceholder: '사전에서 단어 검색 → 단어장에 추가', dictSourceKrdict: '출처: 국립국어원 한국어기초사전', dictSourceFallback: '출처: Wiktionary (한국어기초사전에 없는 단어 — 영어 뜻만 제공)',
->>>>>>> origin/main
       dictSourceWiktionary: '출처: Wiktionary (영어 뜻만 제공 — 한국어기초사전 키를 설정하면 중국어 뜻도 나옵니다)',
       footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
     },
@@ -811,11 +797,7 @@ md文件内容如下（或已上传）：
       renameTitle: 'Rename',
       heroTitle: 'Learn Korean<br>&amp; English by Typing',
       heroDesc: "A little every day — memorize Korean and English words with your fingertips. Only words you truly learn stick.",
-<<<<<<< HEAD
       favTitle: 'Favorite', notesTitle: 'Notes', editWordTitle: 'Edit word', deleteWordTitle: 'Delete word', restartTitle: 'Restart',
-=======
-      favTitle: 'Favorite', notesTitle: 'Notes', editWordTitle: 'Edit word', restartTitle: 'Restart',
->>>>>>> origin/main
       mobilePlaceholderStart: 'Tap here to start typing',
       mobilePlaceholderKo: 'Type using a Korean keyboard',
       mobileTipKo: '※ In Korean mode, please use your phone\'s Korean keyboard.',
@@ -893,11 +875,7 @@ md文件内容如下（或已上传）：
       dictTitle: 'Dictionary', dictLookupNewWord: 'Look up in dictionary', dictModalTitle: '📖 Korean Dictionary',
       dictSearchPlaceholder: 'Word to look up', dictSearchBtn: 'Search', dictCloseBtn: 'Close',
       dictLoading: 'Searching...', dictNoResult: 'No results.', dictFailed: "Can't reach the dictionary.",
-<<<<<<< HEAD
-      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)', dictSourceFallback: 'Source: Wiktionary (not in KRDict — English only)',
-=======
       dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictAddBtn: '+ Add to notebook', dictAdded: '✓ Added', dictPickNotebook: 'Add to notebook', heroSearchPlaceholder: 'Search the dictionary → add to a notebook', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)', dictSourceFallback: 'Source: Wiktionary (not in KRDict — English only)',
->>>>>>> origin/main
       dictSourceWiktionary: 'Source: Wiktionary (English only — set a KRDict key to also get Chinese meanings)',
       footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
     }
@@ -2959,15 +2937,12 @@ md文件内容如下（或已上传）：
   $('editWordBtn').addEventListener('click', ()=>{
     const w=currentWordObj(); if(w) openEditWordModal(w);
   });
-<<<<<<< HEAD
   // 연습 카드의 삭제도 목록의 ✕와 같은 deleteWordAt(id 단행 삭제)을 탄다 — 확인창을
   // 거치는 것까지 똑같이 해서, 타이핑 중 실수로 눌러도 단어가 날아가지 않게 한다.
   $('deleteWordBtn').addEventListener('click', ()=>{
     const w=currentWordObj(); if(!w) return;
     if(confirm(t('deleteConfirm',{word:w.word}))) deleteWordAt(wordIndex);
   });
-=======
->>>>>>> origin/main
   notesPanelSaveBtn.addEventListener('click', saveCurrentNotes);
   notesPanelTextarea.addEventListener('paste', (e)=>{
     e.preventDefault();
@@ -3073,8 +3048,6 @@ md文件内容如下（或已上传）：
   function dictEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function openDict(target, q){
     dictTarget = target;
-<<<<<<< HEAD
-=======
     // 'global' = opened from the home-page search bar: senses are added to a notebook the
     // user picks here, instead of editing a word that's already on screen. The dictionary is
     // Korean, so the picker lists the 한국어 notebooks regardless of the current practice tab.
@@ -3086,7 +3059,6 @@ md文件内容如下（或已上传）：
       const want = [kept, String(currentNotebookIdByMode.ko)].find(v=>v && notebooks.ko.some(nb=>String(nb.id)===v));
       if(want) nbSel.value = want;
     }
->>>>>>> origin/main
     dictOverlay.style.opacity='1'; dictOverlay.style.pointerEvents='auto';
     dictInput.value = q || '';
     dictResultsEl.innerHTML=''; dictSourceEl.textContent='';
@@ -3129,19 +3101,12 @@ md文件内容如下（或已上传）：
             ${gloss?`<div style="font-weight:700;">${dictEsc(gloss)}</div>`:''}
             ${sn.zhDfn?`<div style="font-size:11px;color:rgba(var(--ink-rgb),.55);">${dictEsc(sn.zhDfn)}</div>`:''}
           </div>
-<<<<<<< HEAD
-          ${gloss?`<button class="dict-use-btn" data-gloss="${dictEsc(gloss)}" style="all:unset;cursor:pointer;flex:none;font-size:10.5px;font-weight:700;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;padding:6px 10px;box-sizing:border-box;">${dictEsc(t('dictUseBtn'))}</button>`:''}
-=======
           ${gloss?`<button class="dict-use-btn" data-gloss="${dictEsc(gloss)}" data-word="${dictEsc(e.word)}" style="all:unset;cursor:pointer;flex:none;font-size:10.5px;font-weight:700;border:1px solid rgba(var(--ink-rgb),.25);border-radius:100px;padding:6px 10px;box-sizing:border-box;">${dictEsc(t(dictTarget==='global'?'dictAddBtn':'dictUseBtn'))}</button>`:''}
->>>>>>> origin/main
         </div>`;
       }).join('');
       return `<div style="border:1px solid rgba(var(--ink-rgb),.14);border-radius:16px;padding:14px 16px;background:var(--input-bg);">${head}${senses}</div>`;
     }).join('');
   }
-<<<<<<< HEAD
-  function applyDictMeaning(gloss, btn){
-=======
   // Same create-or-merge rule as the 단어 추가 box and bulk import: a word already in the
   // chosen notebook gets the meaning merged into it (favorite/notes/SRS untouched), otherwise
   // a new row is created. Doesn't move the practice position — the user is searching, not
@@ -3169,7 +3134,6 @@ md文件内容如下（或已上传）：
   }
   function applyDictMeaning(gloss, btn){
     if(dictTarget==='global'){ addDictWordToNotebook(btn.dataset.word, gloss, btn); return; }
->>>>>>> origin/main
     if(dictTarget==='new'){
       const inp=$('newMeaning');
       inp.value = inp.value ? mergeMeaningLocal(inp.value, gloss) : gloss;
@@ -3187,10 +3151,7 @@ md文件内容如下（或已上传）：
   $('dictSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); runDictLookup(dictInput.value); });
   $('closeDictModalBtn').addEventListener('click', closeDict);
   dictOverlay.addEventListener('click',(e)=>{ if(e.target===dictOverlay) closeDict(); });
-<<<<<<< HEAD
-=======
   $('heroSearchForm').addEventListener('submit',(e)=>{ e.preventDefault(); const q=$('heroSearchInput').value.trim(); if(q) openDict('global', q); });
->>>>>>> origin/main
   $('dictBtn').addEventListener('click', ()=>{ const w=currentWordObj(); openDict('current', w?w.word:''); });
   $('newWordDictBtn').addEventListener('click', ()=>{ openDict('new', $('newWord').value.trim()); });
 
