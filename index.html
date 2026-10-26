@@ -152,6 +152,7 @@
             <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
             <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📝</button>
             <button id="editWordBtn" data-i18n-title="editWordTitle" title="단어 수정" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
+            <button id="deleteWordBtn" data-i18n-title="deleteWordTitle" title="단어 삭제" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">🗑</button>
             <button id="dictBtn" data-i18n-title="dictTitle" title="사전" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📖</button>
             <button id="restartBtn" data-i18n-title="restartTitle" title="다시 시작" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">↻</button>
           </div>
@@ -700,7 +701,7 @@ md文件内容如下（或已上传）：
       renameTitle: '이름 변경',
       heroTitle: '타자로 배우는<br>한글 &amp; 영어',
       heroDesc: '매일 조금씩, 손끝으로 외우는 한글과 영어 단어. 진짜로 익힌 단어만 남습니다.',
-      favTitle: '즐겨찾기', notesTitle: '노트', editWordTitle: '단어 수정', restartTitle: '다시 시작',
+      favTitle: '즐겨찾기', notesTitle: '노트', editWordTitle: '단어 수정', deleteWordTitle: '단어 삭제', restartTitle: '다시 시작',
       mobilePlaceholderStart: '여기를 눌러 입력을 시작하세요',
       mobilePlaceholderKo: '한국어 키보드로 입력하세요',
       mobileTipKo: '※ 한국어 모드일 때는 휴대폰의 한국어 키보드를 사용해 주세요.',
@@ -788,7 +789,7 @@ md文件内容如下（或已上传）：
       renameTitle: 'Rename',
       heroTitle: 'Learn Korean<br>&amp; English by Typing',
       heroDesc: "A little every day — memorize Korean and English words with your fingertips. Only words you truly learn stick.",
-      favTitle: 'Favorite', notesTitle: 'Notes', editWordTitle: 'Edit word', restartTitle: 'Restart',
+      favTitle: 'Favorite', notesTitle: 'Notes', editWordTitle: 'Edit word', deleteWordTitle: 'Delete word', restartTitle: 'Restart',
       mobilePlaceholderStart: 'Tap here to start typing',
       mobilePlaceholderKo: 'Type using a Korean keyboard',
       mobileTipKo: '※ In Korean mode, please use your phone\'s Korean keyboard.',
@@ -2927,6 +2928,12 @@ md文件内容如下（或已上传）：
   // 쓰므로 저장도 똑같이 id 단일 행 PATCH로 간다. 노트 버튼은 이 ✎와 헷갈리지 않게 📝로 바꿨다.
   $('editWordBtn').addEventListener('click', ()=>{
     const w=currentWordObj(); if(w) openEditWordModal(w);
+  });
+  // 연습 카드의 삭제도 목록의 ✕와 같은 deleteWordAt(id 단행 삭제)을 탄다 — 확인창을
+  // 거치는 것까지 똑같이 해서, 타이핑 중 실수로 눌러도 단어가 날아가지 않게 한다.
+  $('deleteWordBtn').addEventListener('click', ()=>{
+    const w=currentWordObj(); if(!w) return;
+    if(confirm(t('deleteConfirm',{word:w.word}))) deleteWordAt(wordIndex);
   });
   notesPanelSaveBtn.addEventListener('click', saveCurrentNotes);
   notesPanelTextarea.addEventListener('paste', (e)=>{
