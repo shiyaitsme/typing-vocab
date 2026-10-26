@@ -143,16 +143,16 @@
 
     <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:stretch;margin-top:-18px;position:relative;">
       <!-- PRACTICE CARD -->
-      <div id="practiceCard" style="flex:1 1 520px;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
-          <div>
+      <div id="practiceCard" style="flex:1 1 520px;min-width:0;max-width:620px;background:#f2ede2;color:#0a0a0a;border-radius:4px;padding:30px;display:flex;flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px 12px;flex-wrap:wrap;margin-bottom:22px;">
+          <div style="min-width:0;">
             <div style="display:flex;align-items:baseline;gap:10px;">
               <div id="pageCounter" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:28px;letter-spacing:-.01em;"></div>
               <div id="pageBadge" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:9.5px;letter-spacing:.06em;color:rgba(10,10,10,.45);border:1px solid rgba(10,10,10,.2);padding:2px 6px;border-radius:2px;"></div>
             </div>
             <div id="masteryDots" style="display:flex;gap:4px;margin-top:6px;"></div>
           </div>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button id="favoriteBtn" data-i18n-title="favTitle" title="즐겨찾기" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:14px;border-radius:2px;color:#0a0a0a;">★</button>
             <button id="notesBtn" data-i18n-title="notesTitle" title="노트" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">📝</button>
             <button id="editWordBtn" data-i18n-title="editWordTitle" title="단어 수정" style="width:32px;height:32px;border:1.5px solid #0a0a0a;background:transparent;cursor:pointer;font-size:13px;border-radius:2px;color:#0a0a0a;">✎</button>
