@@ -364,6 +364,7 @@
       <div id="bulkModalDesc" data-i18n="bulkModalDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
       <textarea id="bulkTextarea" data-i18n-placeholder="bulkTextareaPlaceholder" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:14px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:16px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="exportCsvBtn" data-i18n="exportCsvBtn" style="all:unset;cursor:pointer;margin-right:auto;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">⬇ CSV 다운로드</button>
         <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">취소</button>
         <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">가져오기</button>
       </div>
@@ -747,7 +748,7 @@ md文件内容如下（或已上传）：
       aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
       cancel: '취소', copyBtn: '복사하기', copiedBtn: '✓ 복사됨',
       bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.',
-      bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기',
+      bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기', exportCsvBtn: '⬇ CSV 다운로드',
       importAlertEmpty: '가져올 내용을 입력해 주세요!',
       importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
       importSuccessMerged: ' 이미 있던 단어 {{merged}}개는 뜻을 합쳤습니다.',
@@ -835,7 +836,7 @@ md文件内容如下（或已上传）：
       aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
       cancel: 'Cancel', copyBtn: 'Copy', copiedBtn: '✓ Copied',
       bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format.',
-      bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import',
+      bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import', exportCsvBtn: '⬇ Download CSV',
       importAlertEmpty: 'Please enter content to import!',
       importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
       importSuccessMerged: ' {{merged}} existing word(s) had their meanings merged.',
@@ -3133,6 +3134,24 @@ md文件内容如下（或已上传）：
     modalOverlay.style.opacity='1'; modalOverlay.style.pointerEvents='auto';
     const list = currentNotebookAllWords();
     bulkTextarea.value = mode==='ko' ? list.map(i=>`${i.word},${i.roman}`).join('\n') : list.map(i=>`${i.word},${i.meaning}`).join('\n');
+  });
+  // 단어장 하나를 CSV 파일로 내려받는다. 클라이언트가 이미 들고 있는 단어 배열을 그대로
+  // 쓰므로 서버 요청이 없고(클라우드가 끊겨도 동작), 아무것도 쓰지 않는다. 앞에 BOM을 붙이는
+  // 이유: Excel은 BOM이 없으면 UTF-8 CSV를 ANSI로 읽어서 한글/중국어가 깨진다.
+  function csvCell(v){ v=String(v==null?'':v); return /[",\r\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+  $('exportCsvBtn').addEventListener('click', ()=>{
+    const list = currentNotebookAllWords();
+    const field = meaningField(mode);
+    const rows = [['word', field==='roman'?'meaning/romanization':'meaning', 'favorite', 'wrong_count']]
+      .concat(list.map(w=>[w.word, w[field]||'', w.favorite?1:0, w.wrongCount||0]));
+    const csv = '\uFEFF' + rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+    const nb = currentNotebook();
+    const name = ((nb && nb.name) || 'words').replace(/[\\/:*?"<>|]/g,'_');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+    a.download = `${name}_${todayStr()}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
   });
   $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
 
