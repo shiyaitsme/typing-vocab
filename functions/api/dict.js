@@ -8,7 +8,7 @@
 // from the browser for two reasons: the key would otherwise be visible in page source,
 // and KRDict sends no CORS headers, so a browser fetch would be blocked anyway.
 //
-// If KRDICT_KEY isn't set yet (or KRDict errors out), we fall back to English
+// If KRDICT_KEY isn't set yet (or KRDict errors out or has no entry), we fall back to English
 // Wiktionary's keyless REST API so the lookup button still does something useful the
 // day this ships — it has English glosses only, no Chinese, no word grade.
 //
@@ -39,23 +39,34 @@ export async function onRequestGet({ request, env, waitUntil }) {
     if (hit) return hit;
   }
 
-  let result = null, notice;
+  let result = null, notice, krdictAnswered = false;
   if (env.KRDICT_KEY) {
-    try { result = await lookupKrdict(q, env.KRDICT_KEY); }
+    try { result = await lookupKrdict(q, env.KRDICT_KEY); krdictAnswered = true; }
     catch (err) { notice = String(err && err.message || err); }
   } else {
     notice = 'no_key';
   }
-  if (!result) {
-    try { result = await lookupWiktionary(q); }
-    catch (err) { return Response.json({ error: 'lookup_failed', notice }, { status: 502 }); }
+  // KRDict only covers ~50k learner words, so a miss is common for rarer words and
+  // inflected forms. Wiktionary is much broader (English glosses only), so use it to
+  // fill that gap; if it has nothing either, keep KRDict's empty answer.
+  if (!result || result.entries.length === 0) {
+    try {
+      const wik = await lookupWiktionary(q);
+      if (!result || wik.entries.length) {
+        if (result) wik.fallback = true; // tells the client the main dictionary had no entry
+        result = wik;
+      }
+    } catch (err) {
+      if (!result) return Response.json({ error: 'lookup_failed', notice }, { status: 502 });
+    }
   }
   if (notice) result.notice = notice;
 
   const res = Response.json(result, { headers: { 'Cache-Control': `public, max-age=${CACHE_TTL}` } });
-  // Only cache real KRDict answers: a Wiktionary fallback is cached nowhere, so the
-  // moment KRDICT_KEY is configured every word switches over to the better source.
-  if (cache && result.source === 'krdict') {
+  // Cache only when KRDict itself answered (including "no entry" + Wiktionary fill-in).
+  // A Wiktionary answer given because KRDict was unconfigured or erroring is cached
+  // nowhere, so the moment KRDICT_KEY works every word switches to the better source.
+  if (cache && krdictAnswered) {
     const put = cache.put(cacheKey, res.clone());
     if (waitUntil) waitUntil(put); else await put;
   }
