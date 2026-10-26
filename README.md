@@ -549,3 +549,21 @@ npx wrangler pages dev .
    迁移文件会报 "duplicate column name"，这是正常现象（说明已经加过了），但
    因为上面那条"整文件事务"的坑，**不要**把这种"预期会重复报错"的迁移语句和
    还没跑过的新语句写进同一个文件——分开成独立文件才能保证互不连累。
+
+## 词典查词（📖）
+
+练习卡片右上角的 📖、以及"단어 추가"输入框旁的 📖，会弹出一个韩语词典窗口，
+可以查词义（韩语释义 + 中文/英文翻译 + 初/中/高级），每条释义旁的"+ 뜻 사용"会
+把翻译填进新词的뜻输入框，或合并进当前正在练的词（走和其他编辑一样的按 `id`
+单行 `PATCH`，不会批量覆盖）。查词本身只读，不会自己写库，**不需要跑数据库迁移**。
+
+数据来自 `functions/api/dict.js`（`GET /api/dict?q=词`），后端转发：
+
+- **主源：国立国语院「한국어기초사전」Open API**（<https://krdict.korean.go.kr/chn/openApi/openApiInfo>）。
+  专为学习者设计，每个义项带中文和英文翻译。需要免费 key，每天 5 万次。
+  在 Cloudflare Dashboard → Workers & Pages → `typing-vocab` → Settings →
+  Variables and Secrets 里添加变量 **`KRDICT_KEY`**（建议选 Secret），保存后重新部署一次生效。
+  key 只放在服务端，不会出现在页面源码里；KRDict 也没有 CORS，浏览器无法直连。
+- **兜底：英文 Wiktionary**（无需 key，只有英文释义）。`KRDICT_KEY` 没配或 KRDict 报错时自动
+  使用，所以没拿到 key 之前功能也能用，只是没有中文。
+- 只有 KRDict 的结果会进 Cloudflare 边缘缓存（7 天）。
