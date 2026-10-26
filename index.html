@@ -374,6 +374,8 @@
       <div id="bulkModalDesc" data-i18n="bulkModalDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.</div>
       <textarea id="bulkTextarea" data-i18n-placeholder="bulkTextareaPlaceholder" placeholder="여기에 붙여넣으세요..." style="width:100%;height:140px;padding:14px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:12px;border-radius:16px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button id="importFileBtn" data-i18n="importFileBtn" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">📂 파일 불러오기</button>
+        <input type="file" id="importFileInput" accept=".csv,.txt,.tsv,text/csv,text/plain" style="display:none;">
         <button id="exportCsvBtn" data-i18n="exportCsvBtn" style="all:unset;cursor:pointer;margin-right:auto;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">⬇ CSV 다운로드</button>
         <button id="closeModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">취소</button>
         <button id="importBtn" data-i18n="importBtn" style="all:unset;cursor:pointer;padding:9px 18px;background:var(--accent);color:var(--accent-ink);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;box-sizing:border-box;">가져오기</button>
@@ -757,8 +759,8 @@ md文件内容如下（或已上传）：
       aiPromptTitle: '🤖 AI 프롬프트',
       aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
       cancel: '취소', copyBtn: '복사하기', copiedBtn: '✓ 복사됨',
-      bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요.',
-      bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기', exportCsvBtn: '⬇ CSV 다운로드',
+      bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요. CSV/TXT 파일도 불러올 수 있습니다.',
+      bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기', exportCsvBtn: '⬇ CSV 다운로드', importFileBtn: '📂 파일 불러오기', importFileEmpty: '파일에서 단어를 찾지 못했습니다.', importFileFailed: '파일을 읽을 수 없습니다.',
       importAlertEmpty: '가져올 내용을 입력해 주세요!',
       importSuccess: '가져오기 완료! {{count}}개의 새 단어가 오늘 날짜({{date}})로 이 단어장에 추가되었습니다.',
       importSuccessMerged: ' 이미 있던 단어 {{merged}}개는 뜻을 합쳤습니다.',
@@ -845,8 +847,8 @@ md文件内容如下（或已上传）：
       aiPromptTitle: '🤖 AI Prompt',
       aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
       cancel: 'Cancel', copyBtn: 'Copy', copiedBtn: '✓ Copied',
-      bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format.',
-      bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import', exportCsvBtn: '⬇ Download CSV',
+      bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format. You can also load a CSV/TXT file.',
+      bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import', exportCsvBtn: '⬇ Download CSV', importFileBtn: '📂 Load file', importFileEmpty: 'No words found in that file.', importFileFailed: 'Could not read that file.',
       importAlertEmpty: 'Please enter content to import!',
       importSuccess: 'Import complete! {{count}} new word(s) added to this notebook under today\'s date ({{date}}).',
       importSuccessMerged: ' {{merged}} existing word(s) had their meanings merged.',
@@ -3192,7 +3194,8 @@ md文件内容如下（或已上传）：
   $('openBulkBtn').addEventListener('click', ()=>{
     modalOverlay.style.opacity='1'; modalOverlay.style.pointerEvents='auto';
     const list = currentNotebookAllWords();
-    bulkTextarea.value = mode==='ko' ? list.map(i=>`${i.word},${i.roman}`).join('\n') : list.map(i=>`${i.word},${i.meaning}`).join('\n');
+    const field = meaningField(mode);
+    bulkTextarea.value = list.map(i=>`${csvCell(i.word)},${csvCell(i[field]||'')}`).join('\n');
   });
   // 단어장 하나를 CSV 파일로 내려받는다. 클라이언트가 이미 들고 있는 단어 배열을 그대로
   // 쓰므로 서버 요청이 없고(클라우드가 끊겨도 동작), 아무것도 쓰지 않는다. 앞에 BOM을 붙이는
@@ -3211,6 +3214,49 @@ md文件内容如下（或已上传）：
     a.download = `${name}_${todayStr()}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  });
+  // 붙여넣기와 파일 불러오기가 같은 파서를 쓴다. 내보내기 CSV는 뜻에 쉼표/따옴표가 있으면
+  // "..."로 감싸므로, 단순 split(',')로는 그런 행이 잘려서 뜻이 반쪽만 들어간다.
+  // 헤더 행(word,meaning...)은 우리 내보내기 형식이라 자동으로 건너뛴다.
+  function parseWordRows(text){
+    text = String(text).replace(/^\uFEFF/, '');
+    const firstLine = text.split(/\r?\n/, 1)[0] || '';
+    const delim = (firstLine.includes('\t') && !firstLine.includes(',')) ? '\t' : ',';
+    const rows=[]; let row=[], cell='', q=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      if(q){
+        if(c==='"'){ if(text[i+1]==='"'){ cell+='"'; i++; } else q=false; }
+        else cell+=c;
+      } else if(c==='"' && cell===''){ q=true; }
+      else if(c===delim){ row.push(cell); cell=''; }
+      else if(c==='\n' || c==='\r'){
+        if(c==='\r' && text[i+1]==='\n') i++;
+        row.push(cell); cell=''; rows.push(row); row=[];
+      } else cell+=c;
+    }
+    if(cell!=='' || row.length) { row.push(cell); rows.push(row); }
+    const out = rows.map(r=>[(r[0]||'').trim(), (r[1]||'').trim()]).filter(r=>r[0]);
+    if(out.length && out[0][0].toLowerCase()==='word' && /^meaning/i.test(out[0][1])) out.shift();
+    return out;
+  }
+  // 파일은 바로 가져오지 않고 텍스트 상자에 채워 넣는다 — 사용자가 내용을 눈으로 확인하고
+  // 고친 뒤 기존 가져오기 버튼을 누르게 해서, 가져오기 경로(importInto)를 하나로 유지한다.
+  $('importFileBtn').addEventListener('click', ()=>$('importFileInput').click());
+  $('importFileInput').addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    try{
+      const buf = await file.arrayBuffer();
+      let text;
+      // 한국 Excel이 "CSV"로 저장하면 UTF-8이 아니라 CP949인 경우가 많다.
+      try{ text = new TextDecoder('utf-8',{fatal:true}).decode(buf); }
+      catch(_){ text = new TextDecoder('euc-kr').decode(buf); }
+      const rows = parseWordRows(text);
+      if(!rows.length){ alert(t('importFileEmpty')); return; }
+      bulkTextarea.value = rows.map(r=>`${csvCell(r[0])},${csvCell(r[1])}`).join('\n');
+    }catch(err){ console.error('import file failed', err); alert(t('importFileFailed')); }
   });
   $('closeModalBtn').addEventListener('click', ()=>{ modalOverlay.style.opacity='0'; modalOverlay.style.pointerEvents='none'; });
 
@@ -3262,15 +3308,11 @@ md文件内容如下（或已上传）：
   $('importBtn').addEventListener('click', async ()=>{
     const rawText=bulkTextarea.value.trim();
     if(!rawText){ alert(t('importAlertEmpty')); return; }
-    const lines=rawText.split('\n').map(l=>l.trim()).filter(Boolean);
     const tempKo=[], tempEn=[];
     // 같은 단어가 붙여넣은 텍스트 안에 여러 번 나와도(또는 이미 단어장에 있어도)
     // importInto가 뜻을 합쳐주니 여기서는 미리 걸러내지 않는다.
-    lines.forEach(line=>{
-      const parts=line.split(',');
-      const word=parts[0]?parts[0].trim():'';
-      const definition=parts[1]?parts[1].trim():'Custom';
-      if(!word) return;
+    parseWordRows(rawText).forEach(([word, meaning])=>{
+      const definition=meaning||'Custom';
       if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(word)) tempKo.push({word,roman:definition});
       else tempEn.push({word,meaning:definition});
     });
