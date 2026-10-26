@@ -338,7 +338,7 @@
   <div id="aiPromptModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s ease;padding:20px;">
     <div style="background:var(--bg);border:1px solid rgba(var(--ink-rgb),.15);color:rgb(var(--ink-rgb));padding:28px;width:100%;max-width:520px;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
       <div id="aiPromptModalTitle" data-i18n="aiPromptTitle" style="font-family:'Unbounded',sans-serif;font-weight:900;font-size:16px;">🤖 AI 프롬프트</div>
-      <div id="aiPromptModalDesc" data-i18n="aiPromptDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.</div>
+      <div id="aiPromptModalDesc" data-i18n="aiPromptDesc" style="font-size:11px;color:rgba(var(--ink-rgb),.5);line-height:1.6;">이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, CSV 파일로 정리해 줍니다. 그 파일을 "가져오기" 창의 "파일 불러오기"로 불러오거나(텍스트로 받았다면 붙여넣기), 바로 가져올 수 있습니다.</div>
       <textarea id="aiPromptTextarea" readonly style="width:100%;height:220px;padding:14px;border:1px solid rgba(var(--ink-rgb),.2);background:var(--input-bg);color:rgb(var(--ink-rgb));font-family:'Space Grotesk',sans-serif;font-size:11.5px;border-radius:16px;resize:none;box-sizing:border-box;"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;">
         <button id="closeAiPromptModalBtn" data-i18n="cancel" style="all:unset;cursor:pointer;padding:9px 18px;border:1px solid rgba(var(--ink-rgb),.25);font-size:11px;letter-spacing:.03em;text-transform:uppercase;border-radius:100px;font-weight:700;color:rgb(var(--ink-rgb));box-sizing:border-box;">취소</button>
@@ -690,13 +690,14 @@
 5. 英语单词格式：英语单词,中文翻译
    例：abyss,深渊
 
-6. 统一规范：
-   - 单词和释义之间仅用英文逗号（,）隔开，绝对不要空格
-   - 一行一个单词
+6. 统一规范（网站按"第1列=单词、第2列=释义"读取文件，格式错了就会导入错位）：
+   - 只有两列：单词和释义之间仅用英文逗号（,）隔开，逗号前后绝对不要空格
+   - 释义里如果有多个意思，用斜杠（/）或中文分号（；）隔开，不要在释义里再用逗号；实在避免不了时，把整个释义用英文双引号包起来（如 알선하다,"介绍, 斡旋"）
+   - 一行一个单词，不要表头行、不要序号、不要空行
    - 按md中出现顺序整理即可，不用排序
    - 要校对单词本身以及对应的意思是否准确，尤其是单词本身的准确度，不要将md里面错误的单词也直接添加进文件
 
-7. 输出：直接给我可以复制粘贴的纯文本代码块，不要序号、不要额外解释、不要问候语，给我【txt格式文件】，不要直接在对话里给普通文本
+7. 输出：生成一个可下载的文件，文件名 words.csv，UTF-8 编码，内容就是上面的纯文本（可直接导入网站的"파일 불러오기"）。如果你没法生成文件，就只输出一个纯文本代码块。不要额外解释、不要问候语。
 
 md文件内容如下（或已上传）：
 [粘贴内容/上传文件]`;
@@ -757,7 +758,7 @@ md文件内容如下（或已上传）：
       editWordAlertDuplicate: "'{{word}}'는 이미 이 단어장에 있는 다른 단어입니다. 합치려면 그 단어를 삭제한 뒤 다시 시도해 주세요.",
       clearConfirm: '이 단어장의 모든 단어를 삭제하시겠습니까? 단어장 자체는 남습니다.',
       aiPromptTitle: '🤖 AI 프롬프트',
-      aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, 바로 아래 "가져오기"에 붙여넣을 수 있는 형식으로 정리해 줍니다.',
+      aiPromptDesc: '이 텍스트를 복사해서 AI(ChatGPT 등)에게 자료(사진/문서)와 함께 보내면, CSV 파일로 정리해 줍니다. 그 파일을 "가져오기" 창의 "파일 불러오기"로 불러오거나(텍스트로 받았다면 붙여넣기), 바로 가져올 수 있습니다.',
       cancel: '취소', copyBtn: '복사하기', copiedBtn: '✓ 복사됨',
       bulkModalTitle: '일괄 가져오기/내보내기', bulkModalDesc: '한 줄에 단어 하나씩, <b>단어,뜻</b> 형식으로 입력하세요. CSV/TXT 파일도 불러올 수 있습니다.',
       bulkTextareaPlaceholder: '여기에 붙여넣으세요...', importBtn: '가져오기', exportCsvBtn: '⬇ CSV 다운로드', importFileBtn: '📂 파일 불러오기', importFileEmpty: '파일에서 단어를 찾지 못했습니다.', importFileFailed: '파일을 읽을 수 없습니다.',
@@ -845,7 +846,7 @@ md文件内容如下（或已上传）：
       editWordAlertDuplicate: "'{{word}}' already exists as a different word in this notebook. Delete that one first if you want to merge them.",
       clearConfirm: 'Delete all words in this notebook? The notebook itself will stay.',
       aiPromptTitle: '🤖 AI Prompt',
-      aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words so you can paste them straight into "Import" below.',
+      aiPromptDesc: 'Copy this text and send it to an AI (like ChatGPT) along with your material (photos/docs) — it will format the words as a CSV file you can load with "Load file" in the Import window (or paste, if it replies with text).',
       cancel: 'Cancel', copyBtn: 'Copy', copiedBtn: '✓ Copied',
       bulkModalTitle: 'Bulk Import/Export', bulkModalDesc: 'One word per line, in <b>word,meaning</b> format. You can also load a CSV/TXT file.',
       bulkTextareaPlaceholder: 'Paste here...', importBtn: 'Import', exportCsvBtn: '⬇ Download CSV', importFileBtn: '📂 Load file', importFileEmpty: 'No words found in that file.', importFileFailed: 'Could not read that file.',
