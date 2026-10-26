@@ -777,7 +777,7 @@ md文件内容如下（或已上传）：
       dictTitle: '사전', dictLookupNewWord: '사전에서 뜻 찾기', dictModalTitle: '📖 한국어 사전',
       dictSearchPlaceholder: '찾을 단어', dictSearchBtn: '검색', dictCloseBtn: '닫기',
       dictLoading: '검색 중...', dictNoResult: '검색 결과가 없습니다.', dictFailed: '사전에 연결할 수 없습니다.',
-      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictSourceKrdict: '출처: 국립국어원 한국어기초사전',
+      dictUseBtn: '+ 뜻 사용', dictUsed: '✓ 사용됨', dictSourceKrdict: '출처: 국립국어원 한국어기초사전', dictSourceFallback: '출처: Wiktionary (한국어기초사전에 없는 단어 — 영어 뜻만 제공)',
       dictSourceWiktionary: '출처: Wiktionary (영어 뜻만 제공 — 한국어기초사전 키를 설정하면 중국어 뜻도 나옵니다)',
       footerHint: '[PC] 영문 자판 그대로 타이핑 (예: d-u-s &rarr; 연) · Backspace 수정 · Enter 다음 단어<br>[모바일] 위 입력창을 터치해 직접 타이핑하세요'
     },
@@ -865,7 +865,7 @@ md文件内容如下（或已上传）：
       dictTitle: 'Dictionary', dictLookupNewWord: 'Look up in dictionary', dictModalTitle: '📖 Korean Dictionary',
       dictSearchPlaceholder: 'Word to look up', dictSearchBtn: 'Search', dictCloseBtn: 'Close',
       dictLoading: 'Searching...', dictNoResult: 'No results.', dictFailed: "Can't reach the dictionary.",
-      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)',
+      dictUseBtn: '+ Use meaning', dictUsed: '✓ Used', dictSourceKrdict: 'Source: KRDict (National Institute of Korean Language)', dictSourceFallback: 'Source: Wiktionary (not in KRDict — English only)',
       dictSourceWiktionary: 'Source: Wiktionary (English only — set a KRDict key to also get Chinese meanings)',
       footerHint: '[PC] Type using your regular QWERTY keyboard (e.g. d-u-s &rarr; 연) · Backspace to fix · Enter for next word<br>[Mobile] Tap the input box above to type directly'
     }
@@ -3049,7 +3049,7 @@ md文件内容如下（或已上传）：
       return;
     }
     if(seq!==dictReqSeq) return;
-    dictSourceEl.textContent = t(data.source==='krdict' ? 'dictSourceKrdict' : 'dictSourceWiktionary');
+    dictSourceEl.textContent = t(data.source==='krdict' ? 'dictSourceKrdict' : data.fallback ? 'dictSourceFallback' : 'dictSourceWiktionary');
     if(!data.entries.length){
       dictResultsEl.innerHTML=`<div style="font-size:12px;color:rgba(var(--ink-rgb),.5);">${dictEsc(t('dictNoResult'))}</div>`;
       return;
